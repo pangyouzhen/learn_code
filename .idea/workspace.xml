@@ -108,9 +108,10 @@
       <screen x="0" y="36" width="1920" height="1044" />
     </state>
     <state width="1895" height="374" key="GridCell.Tab.0.right/0.36.1920.1044@0.36.1920.1044" timestamp="1586012757583" />
-    <state x="441" y="194" key="SettingsEditor" timestamp="1587982973511">
-      <screen x="0" y="36" width="1920" height="1044" />
+    <state x="441" y="158" key="SettingsEditor" timestamp="1588922497314">
+      <screen x="0" y="0" width="1920" height="1043" />
     </state>
+    <state x="441" y="158" key="SettingsEditor/0.0.1920.1043@0.0.1920.1043" timestamp="1588922497314" />
     <state x="441" y="194" key="SettingsEditor/0.36.1920.1044@0.36.1920.1044" timestamp="1587982973511" />
     <state x="615" y="386" key="com.intellij.ide.util.TipDialog" timestamp="1587778527978">
       <screen x="0" y="36" width="1920" height="1044" />

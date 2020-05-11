@@ -38,7 +38,37 @@ output, (h0, c0) = lstm(input1, (h0, c0))
 m = nn.Embedding(num_embeddings=10, embedding_dim=3)
 # 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got torch.FloatTensor
 n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
+print(n.type())
 assert m(n).size() == (2, 4, 3)
 
-# rnn and tensorboard
-rnn = nn.RNN(10, 20, 2)
+# squeeze
+x = torch.randn(3, 1, 4, 1)
+print(x.size())
+print(x.squeeze().size())
+
+# unsqueeze
+x = torch.randn(1, 4, 5)
+print(x.size())
+print(x.unsqueeze(2).size())
+print(x.unsqueeze(1).size())
+
+# view
+x = torch.randn(4, 4)
+print(x.view(-1, 8).size())
+print(x.view(-1, 8).is_contiguous())
+print(x.view(-1, 8).contiguous())
+
+# conv2d
+m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=3, stride=2)
+input1 = torch.randn(20, 16, 50, 100)
+print(m(input1).size())
+
+# transpose
+x = torch.randn(3, 4)
+print(x.size())
+print(x.transpose(1, 0).size())
+
+#  permute
+x = torch.randn(3, 4, 5, 6)
+print(x.size())
+print(x.permute(3, 2, 1, 0).size())
