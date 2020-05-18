@@ -1,0 +1,5 @@
+# pycharm 中无法使用中文输入发
+在pycharm.sh 中加入  run ide 下面 增加
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx

@@ -19,3 +19,13 @@ git branch -a | grep -v master | xargs git branch -D
 git branch -a | grep -v master >file.log
 # 使用文件编辑器编辑 移除所有remotes/
 awk '{print $1}' file.log | xargs git branch -r -D
+
+#lightdm
+sudo systemctl restart lightdm
+#network
+sudo systemctl restart NetworkManager
+# 列出所有功能单元
+sudo systemctl list-units --type=service --all
+
+# 分析相关功能耗时
+systemd-analyze blame
