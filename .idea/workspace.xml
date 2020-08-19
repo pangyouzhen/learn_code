@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0776cbdd-6d54-406c-9142-fa80bbf71864" name="Default Changelist" comment="" />
+    <list default="true" id="0776cbdd-6d54-406c-9142-fa80bbf71864" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/learn_java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/learn_software" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/learn_torch.py" beforeDir="false" afterPath="$PROJECT_DIR$/learn_torch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux.sh" beforeDir="false" afterPath="$PROJECT_DIR$/linux.sh" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,15 +21,19 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1a2BXGhGSzolgc8HwQVTIPe9Pmx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../stock" />
+    <property name="settings.editor.selected.configurable" value="diff.base" />
   </component>
   <component name="RunManager" selected="Python.learn_asyncio">
     <configuration name="learn_asyncio" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -88,38 +99,13 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="737" y="313" width="428" height="481" key="FileChooserDialogImpl" timestamp="1585923887603">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state x="737" y="313" width="428" height="481" key="FileChooserDialogImpl/0.36.1920.1044@0.36.1920.1044" timestamp="1585923887603" />
-    <state width="1895" height="374" key="GridCell.Tab.0.bottom" timestamp="1586012757584">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state width="1895" height="374" key="GridCell.Tab.0.bottom/0.36.1920.1044@0.36.1920.1044" timestamp="1586012757584" />
-    <state width="1895" height="374" key="GridCell.Tab.0.center" timestamp="1586012757582">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state width="1895" height="374" key="GridCell.Tab.0.center/0.36.1920.1044@0.36.1920.1044" timestamp="1586012757582" />
-    <state width="1895" height="374" key="GridCell.Tab.0.left" timestamp="1586012757581">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state width="1895" height="374" key="GridCell.Tab.0.left/0.36.1920.1044@0.36.1920.1044" timestamp="1586012757581" />
-    <state width="1895" height="374" key="GridCell.Tab.0.right" timestamp="1586012757583">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state width="1895" height="374" key="GridCell.Tab.0.right/0.36.1920.1044@0.36.1920.1044" timestamp="1586012757583" />
-    <state x="441" y="158" key="SettingsEditor" timestamp="1588922497314">
+    <state x="743" y="280" width="428" height="484" key="FileChooserDialogImpl" timestamp="1597724771280">
       <screen x="0" y="0" width="1920" height="1043" />
     </state>
-    <state x="441" y="158" key="SettingsEditor/0.0.1920.1043@0.0.1920.1043" timestamp="1588922497314" />
-    <state x="441" y="194" key="SettingsEditor/0.36.1920.1044@0.36.1920.1044" timestamp="1587982973511" />
-    <state x="615" y="386" key="com.intellij.ide.util.TipDialog" timestamp="1587778527978">
-      <screen x="0" y="36" width="1920" height="1044" />
+    <state x="743" y="280" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1043@0.0.1920.1043" timestamp="1597724771280" />
+    <state x="441" y="158" key="SettingsEditor" timestamp="1597063724033">
+      <screen x="0" y="0" width="1920" height="1043" />
     </state>
-    <state x="615" y="386" key="com.intellij.ide.util.TipDialog/0.36.1920.1044@0.36.1920.1044" timestamp="1587778527978" />
-    <state x="548" y="169" width="817" height="776" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1587193156486">
-      <screen x="0" y="36" width="1920" height="1044" />
-    </state>
-    <state x="548" y="169" width="817" height="776" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.36.1920.1044@0.36.1920.1044" timestamp="1587193156486" />
+    <state x="441" y="158" key="SettingsEditor/0.0.1920.1043@0.0.1920.1043" timestamp="1597063724033" />
   </component>
 </project>

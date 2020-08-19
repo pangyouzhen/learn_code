@@ -29,3 +29,5 @@ sudo systemctl list-units --type=service --all
 
 # 分析相关功能耗时
 systemd-analyze blame
+
+systemctl list-units --type=service --all | grep "not-found"
