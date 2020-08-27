@@ -39,6 +39,7 @@ async def process_url(df, query):
                 # 协程嵌套，只需要处理最外层协程即可fetch_async
                 async with session.get(url) as resp:
                     html = (await resp.text())
+                    await asyncio.sleep(1)
                     # 因为这里使用到了await关键字，实现异步，所有他上面的函数体需要声明为异步async
                 df.loc[df['问题'] == query, 'result'] = [json.loads(html)]
         except Exception as e:
