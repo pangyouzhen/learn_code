@@ -50,3 +50,6 @@ print(precision_score(y_true, y_pred))
 # df['embarked'].unique()
 
 # df['embarked'].value_counts()
+
+# 多个值进行抽取
+# df1 = df.loc[(df["intent1"] == 1) & (df["intent3"] == 1)]

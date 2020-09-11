@@ -26,6 +26,12 @@ async def process_url(df: pd.DataFrame, query: str) -> None:
             print(e)
 
 
+# json.loads(payload)  就是将 str转化为字典，post 的参数中json 需要的是一个字典
+# postman 中转化出来的是 str 需要改为data = payload.encode("utf-8")
+# a = json.loads("...")
+# a.pop("preProcess")
+# a["data"] = a["data"].strip("\"")
+
 async def main(df: pd.DataFrame) -> None:
     await asyncio.gather(*[process_url(df, query) for query in df['问题']])
 
