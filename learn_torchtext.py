@@ -18,7 +18,10 @@ import numpy as np
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-spacy_en = spacy.load('en')
+# spacy ,en,ch 语料库的安装方法
+# https://github.com/explosion/spacy-models/releases/tag/en_core_web_md-2.3.0 离线下载
+# pip 安装这个 tar包
+spacy_en = spacy.load('en_core_web_md')
 
 
 def tokenizer(text):  # create a tokenizer function
@@ -117,6 +120,8 @@ for epoch in range(n_epoch):
         target = batch.Sentiment
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
+        # 这里data 为什么进行转换
+        # Adam 和 SGD的区别是什么
         data = data.permute(1, 0)
         optimizer.zero_grad()
 
