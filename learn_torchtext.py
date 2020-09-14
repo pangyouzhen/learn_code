@@ -1,19 +1,28 @@
+#  原文地址  https://blog.csdn.net/JWoswin/article/details/92821752#t4
+
 import pandas as pd
 from torch import optim
 
-# data = pd.read_csv('./data/train.tsv', sep='\t')
-#
-# print(data[:5])
-# print(data.columns)
-# Index(['PhraseId', 'SentenceId', 'Phrase', 'Sentiment'], dtype='object')
+# 1. 读取文件，查看文件
+data = pd.read_csv('./full_data/train.tsv', sep='\t')
+print(data[:5])
+print(data.columns)
 
+# 2. 划分验证集
+from sklearn.model_selection import train_test_split
+
+train, val = train_test_split(data, test_size=0.2)
+train.to_csv("./full_data/train.csv", index=False)
+val.to_csv("./full_data/val.csv", index=False)
+
+# 3. 定义Field
 import spacy
 import torch
 from torchtext import data, datasets
 from torchtext.vocab import Vectors
 from torch.nn import init
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 import numpy as np
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -46,12 +55,19 @@ TEXT = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 设置skip_header=True,不然它会把列名也当一个数据处理
 """
 train, val = data.TabularDataset.splits(
-    path='.', train='train.csv', validation='val.csv', format='csv', skip_header=True,
+    path='.', train='./full_data/train.csv', validation='./full_data/val.csv', format='csv', skip_header=True,
     fields=[('PhraseId', None), ('SentenceId', None), ('Phrase', TEXT), ('Sentiment', LABEL)])
 
-test = data.TabularDataset('test.tsv', format='tsv', skip_header=True,
+test = data.TabularDataset('./full_data/test.tsv', format='tsv', skip_header=True,
                            fields=[('PhraseId', None), ('SentenceId', None), ('Phrase', TEXT)])
-TEXT.build_vocab(train, vectors='glove.6B.100d')  # , max_size=30000)
+# 数据行数
+# 124849 train.csv
+# 31213 val.csv
+# 66293 test.tsv
+
+# 使用本地词向量
+vectors = Vectors(name="glove.6B.100d.txt", cache="/data/project/learn_allennlp/data/.vector_cache/")
+TEXT.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 TEXT.vocab.vectors.unk_init = init.xavier_uniform
 #  第1510 个词
@@ -80,21 +96,32 @@ test_iter = data.Iterator(dataset=test, batch_size=128, train=False,
 由于目的是学习torchtext的使用，所以只定义了一个简单模型
 """
 len_vocab = len(TEXT.vocab)
+print(f"len_vocab is %s" % len_vocab)
+
+
+#  总共长度是15428
 
 
 class Enet(nn.Module):
     def __init__(self):
         super(Enet, self).__init__()
         self.embedding = nn.Embedding(len_vocab, 100)
+        # len_vocab 这个是lookup表的维度
         self.lstm = nn.LSTM(100, 128, 3, batch_first=True)  # ,bidirectional=True)
         self.linear = nn.Linear(128, 5)
 
     def forward(self, x):
         batch_size, seq_num = x.shape
         vec = self.embedding(x)
+        # vec (batch=128,seq_num,embedding_dim=100)
         out, (hn, cn) = self.lstm(vec)
+        #  (batch=128,seq_num,embedding_dim=100) * (100,128,3) 中间的100被抵消
+        # out （128，seq_num，128）
+        # out (128，seq_num，128）-> out[:, -1, :].shape(128,128)
         out = self.linear(out[:, -1, :])
+        # out (128,5)
         out = F.softmax(out, -1)
+        # softmax 不改变维度
         return out
 
 
@@ -116,8 +143,14 @@ best_val_acc = 0
 for epoch in range(n_epoch):
 
     for batch_idx, batch in enumerate(train_iter):
+        # 124849 / 128 batch_size -> 975 batch
         data = batch.Phrase
+        # type(data) == Tensor
+        # data.shape == (... seq_num,128)
+        # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.Sentiment
+        # 这里的目的是什么？
+        # target.shape == 128
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
         # 这里data 为什么进行转换
@@ -126,6 +159,8 @@ for epoch in range(n_epoch):
         optimizer.zero_grad()
 
         out = model(data)
+        print("---------------------------")
+        print(out.shape)
         loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
         loss = loss.sum(-1).mean()
 
@@ -133,6 +168,12 @@ for epoch in range(n_epoch):
         optimizer.step()
 
         if (batch_idx + 1) % 200 == 0:
+            _, y_pre = torch.max(out, -1)
+            acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
+            print('epoch: %d \t batch_idx : %d \t loss: %.4f \t train acc: %.4f'
+                  % (epoch, batch_idx, loss, acc))
+
+        if batch_idx > 974:
             _, y_pre = torch.max(out, -1)
             acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
             print('epoch: %d \t batch_idx : %d \t loss: %.4f \t train acc: %.4f'
