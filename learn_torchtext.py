@@ -146,7 +146,7 @@ for epoch in range(n_epoch):
         # 124849 / 128 batch_size -> 975 batch
         data = batch.Phrase
         # type(data) == Tensor
-        # data.shape == (... seq_num,128)
+        # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.Sentiment
         # 这里的目的是什么？

@@ -155,7 +155,7 @@ class CNN(nn.Module):
                                    nn.MaxPool2d(kernel_size=2), )
         self.out = nn.Linear(32 * 7 * 7, 10)
 
-    def forward(self, *input: Any, **kwargs: Any) -> T_co:
+    def forward(self, *input: Any, **kwargs: Any):
         x = kwargs.get("x")
         x = self.conv1(x)
         x = self.conv2(x)
