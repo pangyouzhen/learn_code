@@ -30,3 +30,7 @@ classifier = fasttext.supervised("./full_data/fasttext_train.txt", "./full_data/
                                  lr=0.1,
                                  lr_update_rate=5,
                                  epoch=30, dim=128, ws=8)
+
+test_data["predict"] = test_data["jieba"].apply(lambda x: classifier.predict_proba([x], k=3))
+test_data["predict_label"] = test_data["predict"].apply(lambda x: list(map(str, x[0][0]))[0])
+# 下面可以直接用sklearn 的混淆矩阵进行计算
