@@ -3,9 +3,11 @@
 import chardet
 from pathlib import Path
 
-file_ = Path("./任务要求--第一课时.txt")
+file_ = Path("./full_data/train.csv")
 raw = file_.read_bytes()
 encoding = chardet.detect(raw)['encoding']
+# python 3.8 高级用法
+# print(f"{encoding=}")
 print(encoding)
 
 # 单个文件转换编码
@@ -14,7 +16,18 @@ print(encoding)
 #  find default -type d -exec mkdir -p utf/{} \;
 # find default -type f -exec iconv -f GBK -t UTF-8 {} -o utf/{} \;
 
+# Pathlib 常见用法
+# 绝对路径
+print(file_.absolute())
+# 前缀和后缀,前缀不是 prefix 而是stem，
+print(file_.stem)
+print(file_.suffix)
+# 子目录 直接 /
+# q = file_/'capthcha'
+# 枚举所有文件
+# p.glob('**/*.py')
 
+print("-------------------")
 #### config
 
 import configparser

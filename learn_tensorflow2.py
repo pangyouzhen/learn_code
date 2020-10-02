@@ -15,7 +15,7 @@ class ESIM:
 
         # init placeholder
         self.text_a = tf.placeholder(tf.int32, [None, seq_length], name="text_a")
-        # 这里的None的传入的是？如果是batch_size,为啥不设定成batch_size
+        # 这里的None的传入的是batch_size,这里的参数，没有batch_size
         self.text_b = tf.placeholder(tf.int32, [None, seq_length], name="text_b")
         self.y = tf.placeholder(tf.int32, [None, class_num], name="y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
