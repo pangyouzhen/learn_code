@@ -135,6 +135,7 @@ print(F.softmax(x, dim=1).sum())
 print(torch.sigmoid(x))
 
 #  cat
+#  cat 除了指定的轴维度不同，其他的必须相同
 a = torch.randn(3, 4, 5)
 b = torch.randn(4, 4, 5)
 assert torch.cat((a, a, a), dim=1).size() == (3, 12, 5)
@@ -166,17 +167,31 @@ class CNN(nn.Module):
 
 cnn = CNN()
 print(cnn)
-trainloader = torch.utils.data.Dataloader()
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(cnn.parameters(), lr=0.01)
-for epoch in range(2):
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        inputs, labels = data
-        optimizer.zero_grad()
-        outputs = cnn(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
-print("finish")
+# 这一段代码有问题
+# trainloader = torch.utils.data.dataloader
+# criterion = nn.CrossEntropyLoss()
+# optimizer = optim.SGD(cnn.parameters(), lr=0.01)
+# for epoch in range(2):
+#     running_loss = 0.0
+#     for i, data in enumerate(trainloader, 0):
+#         inputs, labels = data
+#         optimizer.zero_grad()
+#         outputs = cnn(inputs)
+#         loss = criterion(outputs, labels)
+#         loss.backward()
+#         optimizer.step()
+#         running_loss += loss.item()
+# print("finish")
+
+# (batch_size,in_channels,H_in,W_in) -> (batch_size,out_channels,H_out,W_out)
+m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=3, stride=2)
+# m2 = nn.Conv2d(16, 33, (3, 5), stride=(2, 1), padding=(4, 2))
+# m3 = nn.Conv2d(16, 33, (3, 5), stride=(2, 1), padding=(4, 2), dilation=(3, 1))
+input = torch.randn(20, 16, 50, 100)
+# H_out = (50 + 2 * 0 - 0 *(3-1) -1) / 2+ 1
+# W_out =
+print(m(input).shape)
+# torch.Size([20, 33, 24, 49])
+
+# print(m2(input).shape)
+# print(m3(input).shape)
