@@ -195,3 +195,69 @@ print(m(input).shape)
 
 # print(m2(input).shape)
 # print(m3(input).shape)
+
+# 损失函数-交叉熵
+# Input: (minibatch,C) where C = number of classe
+# target: (minibatch)
+
+
+x_input = torch.randn(3, 3)  # 随机生成输入
+print('x_input:\n', x_input)
+y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
+
+# 计算输入softmax，此时可以看到每一行加到一起结果都是1
+softmax_func = nn.Softmax(dim=1)
+soft_output = softmax_func(x_input)
+print('soft_output:\n', soft_output)
+
+# 在softmax的基础上取log
+log_output = torch.log(soft_output)
+print('log_output:\n', log_output)
+
+# 对比softmax与log的结合与nn.LogSoftmaxloss(负对数似然损失)的输出结果，发现两者是一致的。
+logsoftmax_func = nn.LogSoftmax(dim=1)
+logsoftmax_output = logsoftmax_func(x_input)
+print('logsoftmax_output:\n', logsoftmax_output)
+
+# pytorch中关于NLLLoss的默认参数配置为：reducetion=True、size_average=True
+nllloss_func = nn.NLLLoss()
+nlloss_output = nllloss_func(logsoftmax_output, y_target)
+print('nlloss_output:\n', nlloss_output)
+
+# 直接使用pytorch中的loss_func=nn.CrossEntropyLoss()看与经过NLLLoss的计算是不是一样
+crossentropyloss = nn.CrossEntropyLoss()
+crossentropyloss_output = crossentropyloss(x_input, y_target)
+print('crossentropyloss_output:\n', crossentropyloss_output)
+
+# x_input:
+#  tensor([[-0.5683,  0.6400, -1.5926],
+#         [ 0.9784, -0.3355, -0.5546],
+#         [-0.1254, -1.1503, -0.2112]])
+# soft_output:
+#  tensor([[0.2125, 0.7113, 0.0763],
+#         [0.6736, 0.1810, 0.1454],
+#         [0.4392, 0.1576, 0.4031]])
+# log_output:
+#  tensor([[-1.5490, -0.3407, -2.5733],
+#         [-0.3952, -1.7091, -1.9282],
+#         [-0.8227, -1.8476, -0.9085]])
+# logsoftmax_output:
+#  tensor([[-1.5490, -0.3407, -2.5733],
+#         [-0.3952, -1.7091, -1.9282],
+#         [-0.8227, -1.8476, -0.9085]])
+# nlloss_output:
+#  (0.3407 + 1.9282 + 0.8227) /3
+#  tensor(1.0305)
+# crossentropyloss_output:
+#  tensor(1.0305)
+
+
+# 这个为什么会报 target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
+# x_input = torch.randn(3, 2)
+# y_target = torch.tensor([1, 2, 0])
+# crossentropyloss = nn.CrossEntropyLoss()
+# crossentropyloss_output = crossentropyloss(x_input, y_target)
+
+score = torch.randn(3, 2)
+label = torch.Tensor([1, 0, 1]).long()
+crossentropyloss_output2 = crossentropyloss(score, label)
