@@ -297,6 +297,7 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
     training_pairs = [tensorsFromPair(random.choice(pairs))
                       for i in range(n_iters)]
+    # 使用了NLLLoss
     criterion = nn.NLLLoss()
 
     for iter in range(1, n_iters + 1):

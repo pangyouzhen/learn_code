@@ -1,16 +1,21 @@
+from typing import Tuple
+
 import pandas as pd
 import asyncio
 import aiohttp
 import json
+from utils.Logger import loggutils
 
 sema = asyncio.BoundedSemaphore(10)
-df = pd.read_excel("./df.xlsx")
+df = pd.read_excel("./data/df.xlsx")
 df["result"] = None
 
 
 # 限制线程个数，防止崩溃
 
-async def process_url(df: pd.DataFrame, query: str) -> None:
+async def process_url(df: pd.DataFrame, ind_query: Tuple) -> None:
+    ind = ind_query[0]
+    query = ind_query[1]
     with (await sema):
         try:
             async with aiohttp.ClientSession() as session:
@@ -21,9 +26,9 @@ async def process_url(df: pd.DataFrame, query: str) -> None:
                     html = (await resp.text())
                     await asyncio.sleep(1)
                     # 因为这里使用到了await关键字，实现异步，所有他上面的函数体需要声明为异步async
-                df.loc[df['问题'] == query, 'result'] = [html]
+                df.loc[ind, 'result'] = html
         except Exception as e:
-            print(e)
+            loggutils.logger.error(e)
 
 
 # json.loads(payload)  就是将 str转化为字典，post 的参数中json 需要的是一个字典
@@ -33,10 +38,12 @@ async def process_url(df: pd.DataFrame, query: str) -> None:
 # a["data"] = a["data"].strip("\"")
 
 async def main(df: pd.DataFrame) -> None:
-    await asyncio.gather(*[process_url(df, query) for query in df['问题']])
+    await asyncio.gather(*[process_url(df, (ind, query)) for ind, query in enumerate(df['问题'])])
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(df))
     loop.close()
+    # python 3.7+
+    # asyncio.run(main(df))

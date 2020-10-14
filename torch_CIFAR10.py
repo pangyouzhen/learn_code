@@ -84,7 +84,6 @@ for epoch in range(2):
         # TODO
         # outputs.shape = [batch_size,class_number] labels.shape= batch_size 这里的交叉熵是怎么计算的de
         # 一维的就相当于list，二维就相当于矩阵
-        # 交叉熵的公式和代码怎样对应啊
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
