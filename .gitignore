@@ -6,3 +6,5 @@ params.pkl
 .data
 data
 *log
+*pyc
+*__pycache__/

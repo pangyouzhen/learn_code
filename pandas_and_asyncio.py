@@ -4,7 +4,7 @@ import pandas as pd
 import asyncio
 import aiohttp
 import json
-from utils.Logger import loggutils
+from loguru import logger
 
 sema = asyncio.BoundedSemaphore(10)
 df = pd.read_excel("./data/df.xlsx")
@@ -13,6 +13,7 @@ df["result"] = None
 
 # 限制线程个数，防止崩溃
 
+@logger.catch()
 async def process_url(df: pd.DataFrame, ind_query: Tuple) -> None:
     ind = ind_query[0]
     query = ind_query[1]
@@ -28,7 +29,7 @@ async def process_url(df: pd.DataFrame, ind_query: Tuple) -> None:
                     # 因为这里使用到了await关键字，实现异步，所有他上面的函数体需要声明为异步async
                 df.loc[ind, 'result'] = html
         except Exception as e:
-            loggutils.logger.error(e)
+            logger.error(e)
 
 
 # json.loads(payload)  就是将 str转化为字典，post 的参数中json 需要的是一个字典
