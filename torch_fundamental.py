@@ -34,8 +34,17 @@ lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
-
+# lstm 为什么输出的是元组，h0，和c0 输出代表的意思是？
 output, (h0, c0) = lstm(input1, (h0, c0))
+assert output.size() == (5, 3, 20)
+output2, (h1, c1) = lstm(input1)
+assert output2.size() == (5, 3, 20)
+
+bilstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2, bidirectional=True)
+input1 = torch.randn(5, 3, 10)
+output2, (h1, c1) = bilstm(input1)
+# bidirectional (batch_size,seq_num,2 * hidden_size)
+assert output2.size() == (5, 3, 40)
 
 #  embedding
 m = nn.Embedding(num_embeddings=10, embedding_dim=3)
@@ -126,6 +135,7 @@ print(x.type())
 
 # softmax
 x = torch.rand(2, 5).int().float()
+print(F.softmax(x))
 print(F.softmax(x, dim=0))
 print(F.softmax(x, dim=1).sum())
 
