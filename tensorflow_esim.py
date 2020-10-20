@@ -157,6 +157,8 @@ class ESIM:
 
 
 if __name__ == '__main__':
+    print(tf.__version__)
+    assert tf.__version__ == "1.14.0"
     esim = ESIM(is_training=True, init_embedding_up=20, seq_length=2, class_num=10000, vocabulary_size=500,
                 embedding_size=300, hidden_num=5,
                 l2_lambda=0.01, learning_rate=0.0001)

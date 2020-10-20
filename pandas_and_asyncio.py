@@ -25,11 +25,14 @@ async def process_url(df: pd.DataFrame, ind_query: Tuple) -> None:
                 payload = "{\"openId\":\"1111111\",\"userInput\":%s}" % query
                 url = "http://127.0.0.1/8000/index"
                 # 协程嵌套，只需要处理最外层协程即可fetch_async
-                async with session.post(url, json=json.loads(payload)) as resp:
-                    html = (await resp.text())
-                    await asyncio.sleep(1)
-                    # 因为这里使用到了await关键字，实现异步，所有他上面的函数体需要声明为异步async
-                df.loc[ind, 'result'] = html
+                # async with session.post(url, json=json.loads(payload)) as resp:
+                #     html = (await resp.text())
+                #     await asyncio.sleep(1)
+                #     # 因为这里使用到了await关键字，实现异步，所有他上面的函数体需要声明为异步async
+                resp = await session.post(url, data=payload.encode("utf-8"), headers=None)
+                await asyncio.sleep(0.5)
+                df.loc[ind, 'result'] = await resp.text()
+        #         这里本身就是 =await 是异步的，所以不存在同步异步的问题
         except Exception as e:
             logger.error(e)
 
