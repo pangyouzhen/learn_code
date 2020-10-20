@@ -10,6 +10,8 @@ sema = asyncio.BoundedSemaphore(10)
 df = pd.read_excel("./data/df.xlsx")
 df["result"] = None
 
+logger.add("./a.log")
+
 
 # 限制线程个数，防止崩溃
 
