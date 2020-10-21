@@ -142,7 +142,11 @@ print(F.softmax(x, dim=1).sum())
 print(F.softmax(x, dim=1))
 print(F.softmax(x, dim=1).sum())
 
-print(torch.sigmoid(x))
+
+print("激活函数-----")
+print(F.tanh(x).size())
+
+print(torch.sigmoid(x).size())
 
 #  cat
 #  cat 除了指定的轴维度不同，其他的必须相同
