@@ -153,8 +153,8 @@ for epoch in range(n_epoch):
         # target.shape == 128
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
-        # 这里data 为什么进行转换
         # Adam 和 SGD的区别是什么
+        #  data 转换 （seq_num,batch_size） -> (batch_size,seq_num)
         data = data.permute(1, 0)
         optimizer.zero_grad()
 

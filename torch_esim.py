@@ -48,7 +48,9 @@ SENTENCE2.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 SENTENCE2.vocab.vectors.unk_init = init.xavier_uniform
 
-train_iter = data.BucketIterator(train, batch_size=128,
+batch_size = 128
+
+train_iter = data.BucketIterator(train, batch_size=batch_size,
                                  shuffle=True, device=DEVICE)
 sentence1_vocab = len(SENTENCE1.vocab)
 
@@ -57,9 +59,8 @@ sentence1_vocab = len(SENTENCE1.vocab)
 # 查看一个batch
 # batch = next(iter(train_iter))
 # print(batch.fields)
-# print("batch text: ", batch.sentence1.shape) -> [64, 128]
-#  TODO 为啥 和 SENTENCE1.vocab.vectors.shape 的最后一个维度不相同啊，一个是300，一个是128
-# print("batch text: ", batch.sentence2.shape) # 对应 Fileld 的 name
+# print("batch text: ", batch.sentence1.shape) -> [64, 128] (seq_num_a,batch_size)
+# print("batch text: ", batch.sentence2.shape) -> [63, 128]
 # print("batch label: ", batch.label.shape) -> [128]
 
 class Esim(nn.Module):
@@ -80,9 +81,10 @@ class Esim(nn.Module):
         return result
 
     def input_encoding(self, a, b):
-        # input: batch_size,seq_num,
-        a_embedding = self.embedding1(a)
-        b_embedding = self.embedding1(b)
+        assert a.dim == 2 and a.shape[0] == batch_size
+        # input: batch_size,seq_num
+        a_embedding = self.embedding(a)
+        b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
@@ -106,7 +108,7 @@ class Esim(nn.Module):
         b_diff = b_bar - b_hat
         b_mul = torch.mul(b_bar, b_hat)
         m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=2)
-
+        # 这边是用的同一个 lstm吗
         v_a = self.lstm(m_a)
         v_b = self.lstm(m_b)
         v_a_mean = torch.mean(v_a, dim=1)
@@ -119,7 +121,6 @@ class Esim(nn.Module):
         # output:  batch_size,2 * seq_num_a + 2* seq_num_b, 2 * hidden
         return v
 
-    # TODO
     def prediction(self, v):
         # batch_size, 2 * seq_num_a + 2 * seq_num_b, 2 * hidden
         feed_forward1 = self.linear1(v)
@@ -146,7 +147,6 @@ for epoch in range(n_epoch):
     # Example object has no attribute sentence2，看前面 assert 那个
     for batch_idx, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
-        data = batch.sentence1, batch.sentence2
         # type(data) == Tensor
         # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
@@ -156,8 +156,13 @@ for epoch in range(n_epoch):
         target = target.to(DEVICE)
         # Adam 和 SGD的区别是什么
         optimizer.zero_grad()
+        sentence1 = batch.sentence1
+        # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
+        sentence1 = sentence1.permute(1, 0)
+        sentence2 = batch.sentence2
+        sentence2 = sentence2.permute(1, 0)
 
-        out = model(batch.sentence1, batch.sentence2)
+        out = model(sentence1, sentence2)
         print("---------------------------")
         print(out.shape)
         loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
