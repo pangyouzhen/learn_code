@@ -32,8 +32,10 @@ LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
-train = data.TabularDataset('./full_data/ants/ants_torchtext_train.csv', format='tsv', skip_header=True,
+train = data.TabularDataset('./full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
                             fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
+# 增加读取文件类型判断
+assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
 
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
@@ -41,15 +43,25 @@ vectors = Vectors(name="sgns.sogounews.bigram-char", cache="./data/")
 SENTENCE1.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 SENTENCE1.vocab.vectors.unk_init = init.xavier_uniform
-#  第1510 个词
-print(SENTENCE1.vocab.itos[1510])
+
+SENTENCE2.build_vocab(train, vectors=vectors)  # , max_size=30000)
+# 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
+SENTENCE2.vocab.vectors.unk_init = init.xavier_uniform
 
 train_iter = data.BucketIterator(train, batch_size=128,
                                  shuffle=True, device=DEVICE)
 sentence1_vocab = len(SENTENCE1.vocab)
 
 
-# 文字-index-embeding
+# print(SENTENCE1.vocab.vectors.shape) torch.Size([1443, 300])
+# 查看一个batch
+# batch = next(iter(train_iter))
+# print(batch.fields)
+# print("batch text: ", batch.sentence1.shape) -> [64, 128]
+#  TODO 为啥 和 SENTENCE1.vocab.vectors.shape 的最后一个维度不相同啊，一个是300，一个是128
+# print("batch text: ", batch.sentence2.shape) # 对应 Fileld 的 name
+# print("batch label: ", batch.label.shape) -> [128]
+
 class Esim(nn.Module):
     def __init__(self, sentence1_vocab, embedding_dim):
         super().__init__()
@@ -68,7 +80,7 @@ class Esim(nn.Module):
         return result
 
     def input_encoding(self, a, b):
-        # input: str,str
+        # input: batch_size,seq_num,
         a_embedding = self.embedding1(a)
         b_embedding = self.embedding1(b)
         # output: batch_size,seq_num,embedding_dim
@@ -123,8 +135,6 @@ print(SENTENCE1.vocab.vectors.shape)
 model.embedding.weight.data.copy_(SENTENCE1.vocab.vectors)
 model.to(DEVICE)
 
-model.to(DEVICE)
-
 # 训练
 optimizer = torch.optim.Adam(model.parameters())  # ,lr=0.000001)
 
@@ -133,23 +143,21 @@ n_epoch = 20
 best_val_acc = 0
 
 for epoch in range(n_epoch):
-    # TODO Example object has no attribute sentence2
+    # Example object has no attribute sentence2，看前面 assert 那个
     for batch_idx, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
-        data = batch.Phrase
+        data = batch.sentence1, batch.sentence2
         # type(data) == Tensor
         # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
-        target = batch.Sentiment
+        target = batch.label
         # target.shape == 128
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
-        # 这里data 为什么进行转换
         # Adam 和 SGD的区别是什么
-        data = data.permute(1, 0)
         optimizer.zero_grad()
 
-        out = model(data)
+        out = model(batch.sentence1, batch.sentence2)
         print("---------------------------")
         print(out.shape)
         loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
@@ -169,23 +177,3 @@ for epoch in range(n_epoch):
             acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
             print('epoch: %d \t batch_idx : %d \t loss: %.4f \t train acc: %.4f'
                   % (epoch, batch_idx, loss, acc))
-
-    # val_accs = []
-    # for batch_idx, batch in enumerate(val_iter):
-    #     data = batch.Phrase
-    #     target = batch.Sentiment
-    #     target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
-    #     target = target.to(DEVICE)
-    #     data = data.permute(1, 0)
-    #     out = model(data)
-    #
-    #     _, y_pre = torch.max(out, -1)
-    #     acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
-    #     val_accs.append(acc)
-    #
-    # acc = np.array(val_accs).mean()
-    # if acc > best_val_acc:
-    #     print('val acc : %.4f > %.4f saving model' % (acc, best_val_acc))
-    #     torch.save(model.state_dict(), 'params.pkl')
-    #     best_val_acc = acc
-    # print('val acc: %.4f' % (acc))
