@@ -34,7 +34,7 @@ lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
-# lstm 为什么输出的是元组，h0，和c0 输出代表的意思是？
+# TODO lstm 为什么输出的是元组，h0，和c0 输出代表的意思是？
 output, (h0, c0) = lstm(input1, (h0, c0))
 assert output.size() == (5, 3, 20)
 output2, (h1, c1) = lstm(input1)
@@ -46,12 +46,29 @@ output2, (h1, c1) = bilstm(input1)
 # bidirectional (batch_size,seq_num,2 * hidden_size)
 assert output2.size() == (5, 3, 40)
 
-#  embedding
+#  embedding, embedding就是lookup，寻找
 m = nn.Embedding(num_embeddings=10, embedding_dim=3)
 # 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got torch.FloatTensor
 n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
 print(n.type())
 assert m(n).size() == (2, 4, 3)
+
+# TODO 增加padding_idx的作用是什么？
+m2 = nn.Embedding(10, 3, padding_idx=0)
+input = torch.LongTensor([[0, 2, 0, 5]])
+assert m2(input).size() == (1, 4, 3)
+
+weight = torch.FloatTensor([[1, 2.3, 3], [4, 5.1, 6.3]])
+embedding = nn.Embedding.from_pretrained(weight)
+input = torch.LongTensor([1])
+print(embedding(input))
+assert embedding(input) == torch.Tensor([[4, 5.1, 6.3]])
+
+weight = torch.FloatTensor([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
+                            [5, 5, 5], [6, 6, 6], [7, 7, 7], [8, 8, 8], [9, 9, 9]])
+embedding = nn.Embedding.from_pretrained(weight)
+n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
+print(embedding(n))
 
 # squeeze
 x = torch.randn(3, 1, 4, 1)
@@ -141,7 +158,6 @@ print(F.softmax(x, dim=1).sum())
 
 print(F.softmax(x, dim=1))
 print(F.softmax(x, dim=1).sum())
-
 
 print("激活函数-----")
 print(F.tanh(x).size())

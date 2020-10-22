@@ -37,21 +37,21 @@ train = data.TabularDataset('./full_data/ants/ants_torchtext_train.csv', format=
 
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
-vectors = Vectors(name="glove.6B.100d.txt", cache="/data/project/learn_allennlp/data/.vector_cache/")
+vectors = Vectors(name="sgns.sogounews.bigram-char", cache="./data/")
 SENTENCE1.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 SENTENCE1.vocab.vectors.unk_init = init.xavier_uniform
 #  第1510 个词
 print(SENTENCE1.vocab.itos[1510])
 
-train_iter = data.BucketIterator(train, batch_size=128, sort_key=lambda x: len(x.Phrase),
+train_iter = data.BucketIterator(train, batch_size=128,
                                  shuffle=True, device=DEVICE)
 sentence1_vocab = len(SENTENCE1.vocab)
 
 
 # 文字-index-embeding
 class Esim(nn.Module):
-    def __init__(self, embedding_dim):
+    def __init__(self, sentence1_vocab, embedding_dim):
         super().__init__()
         self.embedding = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
         # self.embedding2 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
@@ -118,9 +118,8 @@ class Esim(nn.Module):
         return softmax
 
 
-model = Esim(300)
-# TODO ERROR
-# the size of tensor a (300) must match  the size of tensor b (100) at non-singeton
+model = Esim(sentence1_vocab=sentence1_vocab, embedding_dim=300)
+print(SENTENCE1.vocab.vectors.shape)
 model.embedding.weight.data.copy_(SENTENCE1.vocab.vectors)
 model.to(DEVICE)
 
@@ -134,7 +133,7 @@ n_epoch = 20
 best_val_acc = 0
 
 for epoch in range(n_epoch):
-
+    # TODO Example object has no attribute sentence2
     for batch_idx, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
         data = batch.Phrase
@@ -142,7 +141,6 @@ for epoch in range(n_epoch):
         # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.Sentiment
-        # 这里的目的是什么？
         # target.shape == 128
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
