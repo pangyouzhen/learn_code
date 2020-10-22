@@ -9,6 +9,8 @@ from torchtext import data
 from torchtext.vocab import Vectors
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("--------------------------------")
+print(DEVICE)
 
 
 # 预处理，生成torchtext的格式
@@ -53,6 +55,7 @@ batch_size = 128
 train_iter = data.BucketIterator(train, batch_size=batch_size,
                                  shuffle=True, device=DEVICE)
 sentence1_vocab = len(SENTENCE1.vocab)
+sentence2_vocab = len(SENTENCE2.vocab)
 
 
 # print(SENTENCE1.vocab.vectors.shape) torch.Size([1443, 300])
@@ -64,13 +67,29 @@ sentence1_vocab = len(SENTENCE1.vocab)
 # print("batch label: ", batch.label.shape) -> [128]
 
 class Esim(nn.Module):
-    def __init__(self, sentence1_vocab, embedding_dim):
+    def __init__(self, sentence1_vocab, embedding_dim, hidden_size):
         super().__init__()
-        self.embedding = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
+        self.dropout = 0.5
+        self.embedding1 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
+        self.embedding2 = nn.Embedding(num_embeddings=sentence2_vocab, embedding_dim=embedding_dim)
         # self.embedding2 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=20, num_layers=2, bidirectional=True)
-        self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
-        self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True)
+        self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True)
+        # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
+        # self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
+        self.fc = nn.Sequential(
+            nn.BatchNorm1d(hidden_size * 8),
+            nn.Linear(hidden_size * 8, 2),
+            nn.ELU(inplace=True),
+            nn.BatchNorm1d(2),
+            nn.Dropout(self.dropout),
+            nn.Linear(2, 2),
+            nn.ELU(inplace=True),
+            nn.BatchNorm1d(2),
+            nn.Dropout(self.dropout),
+            nn.Linear(2, 2),
+            nn.Softmax(dim=-1)
+        )
 
     def forward(self, a, b):
         # premise_embedding, hypothesis_embedding = self.embedding(premise, hypothesis)
@@ -81,10 +100,9 @@ class Esim(nn.Module):
         return result
 
     def input_encoding(self, a, b):
-        assert a.dim == 2 and a.shape[0] == batch_size
         # input: batch_size,seq_num
-        a_embedding = self.embedding(a)
-        b_embedding = self.embedding(b)
+        a_embedding = self.embedding1(a)
+        b_embedding = self.embedding2(b)
         # output: batch_size,seq_num,embedding_dim
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
@@ -105,37 +123,54 @@ class Esim(nn.Module):
         a_diff = a_bar - a_hat
         a_mul = torch.mul(a_bar, a_hat)
         m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=2)
+        # output: batch_size, seq_num_a, 2 * hidden_size * 4
         b_diff = b_bar - b_hat
         b_mul = torch.mul(b_bar, b_hat)
         m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=2)
-        # 这边是用的同一个 lstm吗
-        v_a = self.lstm(m_a)
-        v_b = self.lstm(m_b)
-        v_a_mean = torch.mean(v_a, dim=1)
-        v_b_mean = torch.mean(v_b, dim=1)
-
-        v_a_max = torch.max(v_a, dim=1)
-        v_b_max = torch.max(v_b, dim=1)
-
-        v = torch.cat((v_a_mean, v_a_max, v_b_mean, v_b_max), dim=1)
+        # output: batch_size, seq_num_b, 2 * hidden_size * 4
+        v_a, _ = self.lstm2(m_a)
+        v_b, _ = self.lstm2(m_b)
+        # output: batch_size, seq_num_b, 2 * hidden_size
+        # v_a_mean = torch.mean(v_a, dim=1)
+        # v_b_mean = torch.mean(v_b, dim=1)
+        #
+        # v_a_max = torch.max(v_a, dim=1)
+        # v_b_max = torch.max(v_b, dim=1)
+        #
+        # v = torch.cat((v_a_mean, v_a_max, v_b_mean, v_b_max), dim=1)
         # output:  batch_size,2 * seq_num_a + 2* seq_num_b, 2 * hidden
-        return v
+        q1_rep = self.apply_multiple(v_a)
+        q2_rep = self.apply_multiple(v_b)
+
+        # Classifier
+        x = torch.cat([q1_rep, q2_rep], -1)
+        return x
 
     def prediction(self, v):
         # batch_size, 2 * seq_num_a + 2 * seq_num_b, 2 * hidden
-        feed_forward1 = self.linear1(v)
+        # feed_forward1 = self.linear1(v)
         # batch_size,2 * seq_num_a + 2 * seq_num_b,  2 * hidden
-        tanh_layer = F.tanh(feed_forward1)
-        feed_forward2 = self.linear2(tanh_layer)
-        softmax = F.softmax(feed_forward2)
-        return softmax
+        # tanh_layer = F.tanh(feed_forward1)
+        # feed_forward2 = self.linear2(tanh_layer)
+        # softmax = F.softmax(feed_forward2)
+        score = self.fc(v)
+        return score
+
+    def apply_multiple(self, x):
+        # input: batch_size * seq_len * (2 * hidden_size)
+        p1 = F.avg_pool1d(x.transpose(1, 2), x.size(1)).squeeze(-1)
+        p2 = F.max_pool1d(x.transpose(1, 2), x.size(1)).squeeze(-1)
+        # output: batch_size * (4 * hidden_size)
+        return torch.cat([p1, p2], 1)
 
 
-model = Esim(sentence1_vocab=sentence1_vocab, embedding_dim=300)
+model = Esim(sentence1_vocab=sentence1_vocab, embedding_dim=300, hidden_size=20)
 print(SENTENCE1.vocab.vectors.shape)
-model.embedding.weight.data.copy_(SENTENCE1.vocab.vectors)
+model.embedding1.weight.data.copy_(SENTENCE1.vocab.vectors)
+model.embedding2.weight.data.copy_(SENTENCE2.vocab.vectors)
 model.to(DEVICE)
 
+crition = F.cross_entropy
 # 训练
 optimizer = torch.optim.Adam(model.parameters())  # ,lr=0.000001)
 
@@ -144,17 +179,17 @@ n_epoch = 20
 best_val_acc = 0
 
 for epoch in range(n_epoch):
+    epoch_loss = 0
+    acc = 0
     # Example object has no attribute sentence2，看前面 assert 那个
-    for batch_idx, batch in enumerate(train_iter):
+    for epoch2, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
         # type(data) == Tensor
         # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.label
         # target.shape == 128
-        target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
-        # Adam 和 SGD的区别是什么
         optimizer.zero_grad()
         sentence1 = batch.sentence1
         # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
@@ -163,22 +198,13 @@ for epoch in range(n_epoch):
         sentence2 = sentence2.permute(1, 0)
 
         out = model(sentence1, sentence2)
-        print("---------------------------")
-        print(out.shape)
-        loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
-        loss = loss.sum(-1).mean()
-
+        # print("---------------------------")
+        # print(out.shape)
+        loss = crition(out, target)
         loss.backward()
         optimizer.step()
-
-        if (batch_idx + 1) % 200 == 0:
-            _, y_pre = torch.max(out, -1)
-            acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
-            print('epoch: %d \t batch_idx : %d \t loss: %.4f \t train acc: %.4f'
-                  % (epoch, batch_idx, loss, acc))
-
-        if batch_idx > 974:
-            _, y_pre = torch.max(out, -1)
-            acc = torch.mean((torch.tensor(y_pre == batch.Sentiment, dtype=torch.float)))
-            print('epoch: %d \t batch_idx : %d \t loss: %.4f \t train acc: %.4f'
-                  % (epoch, batch_idx, loss, acc))
+        epoch_loss = epoch_loss + loss.data
+        _, y_pre = torch.max(out, -1)
+        acc = torch.mean((torch.tensor(y_pre == batch.label, dtype=torch.float)))
+        print("acc is", acc)
+    print("epoch_loss", epoch_loss)
