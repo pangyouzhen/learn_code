@@ -180,7 +180,7 @@ best_val_acc = 0
 
 for epoch in range(n_epoch):
     epoch_loss = 0
-    acc = 0
+    train_acc = 0
     # Example object has no attribute sentence2，看前面 assert 那个
     for epoch2, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
@@ -205,5 +205,5 @@ for epoch in range(n_epoch):
         optimizer.step()
         epoch_loss = epoch_loss + loss.data
         y_pre = torch.argmax(out, dim=-1)
-        acc = torch.mean((torch.tensor(y_pre == batch.label, dtype=torch.float)))
-    print("epoch_loss is", epoch_loss, "acc is", acc)
+        train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+    print("epoch_loss is", epoch_loss / len(train), "acc is", train_acc / len(train))
