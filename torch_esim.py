@@ -204,7 +204,6 @@ for epoch in range(n_epoch):
         loss.backward()
         optimizer.step()
         epoch_loss = epoch_loss + loss.data
-        _, y_pre = torch.max(out, -1)
+        y_pre = torch.argmax(out, dim=-1)
         acc = torch.mean((torch.tensor(y_pre == batch.label, dtype=torch.float)))
-        print("acc is", acc)
-    print("epoch_loss", epoch_loss)
+    print("epoch_loss is", epoch_loss, "acc is", acc)
