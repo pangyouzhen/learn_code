@@ -1,0 +1,55 @@
+# docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
+# 列出索引列表
+GET _cat/indices
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+#创建索引
+PUT intentmapindex
+{
+    "mappings": {
+        "dynamic": false,
+        "properties": {
+            "age": {
+                "type": "integer"
+            },
+            "email": {
+                "type": "keyword"
+            },
+            "name": {
+                "type": "text"
+            }
+        }
+    }
+}
+
+# 删除索引
+DELETE intentmapindex
+# 查看某个索引的状态
+GET _cat/indices/intentmapindex
+# 查看索引的mapping
+GET intentmapindex/_mapping
+
+# suggest 功能
+# error
+POST my-index-000001/_search
+{
+  "query" : {
+    "match": {
+      "message": "tring out Elasticsearch"
+    }
+  },
+  "suggest" : {
+    "my-suggestion" : {
+      "text" : "tring out Elasticsearch",
+      "term" : {
+        "field" : "message"
+      }
+    }
+  }
+}
+
+

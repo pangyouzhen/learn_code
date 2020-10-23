@@ -183,10 +183,6 @@ for epoch in range(n_epoch):
     train_acc = 0
     # Example object has no attribute sentence2，看前面 assert 那个
     for epoch2, batch in enumerate(train_iter):
-        # 124849 / 128 batch_size -> 975 batch
-        # type(data) == Tensor
-        # data.shape == (...==seq_num,128)
-        # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.label
         # target.shape == 128
         target = target.to(DEVICE)
