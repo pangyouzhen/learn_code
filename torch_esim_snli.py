@@ -1,6 +1,5 @@
-import json
+import re
 
-import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,35 +12,35 @@ print("--------------------------------")
 print(DEVICE)
 
 
-# 预处理，生成torchtext的格式
-def process_dataset(file):
-    def split_multi_columns(x):
-        js = json.loads(x["json"])
-        return js["sentence1"], js["sentence2"], js["label"]
-
-    df = pd.read_csv(file, sep="\t", encoding="utf-8", names=["json"])
-    # 别忘了result_type 参数
-    df[['sentence1', 'sentence2', 'label']] = df.apply(lambda x: split_multi_columns(x), axis=1, result_type="expand")
-    df = df[['sentence1', 'sentence2', 'label']]
-    df.to_csv("./full_data/ants/ants_torchtext_train.csv", index=False, encoding="utf-8")
+def extract_text(s):
+    # 移除括号
+    s = re.sub('\\(', '', s)
+    s = re.sub('\\)', '', s)
+    # 使用一个空格替换两个以上连续空格
+    s = re.sub('\\s{2,}', ' ', s)
+    return s.strip().split()
 
 
-def tokenizer(text):
-    return [tok for tok in text]
+LABEL = data.Field(sequential=False, use_vocab=True)
+SENTENCE1 = data.Field(sequential=True, tokenize=extract_text, lower=True)
+SENTENCE2 = data.Field(sequential=True, tokenize=extract_text, lower=True)
 
-
-LABEL = data.Field(sequential=False, use_vocab=False)
-SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-
-train = data.TabularDataset('./full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
-                            fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
+train = data.TabularDataset('/data/Downloads/data/dataset/snli_1.0/snli_1.0_train.txt', format='tsv', skip_header=True,
+                            fields=[("gold_label", LABEL),
+                                    ("sentence1_binary_parse", None), ("sentence2_binary_parse", None),
+                                    ("sentence1_parse", None), ("sentence2_parse", None),
+                                    ('sentence1', SENTENCE1), ('sentence2', SENTENCE2),
+                                    ("captionID", None), ("pairID", None), ("label1", None), ("label2", None),
+                                    ("label3", None), ("label4", None), ("label5", None)])
 # 增加读取文件类型判断
-assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
+assert list(train[5].__dict__.keys()) == ['gold_label', 'sentence1', 'sentence2']
+print(train[5])
+print(train[5].__dict__.keys())
+print(train.examples[1].sentence2)
 
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
-vectors = Vectors(name="sgns.sogounews.bigram-char", cache="./data/")
+vectors = Vectors(name="glove.6B.100d.txt", cache="/data/project/learn_allennlp/data/.vector_cache/")
 SENTENCE1.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 SENTENCE1.vocab.vectors.unk_init = init.xavier_uniform
@@ -65,6 +64,7 @@ sentence2_vocab = len(SENTENCE2.vocab)
 # print("batch text: ", batch.sentence1.shape) -> [64, 128] (seq_num_a,batch_size)
 # print("batch text: ", batch.sentence2.shape) -> [63, 128]
 # print("batch label: ", batch.label.shape) -> [128]
+
 
 class Esim(nn.Module):
     def __init__(self, sentence1_vocab, embedding_dim, hidden_size):
@@ -164,7 +164,7 @@ class Esim(nn.Module):
         return torch.cat([p1, p2], 1)
 
 
-model = Esim(sentence1_vocab=sentence1_vocab, embedding_dim=300, hidden_size=20)
+model = Esim(sentence1_vocab=sentence1_vocab, embedding_dim=100, hidden_size=20)
 print(SENTENCE1.vocab.vectors.shape)
 model.embedding1.weight.data.copy_(SENTENCE1.vocab.vectors)
 model.embedding2.weight.data.copy_(SENTENCE2.vocab.vectors)
@@ -183,7 +183,7 @@ for epoch in range(n_epoch):
     train_acc = 0
     # Example object has no attribute sentence2，看前面 assert 那个
     for epoch2, batch in enumerate(train_iter):
-        target = batch.label
+        target = batch.gold_label
         # target.shape == 128
         target = target.to(DEVICE)
         optimizer.zero_grad()

@@ -31,3 +31,8 @@ sudo systemctl list-units --type=service --all
 #<!-- 分析相关功能耗时 -->
 systemd-analyze blame
 systemctl list-units --type=service --all | grep "not-found"
+
+# 格式化 json
+head -n 1 ./data/dataset/snli_1.0/snli_1.0_train.jsonl | python -m json.tool
+echo '{"a": 1, "b": 2}' | python -m json.tool
+python -m json.tool djg.txt
