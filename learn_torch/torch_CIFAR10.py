@@ -103,4 +103,4 @@ print('Finished Training')
 # print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
 #
 # net = Net()
-# net.load_state_dict(torch.load(PATH))
+# net.load_state_dict(learn_torch.load(PATH))

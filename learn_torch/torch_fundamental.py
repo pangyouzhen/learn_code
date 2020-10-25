@@ -48,7 +48,7 @@ assert output2.size() == (5, 3, 40)
 
 #  embedding, embedding就是lookup，寻找
 m = nn.Embedding(num_embeddings=10, embedding_dim=3)
-# 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got torch.FloatTensor
+# 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got learn_torch.FloatTensor
 n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
 print(n.type())
 assert m(n).size() == (2, 4, 3)
@@ -135,9 +135,9 @@ masked = torch.tensor([1, 1, 0, 0]).bool()
 b = a.masked_fill(mask=masked, value=torch.tensor(0))
 print(b)
 
-# torch 中的两种相乘方式
-# torch.mul() 矩阵点乘，也就是element wise 对应位相乘
-# torch.matmul() 矩阵相乘，对应 python 中 x @ y ,torch.mm 只适用于二维
+# learn_torch 中的两种相乘方式
+# learn_torch.mul() 矩阵点乘，也就是element wise 对应位相乘
+# learn_torch.matmul() 矩阵相乘，对应 python 中 x @ y ,learn_torch.mm 只适用于二维
 
 #  pytorch 模型的训练步骤
 # 1. 数据 2. 模型 3. 损失函数 4. 优化和拟合
@@ -198,7 +198,7 @@ class CNN(nn.Module):
 cnn = CNN()
 print(cnn)
 # 这一段代码有问题
-# trainloader = torch.utils.data.dataloader
+# trainloader = learn_torch.utils.data.dataloader
 # criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(cnn.parameters(), lr=0.01)
 # for epoch in range(2):
@@ -221,7 +221,7 @@ input = torch.randn(20, 16, 50, 100)
 # H_out = (50 + 2 * 0 - 0 *(3-1) -1) / 2+ 1
 # W_out =
 print(m(input).shape)
-# torch.Size([20, 33, 24, 49])
+# learn_torch.Size([20, 33, 24, 49])
 
 # print(m2(input).shape)
 # print(m3(input).shape)
@@ -283,8 +283,8 @@ print('crossentropyloss_output:\n', crossentropyloss_output)
 
 
 # 这个为什么会报 target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
-# x_input = torch.randn(3, 2)
-# y_target = torch.tensor([1, 2, 0])
+# x_input = learn_torch.randn(3, 2)
+# y_target = learn_torch.tensor([1, 2, 0])
 # crossentropyloss = nn.CrossEntropyLoss()
 # crossentropyloss_output = crossentropyloss(x_input, y_target)
 

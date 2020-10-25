@@ -4,7 +4,7 @@ import pandas as pd
 from torch import optim
 
 # 1. 读取文件，查看文件
-data = pd.read_csv('./full_data/train.tsv', sep='\t')
+data = pd.read_csv('../full_data/train.tsv', sep='\t')
 print(data[:5])
 print(data.columns)
 
@@ -55,10 +55,10 @@ TEXT = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 设置skip_header=True,不然它会把列名也当一个数据处理
 """
 train, val = data.TabularDataset.splits(
-    path='.', train='./full_data/train.csv', validation='./full_data/val.csv', format='csv', skip_header=True,
+    path='..', train='./full_data/train.csv', validation='./full_data/val.csv', format='csv', skip_header=True,
     fields=[('PhraseId', None), ('SentenceId', None), ('Phrase', TEXT), ('Sentiment', LABEL)])
 
-test = data.TabularDataset('./full_data/test.tsv', format='tsv', skip_header=True,
+test = data.TabularDataset('../full_data/test.tsv', format='tsv', skip_header=True,
                            fields=[('PhraseId', None), ('SentenceId', None), ('Phrase', TEXT)])
 # 数据行数
 # 124849 train.csv

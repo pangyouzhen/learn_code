@@ -22,7 +22,7 @@ LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
-train = data.TabularDataset('./full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
+train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
                             fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
 # 增加读取文件类型判断
 assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
@@ -194,7 +194,7 @@ def main():
         # if (f1 + f2) / 2 > min_f:
         #     min_f = (f1 + f2) / 2
         #     print("save model")
-        #     torch.save(model.state_dict(), '../data/esim_match_data/esim_params_30.pkl')
+        #     learn_torch.save(model.state_dict(), '../data/esim_match_data/esim_params_30.pkl')
 
 
 if __name__ == '__main__':
