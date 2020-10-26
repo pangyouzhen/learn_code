@@ -52,3 +52,5 @@ for i in tag2:
 print(tag2[:1])
 print(len(tag2))
 # for 调用可迭代类型，应该 按照顺序，__iter__,__getitem__
+# 打印继承关系  内部的__mro__ 方法
+print(Tag2.mro())

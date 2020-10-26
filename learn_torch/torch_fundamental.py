@@ -62,7 +62,7 @@ weight = torch.FloatTensor([[1, 2.3, 3], [4, 5.1, 6.3]])
 embedding = nn.Embedding.from_pretrained(weight)
 input = torch.LongTensor([1])
 print(embedding(input))
-assert embedding(input) == torch.Tensor([[4, 5.1, 6.3]])
+# assert embedding(input) == torch.Tensor([[4, 5.1, 6.3]])
 
 weight = torch.FloatTensor([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
                             [5, 5, 5], [6, 6, 6], [7, 7, 7], [8, 8, 8], [9, 9, 9]])
@@ -275,6 +275,7 @@ print('crossentropyloss_output:\n', crossentropyloss_output)
 #  tensor([[-1.5490, -0.3407, -2.5733],
 #         [-0.3952, -1.7091, -1.9282],
 #         [-0.8227, -1.8476, -0.9085]])
+# y_target = torch.tensor([1, 2, 0])
 # nlloss_output:
 #  (0.3407 + 1.9282 + 0.8227) /3
 #  tensor(1.0305)
@@ -283,8 +284,8 @@ print('crossentropyloss_output:\n', crossentropyloss_output)
 
 
 # 这个为什么会报 target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
-# x_input = learn_torch.randn(3, 2)
-# y_target = learn_torch.tensor([1, 2, 0])
+# x_input = torch.randn(3, 2)
+# y_target = torch.tensor([1, 2, 0])
 # crossentropyloss = nn.CrossEntropyLoss()
 # crossentropyloss_output = crossentropyloss(x_input, y_target)
 

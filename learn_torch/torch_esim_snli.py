@@ -10,6 +10,7 @@ from torchtext.vocab import Vectors
 from learn_torch.torch_esim_model import Esim
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# DEVICE = "cpu"
 print("--------------------------------")
 print(DEVICE)
 
@@ -34,6 +35,7 @@ train = data.TabularDataset('/data/Downloads/data/dataset/snli_1.0/snli_1.0_trai
                                     ('sentence1', SENTENCE1), ('sentence2', SENTENCE2),
                                     ("captionID", None), ("pairID", None), ("label1", None), ("label2", None),
                                     ("label3", None), ("label4", None), ("label5", None)])
+
 # 增加读取文件类型判断
 assert list(train[5].__dict__.keys()) == ['gold_label', 'sentence1', 'sentence2']
 print(train[5])
@@ -47,8 +49,9 @@ vectors = Vectors(name="glove.6B.100d.txt", cache="/data/project/learn_allennlp/
 # 获取词向量的维度
 vectors_dim = vectors.dim
 # 获取分类的维度
+print(set([i.gold_label for i in train.examples]))
 num_class = len(set([i.gold_label for i in train.examples]))
-# 这里怎样去除不想要的类别 + 如何用 torchtext 转换乘 数字编码
+# 这里怎样去除不想要的类别
 print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
 
 LABEL.build_vocab(train)
@@ -84,9 +87,10 @@ model.to(DEVICE)
 
 crition = F.cross_entropy
 # 训练
-optimizer = torch.optim.Adam(model.parameters())  # ,lr=0.000001)
-
-n_epoch = 50
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # ,lr=0.000001)
+# 学习率过大，会导致震荡，甚至无法收敛
+# 学习率过小，训练缓慢
+n_epoch = 10
 
 best_val_acc = 0
 
@@ -107,11 +111,14 @@ for epoch in range(n_epoch):
 
         out = model(sentence1, sentence2)
         # print("---------------------------")
-        # print(out.shape)
+        # target 默认构建的label是从 1 开始的
+        target = target - 1
         loss = crition(out, target)
         loss.backward()
         optimizer.step()
         epoch_loss = epoch_loss + loss.data
         y_pre = torch.argmax(out, dim=-1)
         train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+        # print("train_acc", train_acc)
     print("epoch_loss is", epoch_loss / len(train), "acc is", train_acc / len(train))
+#  如果cuda 下报错，最好先看下 cpu是否运行正确
