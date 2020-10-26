@@ -5,7 +5,7 @@ import pandas as pd
 
 #  后面可以将jieba替换成fast jieba
 
-df = pd.read_csv("./full_data/train.csv")
+df = pd.read_csv("../full_data/train.csv")
 df = df[["Phrase", "Sentiment"]]
 jieba.load_userdict("./")
 #  下面dict 仅作示例，原始中可以通过 str 相加得到

@@ -3,7 +3,7 @@
 import chardet
 from pathlib import Path
 
-file_ = Path("./full_data/train.csv")
+file_ = Path("../full_data/train.csv")
 raw = file_.read_bytes()
 encoding = chardet.detect(raw)['encoding']
 # python 3.8 高级用法
