@@ -4,16 +4,16 @@ import pandas as pd
 from torch import optim
 
 # 1. 读取文件，查看文件
-data = pd.read_csv('../full_data/train.tsv', sep='\t')
-print(data[:5])
-print(data.columns)
+# data = pd.read_csv('../full_data/train.tsv', sep='\t')
+# print(data[:5])
+# print(data.columns)
 
 # 2. 划分验证集
-from sklearn.model_selection import train_test_split
-
-train, val = train_test_split(data, test_size=0.2)
-train.to_csv("./full_data/train.csv", index=False)
-val.to_csv("./full_data/val.csv", index=False)
+# from sklearn.model_selection import train_test_split
+#
+# train, val = train_test_split(data, test_size=0.2)
+# train.to_csv("./full_data/train.csv", index=False)
+# val.to_csv("./full_data/val.csv", index=False)
 
 # 3. 定义Field
 import spacy
@@ -150,7 +150,6 @@ for epoch in range(n_epoch):
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))
         target = batch.Sentiment
         # 这里的目的是什么？
-        # target.shape == 128
         target = torch.sparse.torch.eye(5).index_select(dim=0, index=target.cpu().data)
         target = target.to(DEVICE)
         # Adam 和 SGD的区别是什么
@@ -159,8 +158,8 @@ for epoch in range(n_epoch):
         optimizer.zero_grad()
 
         out = model(data)
-        print("---------------------------")
-        print(out.shape)
+        # print("---------------------------")
+        # print(out.shape)
         loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
         loss = loss.sum(-1).mean()
 

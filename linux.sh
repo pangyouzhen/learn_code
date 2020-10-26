@@ -51,3 +51,6 @@ cat /proc/pid/cmdline
 
 # 磁盘分区情况
 fsck -l
+
+#脚本调试
+sh -x xxx.sh

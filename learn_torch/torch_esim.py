@@ -1,3 +1,4 @@
+# https://blog.csdn.net/qq_44722174/article/details/104640018
 import json
 
 import pandas as pd
@@ -80,11 +81,11 @@ model.embedding1.weight.data.copy_(SENTENCE1.vocab.vectors)
 model.embedding2.weight.data.copy_(SENTENCE2.vocab.vectors)
 model.to(DEVICE)
 
-crition = F.cross_entropy
+crition = torch.nn.BCELoss()
 # 训练
 optimizer = torch.optim.Adam(model.parameters())  # ,lr=0.000001)
 
-n_epoch = 5
+n_epoch = 10
 
 best_val_acc = 0
 
@@ -106,10 +107,15 @@ for epoch in range(n_epoch):
         out = model(sentence1, sentence2)
         # print("---------------------------")
         # print(out.shape)
+        target = torch.sparse.torch.eye(2).index_select(dim=0, index=target.cpu().data)
+        target = target.to(DEVICE)
+        # TODO 这里究竟选哪种损失函数
         loss = crition(out, target)
+        # loss = -target * torch.log(out) - (1 - target) * torch.log(1 - out)
+        # loss = loss.sum(-1).mean()
         loss.backward()
         optimizer.step()
         epoch_loss = epoch_loss + loss.data
         y_pre = torch.argmax(out, dim=-1)
-        train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-    print("epoch_loss is", epoch_loss / len(train), "acc is", train_acc / len(train))
+        # train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+    print("epoch_loss is", epoch_loss, "acc is", train_acc / len(train))

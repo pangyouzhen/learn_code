@@ -29,7 +29,7 @@ assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
 
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
-vectors = Vectors(name="sgns.sogounews.bigram-char", cache="./data/")
+vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")
 SENTENCE1.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
 SENTENCE1.vocab.vectors.unk_init = init.xavier_uniform
