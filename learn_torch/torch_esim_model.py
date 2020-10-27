@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# 需要将模型独立开，如果在原先文件里，会将前面的都执行一下
 class Esim(nn.Module):
     def __init__(self, sentence1_vocab, sentence2_vocab, embedding_dim, hidden_size, num_class):
         super().__init__()

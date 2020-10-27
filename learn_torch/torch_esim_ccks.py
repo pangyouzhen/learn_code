@@ -1,31 +1,15 @@
-# https://blog.csdn.net/qq_44722174/article/details/104640018
-import json
-
-import pandas as pd
 import torch
 import torch.nn.functional as F
 from torch.nn import init
 from torchtext import data
 from torchtext.vocab import Vectors
+import pandas as pd
 
 from learn_torch.torch_esim_model import Esim
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("--------------------------------")
 print(DEVICE)
-
-
-# 预处理，生成torchtext的格式
-def process_dataset(file):
-    def split_multi_columns(x):
-        js = json.loads(x["json"])
-        return js["sentence1"], js["sentence2"], js["label"]
-
-    df = pd.read_csv(file, sep="\t", encoding="utf-8", names=["json"])
-    # 别忘了result_type 参数
-    df[['sentence1', 'sentence2', 'label']] = df.apply(lambda x: split_multi_columns(x), axis=1, result_type="expand")
-    df = df[['sentence1', 'sentence2', 'label']]
-    df.to_csv("./full_data/ants/ants_torchtext_train.csv", index=False, encoding="utf-8")
 
 
 def tokenizer(text):
@@ -36,9 +20,10 @@ LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
-train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
+train = data.TabularDataset('../data/ccks2018/task3_train.txt', format='tsv', skip_header=True,
                             fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
 # 增加读取文件类型判断
+print(list(train[5].__dict__.keys()))
 assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
 
 # 使用本地词向量
@@ -47,6 +32,7 @@ vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")
 # 获取词向量的维度
 vectors_dim = vectors.dim
 # 获取分类的维度
+# TODO  如何和 pandas dataframe结合
 num_class = len(set([i.label for i in train.examples]))
 print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
 
