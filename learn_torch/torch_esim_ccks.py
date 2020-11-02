@@ -32,7 +32,6 @@ vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")
 # 获取词向量的维度
 vectors_dim = vectors.dim
 # 获取分类的维度
-# TODO  如何和 pandas dataframe结合
 num_class = len(set([i.label for i in train.examples]))
 print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
 

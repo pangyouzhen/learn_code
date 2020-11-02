@@ -32,6 +32,7 @@ def process_dataset(file):
 def tokenizer(text):
     return [tok for tok in text]
 
+
 # quotechar 参数，比如句子中只有一个",数据错乱的情况下
 df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep="\t", encoding="utf-8",
                  names=["sentence1", "sentence2", "label"], quotechar="\\")
@@ -93,25 +94,31 @@ n_epoch = 20
 
 best_val_acc = 0
 
-for epoch in range(n_epoch):
-    epoch_loss = 0
-    train_acc = 0
-    # Example object has no attribute sentence2，看前面 assert 那个
-    for epoch2, batch in enumerate(train_iter):
-        target = batch.label
-        # target.shape == 128
-        target = target.to(DEVICE)
-        optimizer.zero_grad()
-        sentence1 = batch.sentence1
-        # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
-        sentence1 = sentence1.permute(1, 0)
-        sentence2 = batch.sentence2
-        sentence2 = sentence2.permute(1, 0)
 
-        out = model(sentence1, sentence2)
-        loss = crition(out, target)
-        loss.backward()
-        optimizer.step()
-        epoch_loss = epoch_loss + loss.data
-        train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-    print("epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
+def training(model, n_epoch, train_iter):
+    for epoch in range(n_epoch):
+        epoch_loss = 0
+        train_acc = 0
+        # Example object has no attribute sentence2，看前面 assert 那个
+        for epoch2, batch in enumerate(train_iter):
+            target = batch.label
+            # target.shape == 128
+            target = target.to(DEVICE)
+            optimizer.zero_grad()
+            sentence1 = batch.sentence1
+            # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
+            sentence1 = sentence1.permute(1, 0)
+            sentence2 = batch.sentence2
+            sentence2 = sentence2.permute(1, 0)
+
+            out = model(sentence1, sentence2)
+            loss = crition(out, target)
+            loss.backward()
+            optimizer.step()
+            epoch_loss = epoch_loss + loss.data
+            train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+        print("epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
+
+
+if __name__ == '__main__':
+    training(model, 20, train_iter)
