@@ -9,6 +9,7 @@ from torchtext import data
 from torchtext.vocab import Vectors
 
 from learn_torch.torch_esim_model import Esim
+from learn_torch.DataFrameDataSet import DataFrameDataset
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("--------------------------------")
@@ -31,13 +32,16 @@ def process_dataset(file):
 def tokenizer(text):
     return [tok for tok in text]
 
-
+# quotechar 参数，比如句子中只有一个",数据错乱的情况下
+df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep="\t", encoding="utf-8",
+                 names=["sentence1", "sentence2", "label"], quotechar="\\")
 LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
-train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
-                            fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
+# train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
+#                             fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
+train = DataFrameDataset(df, fields={'sentence1': SENTENCE1, 'sentence2': SENTENCE2, "label": LABEL})
 # 增加读取文件类型判断
 assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
 
