@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from torch.nn import init
 from torchtext import data
 from torchtext.vocab import Vectors
+from torch.utils.tensorboard import SummaryWriter
 
 from learn_torch.torch_esim_model import Esim
 from learn_torch.DataFrameDataSet import DataFrameDataset
@@ -28,7 +29,7 @@ def process_dataset(file):
     df = df[['sentence1', 'sentence2', 'label']]
     df.to_csv("./full_data/ants/ants_torchtext_train.csv", index=False, encoding="utf-8")
 
-
+writer = SummaryWriter()
 def tokenizer(text):
     return [tok for tok in text]
 
@@ -117,6 +118,7 @@ def training(model, n_epoch, train_iter):
             optimizer.step()
             epoch_loss = epoch_loss + loss.data
             train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+        writer.add_scalar("Loss/epoch", epoch_loss, epoch)
         print("epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
 
 
