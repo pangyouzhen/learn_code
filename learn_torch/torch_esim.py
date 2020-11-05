@@ -11,6 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from learn_torch.torch_esim_model import Esim
 from learn_torch.DataFrameDataSet import DataFrameDataset
+import numpy as np
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("--------------------------------")
@@ -41,7 +42,7 @@ def tokenizer(text):
 df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
 # print(df[:5])
 # print(df["label"].value_counts())
-assert df["label"].unique().shape == 2
+assert df["label"].unique().shape == (2,)
 LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
@@ -87,6 +88,8 @@ sentence2_vocab = len(SENTENCE2.vocab)
 
 model = Esim(sentence1_vocab=sentence1_vocab, sentence2_vocab=sentence2_vocab, embedding_dim=vectors_dim,
              hidden_size=20, num_class=num_class)
+writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
+                         torch.from_numpy(np.random.randint(100, size=(128, 41))).long()])
 print(SENTENCE1.vocab.vectors.shape)
 model.embedding1.weight.data.copy_(SENTENCE1.vocab.vectors)
 model.embedding2.weight.data.copy_(SENTENCE2.vocab.vectors)
@@ -94,8 +97,7 @@ model.to(DEVICE)
 
 crition = F.cross_entropy
 # 训练
-optimizer = torch.optim.Adam(model.parameters())  # ,lr=0.000001)
-
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # ,lr=0.000001)
 n_epoch = 20
 
 best_val_acc = 0
@@ -123,9 +125,13 @@ def training(model, n_epoch, train_iter):
             optimizer.step()
             epoch_loss = epoch_loss + loss.data
             train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-        writer.add_scalar("Loss/epoch", epoch_loss, epoch)
-        print("epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
-
+        writer.add_scalar("Loss/epoch", epoch_loss / len(train), epoch)
+        writer.add_scalar("acc/epoch", train_acc / len(train), epoch)
+        print('epoch is ', epoch, "epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
 
 if __name__ == '__main__':
     training(model, 20, train_iter)
+writer.close()
+# 运行tensorboard
+# cd  /data/project/learn_code/learn_torch
+# tensorboard --logdir=./runs
