@@ -29,14 +29,19 @@ def process_dataset(file):
     df = df[['sentence1', 'sentence2', 'label']]
     df.to_csv("./full_data/ants/ants_torchtext_train.csv", index=False, encoding="utf-8")
 
+
 writer = SummaryWriter()
+
+
 def tokenizer(text):
     return [tok for tok in text]
 
 
 # quotechar 参数，比如句子中只有一个",数据错乱的情况下
-df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep="\t", encoding="utf-8",
-                 names=["sentence1", "sentence2", "label"], quotechar="\\")
+df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
+# print(df[:5])
+# print(df["label"].value_counts())
+assert df["label"].unique().shape == 2
 LABEL = data.Field(sequential=False, use_vocab=False)
 SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
