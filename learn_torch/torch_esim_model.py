@@ -96,8 +96,6 @@ class Esim(nn.Module):
 
     def apply_multiple(self, x):
         # TODO 为什么这里 size有时是tensor，有时是整数，输入都是tensor
-        print(type(x))
-        print(type(x.size(1)))
         # input: batch_size * seq_len * (2 * hidden_size)
         p1 = F.avg_pool1d(x.transpose(1, 2), int(x.size(1))).squeeze(-1)
         p2 = F.max_pool1d(x.transpose(1, 2), int(x.size(1))).squeeze(-1)

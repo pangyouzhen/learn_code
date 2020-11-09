@@ -131,7 +131,7 @@ def training(model, n_epoch, train_iter):
 
 if __name__ == '__main__':
     training(model, 20, train_iter)
-writer.close()
+    writer.close()
 # 运行tensorboard
 # cd  /data/project/learn_code/learn_torch
 # tensorboard --logdir=./runs

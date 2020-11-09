@@ -54,3 +54,35 @@ fsck -l
 
 #脚本调试
 sh -x xxx.sh
+
+# grep awk sed
+# grep 正则
+grep 10.. .xsession-errors
+# sh 中 * + ? 重复，这里的+ ?用的时候需要 变成\+ \?
+# () 在 grep 正则中也要 \( \)
+# sed 打印第10行
+sed -n "10p" .xsession-errors
+sed -n "10,20p" .xsession-errors
+# p 是打印的意思
+# 使用正则进行匹配 打印
+sed -n "/err\+r/p" .xsession-errors
+#显示行号
+nl .xsession-errors
+# 第一个出现 error 和 ERROR 之间的行
+sed -n "/error/,/ERROR/p" .xsession-errors
+#取反操作
+sed -n "10!p" .xsession-errors
+sed -n "10,20!p" .xsession-errors
+# 每隔两行进行打印
+nl .xsession-errors | sed -n "1~2p"
+
+
+#关闭plank后面的阴影，
+# Window Manager Tweaks - Compositor - Show shadows under dock windows
+# 恢复默认xcfe panel
+#
+#    1. xfce4-panel --quit
+#    2. pkill xfconfd
+#    First delete settings for the panel, rm -rf ~/.config/xfce4/panel
+#    Clear out the settings for xfconfd, rm -rf ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+#    Restart the panel, run xfce4-panel. This will respawn xfconfd automatically. Note if you need or want to restart xfconfd manually know that on my installation it was in /usr/lib/x86_64-linux-gnu/xfce4/xfconf/xfconfd which was outside of $PATH.
