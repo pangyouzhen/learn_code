@@ -96,7 +96,7 @@ model.to(DEVICE)
 crition = F.cross_entropy
 # 训练
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # ,lr=0.000001)
-n_epoch = 20
+n_epoch = 10
 
 best_val_acc = 0
 
