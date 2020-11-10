@@ -58,3 +58,8 @@ tree = ET.parse("test.xml")
 root = tree.getroot()
 all_name = [i.attrib['name'] for i in root.findall('./')]
 print(all_name)
+
+import uuid
+
+# uuid4 是基于 伪随机数的
+id = str(uuid.uuid4())

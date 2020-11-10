@@ -1,6 +1,5 @@
 # https://blog.csdn.net/qq_44722174/article/details/104640018
 
-import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
@@ -17,9 +16,7 @@ def tokenizer(text):
     return [tok for tok in text]
 
 
-def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size, vectors_name, vectors_path):
-    global train
-    assert df["label"].unique().shape == (2,)
+def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size, vectors_name, vectors_path, DEVICE="cpu"):
     LABEL = data.Field(sequential=False, use_vocab=False)
     SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
     SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
@@ -30,7 +27,7 @@ def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size, vectors_name, 
     assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
     # 使用本地词向量
     # torchtext.Vectors 会自动识别 headers
-    vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")
+    vectors = Vectors(name=vectors_name, cache=vectors_path)
     # 获取词向量的维度
     vectors_dim = vectors.dim
     # 获取分类的维度
@@ -60,22 +57,22 @@ def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size, vectors_name, 
 # print("batch label: ", batch.label.shape) -> [128]
 
 
-def init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class):
+def init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class, device):
     model = Esim(sentence1_vocab=len(SENTENCE1.vocab), sentence2_vocab=len(SENTENCE2.vocab), embedding_dim=vectors_dim,
                  hidden_size=20, num_class=num_class)
-    writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
-                             torch.from_numpy(np.random.randint(100, size=(128, 41))).long()])
+    # writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
+    #                          torch.from_numpy(np.random.randint(100, size=(128, 41))).long()])
     print(SENTENCE1.vocab.vectors.shape)
     model.embedding1.weight.data.copy_(SENTENCE1.vocab.vectors)
     model.embedding2.weight.data.copy_(SENTENCE2.vocab.vectors)
-    model.to(DEVICE)
+    model.to(device)
     return model
 
 
-def training(model, n_epoch, train_iter):
+def training(model, n_epoch, train_iter, device, train, lr=0.01):
     crition = F.cross_entropy
     # 训练
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # ,lr=0.000001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)
     for epoch in range(n_epoch):
         epoch_loss = 0
         train_acc = 0
@@ -83,7 +80,7 @@ def training(model, n_epoch, train_iter):
         for epoch2, batch in enumerate(train_iter):
             target = batch.label
             # target.shape == 128
-            target = target.to(DEVICE)
+            target = target.to(device)
             optimizer.zero_grad()
             sentence1 = batch.sentence1
             # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
@@ -97,8 +94,8 @@ def training(model, n_epoch, train_iter):
             optimizer.step()
             epoch_loss = epoch_loss + loss.data
             train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-        writer.add_scalar("Loss/epoch", epoch_loss / len(train), epoch)
-        writer.add_scalar("acc/epoch", train_acc / len(train), epoch)
+        # writer.add_scalar("Loss/epoch", epoch_loss / len(train), epoch)
+        # writer.add_scalar("acc/epoch", train_acc / len(train), epoch)
         print('epoch is ', epoch, "epoch_loss is", epoch_loss, "acc is", train_acc / len(train))
 
 
@@ -114,8 +111,8 @@ if __name__ == '__main__':
         init_text_match_data(df, tokenizer, batch_size,
                              vectors_name="sgns.sogounews.bigram-char",
                              vectors_path="../data/")
-    model = init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class)
-    training(model, 20, train_iter)
+    model = init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class, device=DEVICE)
+    training(model, 20, train_iter, device=DEVICE, train=train)
     writer.close()
 # 运行tensorboard
 # cd  /data/project/learn_code/learn_torch
