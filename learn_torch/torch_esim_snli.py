@@ -3,13 +3,10 @@ import re
 import pandas as pd
 import spacy
 import torch
-from torchtext import data
 
 from learn_torch.torch_esim import init_text_match_data, init_model, training
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("--------------------------------")
-print(DEVICE)
 
 
 def extract_text(s):
@@ -31,11 +28,6 @@ def tokenizer(text):  # create a tokenizer function
     定义分词操作
     """
     return [tok.text for tok in spacy_en.tokenizer(text)]
-
-
-LABEL = data.Field(sequential=False, use_vocab=False)
-SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
 
 def prepare_data():

@@ -1,5 +1,4 @@
-from torchtext.data import Field, Dataset, Example
-import pandas as pd
+from torchtext.data import Dataset, Example
 
 
 class DataFrameDataset(Dataset):
@@ -16,6 +15,7 @@ class DataFrameDataset(Dataset):
                 filter_pred(example) is true, or use all examples if None.
                 Default is None
         """
+        super().__init__(examples, fields, filter_pred)
         self.examples = examples.apply(SeriesExample.fromSeries, args=(fields,), axis=1).tolist()
         if filter_pred is not None:
             self.examples = filter(filter_pred, self.examples)

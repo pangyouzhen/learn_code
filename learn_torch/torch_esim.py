@@ -17,14 +17,11 @@ def tokenizer(text):
 
 
 def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size, vectors_name, vectors_path, DEVICE="cpu"):
+    assert set(list(df)) == {'label', 'sentence1', 'sentence2'}
     LABEL = data.Field(sequential=False, use_vocab=False)
     SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
     SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-    # train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
-    #                             fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
     train = DataFrameDataset(df, fields={'sentence1': SENTENCE1, 'sentence2': SENTENCE2, "label": LABEL})
-    # 增加读取文件类型判断
-    assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
     # 使用本地词向量
     # torchtext.Vectors 会自动识别 headers
     vectors = Vectors(name=vectors_name, cache=vectors_path)
@@ -115,7 +112,7 @@ if __name__ == '__main__':
     training(model, 20, train_iter, device=DEVICE, train=train)
     writer.close()
 # 运行tensorboard
-# cd  /data/project/learn_code/learn_torch
+# cd /data/project/learn_code/learn_torch
 # tensorboard --logdir=./runs
 #  以后要写成函数或者类的形式，这样的好处是可以单独对某一个函数进行测试，而不是将整个程序都重新跑一遍
 #  要善于使用try 和 assert函数

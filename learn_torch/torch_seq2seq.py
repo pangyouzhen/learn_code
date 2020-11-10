@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, print_function, division
-from io import open
-import unicodedata
-import string
-import re
+
 import random
+import re
+import unicodedata
+from io import open
 
 import torch
 import torch.nn as nn
-from torch import optim
 import torch.nn.functional as F
+from torch import optim
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -328,7 +328,6 @@ import matplotlib.pyplot as plt
 
 plt.switch_backend('agg')
 import matplotlib.ticker as ticker
-import numpy as np
 
 
 def showPlot(points):
