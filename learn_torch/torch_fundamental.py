@@ -116,7 +116,7 @@ print(torch.argmax(a, dim=1))
 # element wise
 m = torch.Tensor([[1, 2, 3], [4, 5, 6]])
 n = torch.Tensor([[4, 5, 6], [1, 2, 3]])
-print(torch.mul(m, n))
+print(torch.mul(m, n).size())
 
 # dropout 主要解决过拟合的问题
 m = nn.Dropout(p=0.2)
@@ -315,3 +315,17 @@ loss2 = loss.sum(-1).mean()
 print(loss2)
 # crition = torch.nn.BCELoss()
 # print(crition(target, out) == loss)
+
+tensor1 = torch.randn(10, 3, 4)
+tensor2 = torch.randn(10, 4, 5)
+print(torch.matmul(tensor1, tensor2).size())
+
+m = nn.Conv1d(in_channels=16, out_channels=33, kernel_size=3)
+# input： N,in_channels,L_in
+# 默认情况下： Conv1d：N,out_channels,L_in - kernel_size + 1
+# 公式：https://pytorch.org/docs/stable/generated/torch.nn.Conv1d.html?highlight=conv1d#torch.nn.Conv1d
+input = torch.randn(20, 16, 50)
+output = m(input)
+print(output.shape)
+
+

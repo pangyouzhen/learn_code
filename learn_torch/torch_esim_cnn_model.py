@@ -11,8 +11,8 @@ class Esim(nn.Module):
         self.embedding1 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
         self.embedding2 = nn.Embedding(num_embeddings=sentence2_vocab, embedding_dim=embedding_dim)
         # self.embedding2 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True)
-        self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True)
+        self.cnn = nn.Conv1d(in_channels=embedding_dim, out_channels=int(embedding_dim / 2), kernel_size=2)
+        self.cnn2 = nn.Conv1d(in_channels=int(embedding_dim / 2), out_channels=int(embedding_dim / 2), kernel_size=2)
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
         # self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
         self.fc = nn.Sequential(
@@ -42,41 +42,42 @@ class Esim(nn.Module):
         a_embedding = self.embedding1(a)
         b_embedding = self.embedding2(b)
         # output: batch_size,seq_num,embedding_dim
-        a_bar, (a0, a1) = self.lstm(a_embedding)
-        b_bar, (b0, b1) = self.lstm(b_embedding)
-        # output: batch_size,seq_num,2 * hidden_size
+        a_embedding = a_embedding.permute(0, 2, 1)
+        b_embedding = b_embedding.permute(0, 2, 1)
+        # output: batch_size,embedding_dim,seq_num
+        a_bar = self.cnn(a_embedding)
+        # output：batch_size,out_channels(embedding_dim/2),  seq_num_a - kernel_size + 1
+        b_bar = self.cnn(b_embedding)
+        # output: batch_size,out_channels(embedding_dim/2),  seq_num_b - kernel_size + 1
         return a_bar, b_bar
 
     def inference_modeling(self, a_bar, b_bar):
-        e_ij = torch.matmul(a_bar, b_bar.permute(0, 2, 1))
-        # output： batch_size,seq_num_a,seq_num_b
+        e_ij = torch.matmul(a_bar.permute(0, 2, 1), b_bar)
+        # output： batch_size,seq_num_a-kernel_size+1 ,seq_num_b - kernel_size + 1
         attention_a = F.softmax(e_ij)
         attention_b = F.softmax(e_ij.permute(0, 2, 1))
-        a_hat = torch.matmul(attention_a, b_bar)
-        b_hat = torch.matmul(attention_b, a_bar)
-        # output: batch_size, seq_num, 2 * hidden_size
+        # batch_size, seq_num_a - kernel_size + 1, seq_num_b - kernel_size + 1 * (batch_size,out_channels(embedding_dim/2),  seq_num_b - kernel_size + 1)
+        a_hat = torch.matmul(attention_a, b_bar.permute(0, 2, 1))
+        b_hat = torch.matmul(attention_b, a_bar.permute(0, 2, 1))
+        # output: batch_size, seq_num_a-kernel_size+1 , out_channels
+        a_hat = a_hat.permute(0, 2, 1)
+        b_hat = b_hat.permute(0, 2, 1)
+        # batch_size, out_channels, seq_num_a - kernel_size + 1
         return a_hat, b_hat
 
     def inference_composition(self, a_hat, b_hat, a_bar, b_bar):
         a_diff = a_bar - a_hat
+        # batch_size, out_channels, seq_num_a - kernel_size + 1
         a_mul = torch.mul(a_bar, a_hat)
         m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=2)
-        # output: batch_size, seq_num_a, 2 * hidden_size * 4
+        # output:  batch_size, out_channels, 4* (seq_num_a - kernel_size + 1)
         b_diff = b_bar - b_hat
         b_mul = torch.mul(b_bar, b_hat)
         m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=2)
-        # output: batch_size, seq_num_b, 2 * hidden_size * 4
-        v_a, _ = self.lstm2(m_a)
-        v_b, _ = self.lstm2(m_b)
-        # output: batch_size, seq_num_b, 2 * hidden_size
-        # v_a_mean = learn_torch.mean(v_a, dim=1)
-        # v_b_mean = learn_torch.mean(v_b, dim=1)
-        #
-        # v_a_max = learn_torch.max(v_a, dim=1)
-        # v_b_max = learn_torch.max(v_b, dim=1)
-        #
-        # v = learn_torch.cat((v_a_mean, v_a_max, v_b_mean, v_b_max), dim=1)
-        # output:  batch_size,2 * seq_num_a + 2* seq_num_b, 2 * hidden
+        # output: batch_size, out_channels, 4* (seq_num_a - kernel_size + 1)
+        v_a = self.cnn2(m_a)
+        v_b = self.cnn2(m_b)
+        # output: batch_size, out_channels, (4* (seq_num_a - kernel_size + 1))-kernel_size + 1
         q1_rep = self.apply_multiple(v_a)
         q2_rep = self.apply_multiple(v_b)
 
@@ -104,6 +105,5 @@ class Esim(nn.Module):
 
 if __name__ == '__main__':
     esim = Esim(200, 200, 100, 2, 2)
-    print(esim)
     print(esim(torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
                torch.from_numpy(np.random.randint(100, size=(128, 41))).long()))
