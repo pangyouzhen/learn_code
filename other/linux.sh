@@ -1,6 +1,6 @@
-# 更改键盘某些按键（将F1按键转化为w按键，F2转化为tab键）
+# 更改键盘某些按键（将F1按键转化为w按键，F3转化为tab键）
 xmodmap -e 'keycode 67 = w W w W'
-xmodmap -e 'keycode 68 = Tab ISO_Left_Tab Tab ISO_Left_Tab'
+xmodmap -e 'keycode 69 = Tab ISO_Left_Tab Tab ISO_Left_Tab'
 #查看现在键盘的映射
 xmodmap -pke
 
@@ -86,3 +86,5 @@ nl .xsession-errors | sed -n "1~2p"
 #    First delete settings for the panel, rm -rf ~/.config/xfce4/panel
 #    Clear out the settings for xfconfd, rm -rf ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
 #    Restart the panel, run xfce4-panel. This will respawn xfconfd automatically. Note if you need or want to restart xfconfd manually know that on my installation it was in /usr/lib/x86_64-linux-gnu/xfce4/xfconf/xfconfd which was outside of $PATH.
+
+# 更改xcfe的 alt键  tweak

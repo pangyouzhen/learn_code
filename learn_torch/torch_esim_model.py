@@ -5,12 +5,10 @@ import numpy as np
 
 
 class Esim(nn.Module):
-    def __init__(self, sentence1_vocab, sentence2_vocab, embedding_dim, hidden_size, num_class):
+    def __init__(self, sentence_vocab, embedding_dim, hidden_size, num_class):
         super().__init__()
         self.dropout = 0.5
-        self.embedding1 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
-        self.embedding2 = nn.Embedding(num_embeddings=sentence2_vocab, embedding_dim=embedding_dim)
-        # self.embedding2 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
+        self.embedding = nn.Embedding(num_embeddings=sentence_vocab, embedding_dim=embedding_dim)
         self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True)
         self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True)
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
@@ -39,8 +37,8 @@ class Esim(nn.Module):
 
     def input_encoding(self, a, b):
         # input: batch_size,seq_num
-        a_embedding = self.embedding1(a)
-        b_embedding = self.embedding2(b)
+        a_embedding = self.embedding(a)
+        b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
@@ -104,6 +102,3 @@ class Esim(nn.Module):
 
 if __name__ == '__main__':
     esim = Esim(200, 200, 100, 2, 2)
-    print(esim)
-    print(esim(torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
-               torch.from_numpy(np.random.randint(100, size=(128, 41))).long()))

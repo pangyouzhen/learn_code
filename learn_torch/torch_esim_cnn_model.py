@@ -5,12 +5,10 @@ import numpy as np
 
 
 class Esim(nn.Module):
-    def __init__(self, sentence1_vocab, sentence2_vocab, embedding_dim, hidden_size, num_class):
+    def __init__(self, sentence_vocab, embedding_dim, hidden_size, num_class):
         super().__init__()
         self.dropout = 0.5
-        self.embedding1 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
-        self.embedding2 = nn.Embedding(num_embeddings=sentence2_vocab, embedding_dim=embedding_dim)
-        # self.embedding2 = nn.Embedding(num_embeddings=sentence1_vocab, embedding_dim=embedding_dim)
+        self.embedding = nn.Embedding(num_embeddings=sentence_vocab, embedding_dim=embedding_dim)
         self.cnn = nn.Conv1d(in_channels=embedding_dim, out_channels=int(embedding_dim / 2), kernel_size=2)
         self.cnn2 = nn.Conv1d(in_channels=int(embedding_dim / 2), out_channels=int(embedding_dim / 2), kernel_size=2)
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
@@ -30,7 +28,6 @@ class Esim(nn.Module):
         )
 
     def forward(self, a, b):
-        # premise_embedding, hypothesis_embedding = self.embedding(premise, hypothesis)
         a_bar, b_bar = self.input_encoding(a, b)
         a_hat, b_hat = self.inference_modeling(a_bar, b_bar)
         v = self.inference_composition(a_hat, b_hat, a_bar, b_bar)
@@ -39,8 +36,8 @@ class Esim(nn.Module):
 
     def input_encoding(self, a, b):
         # input: batch_size,seq_num
-        a_embedding = self.embedding1(a)
-        b_embedding = self.embedding2(b)
+        a_embedding = self.embedding(a)
+        b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
         a_embedding = a_embedding.permute(0, 2, 1)
         b_embedding = b_embedding.permute(0, 2, 1)

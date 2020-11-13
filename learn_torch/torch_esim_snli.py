@@ -3,6 +3,9 @@ import re
 import pandas as pd
 import spacy
 import torch
+import torchtext
+from torchtext import data
+from torchtext.datasets import SNLI
 
 from learn_torch.torch_esim import init_text_match_data, init_model, training
 
@@ -43,11 +46,16 @@ def prepare_data():
 
 
 if __name__ == '__main__':
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    df = prepare_data()
-    SENTENCE1, SENTENCE2, LABEL, train_iter, vectors_dim, num_class, train = \
-        init_text_match_data(df, tokenizer, 128, "glove.6B.100d.txt",
-                             "/data/project/learn_allennlp/data/.vector_cache/", DEVICE)
-    model = init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class, device=DEVICE)
-    training(model, 20, train_iter, device=DEVICE, train=train)
-    # writer.close()
+    # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # df = prepare_data()
+    # SENTENCE1, SENTENCE2, LABEL, train_iter, vectors_dim, num_class, train = \
+    #     init_text_match_data(df, tokenizer, 128, "glove.6B.100d.txt",
+    #                          "/data/project/learn_allennlp/data/.vector_cache/", DEVICE)
+    # model = init_model(SENTENCE1, SENTENCE2, vectors_dim, num_class, device=DEVICE)
+    # training(model, 20, train_iter, device=DEVICE, train=train)
+    # # writer.close()
+    LABEL = data.Field(sequential=False, use_vocab=False)
+    SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
+    SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
+    torchtext.datasets.SNLI(path="./temp", format="tsv",
+                            fields={'sentence1': SENTENCE1, 'sentence2': SENTENCE2, "label": LABEL})
