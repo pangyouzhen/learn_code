@@ -19,6 +19,10 @@ def tokenizer(text):
     return [tok for tok in text]
 
 
+def tokenizer2(text):
+    return text.split()
+
+
 def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size: int, vectors_name: str, vectors_path: str,
                          DEVICE="cpu"):
     assert set(list(df)) == {'label', 'sentence1', 'sentence2'}
@@ -34,9 +38,10 @@ def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size: int, vectors_n
     num_class = len(set([i.label for i in train.examples]))
     print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
     SENTENCE.build_vocab(train, vectors=vectors)  # , max_size=30000)
+    # 这里SENTENCE 根据vectors 构建了自己的词向量 ->> SENTENCE.vocab.vectors
+    # 如果原始词向量中没有这个词-> 构建成一个0 tensor
     # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
     SENTENCE.vocab.vectors.unk_init = init.xavier_uniform
-    # 这里torchtext 自动进行了pad，究竟是怎样pad的？
     train_iter = data.BucketIterator(train, batch_size=batch_size,
                                      shuffle=True, device=DEVICE)
     # train_iter = data.BucketIterator(train, batch_size=batch_size, device=DEVICE)
@@ -132,19 +137,17 @@ def testing(model, n_epoch, test_iter, device, test, writer, lr=0.00001):
             "epoch is {} test_epoch_loss is {} test_acc is {}".format(epoch, test_epoch_loss, test_acc / len(test)))
 
 
-if __name__ == '__main__':
+def main():
     # quotechar 参数，比如句子中只有一个",数据错乱的情况下
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # DEVICE = torch.device("cpu")
     print(DEVICE)
     writer = SummaryWriter()
     n_epoch = 20
-    best_val_acc = 0
     batch_size = 256
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)
     train_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
-    train_df = train_df[1:2]
     print(train_df)
     SENTENCE, LABEL, train_iter, vectors, num_class, train = \
         init_text_match_data(train_df, tokenizer, batch_size,
@@ -153,13 +156,17 @@ if __name__ == '__main__':
     model = init_model(SENTENCE, vectors, num_class, DEVICE, writer)
     training(model, n_epoch, train_iter, DEVICE, train, writer)
     # 验证集
-    # test_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
-    # SENTENCE1, SENTENCE2, LABEL, test_iter, vectors_dim, num_class, test = \
-    #     init_text_match_data(test_df, tokenizer, batch_size,
-    #                          vectors_name="sgns.sogounews.bigram-char",
-    #                          vectors_path="../data/", DEVICE=DEVICE)
-    # testing(model, n_epoch, test_iter, DEVICE, test, writer)
+    test_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
+    SENTENCE1, LABEL, test_iter, vectors_dim, num_class, test = \
+        init_text_match_data(test_df, tokenizer, batch_size,
+                             vectors_name="sgns.sogounews.bigram-char",
+                             vectors_path="../data/", DEVICE=DEVICE)
+    testing(model, n_epoch, test_iter, DEVICE, test, writer)
     writer.close()
+
+
+if __name__ == '__main__':
+    main()
 # 运行tensorboard
 # cd /data/project/learn_code/learn_torch
 # tensorboard --logdir=./runs
