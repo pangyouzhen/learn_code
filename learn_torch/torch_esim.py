@@ -144,7 +144,7 @@ if __name__ == '__main__':
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)
     train_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
-    # train_df = train_df[1:2]
+    train_df = train_df[1:2]
     print(train_df)
     SENTENCE, LABEL, train_iter, vectors, num_class, train = \
         init_text_match_data(train_df, tokenizer, batch_size,

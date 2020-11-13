@@ -19,30 +19,26 @@ def tokenizer(text):
 
 
 LABEL = data.Field(sequential=False, use_vocab=False)
-SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
+SENTENCE = data.Field(sequential=True, tokenize=tokenizer, lower=True)
 
 train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
-                            fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
+                            fields=[('sentence1', SENTENCE), ('sentence2', SENTENCE), ('label', LABEL)])
+print(len(train))
 # 增加读取文件类型判断
 assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
 
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
 vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")
-SENTENCE1.build_vocab(train, vectors=vectors)  # , max_size=30000)
+SENTENCE.build_vocab(train, vectors=vectors)  # , max_size=30000)
 # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
-SENTENCE1.vocab.vectors.unk_init = init.xavier_uniform
-
-SENTENCE2.build_vocab(train, vectors=vectors)  # , max_size=30000)
-# 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
-SENTENCE2.vocab.vectors.unk_init = init.xavier_uniform
+SENTENCE.vocab.vectors.unk_init = init.xavier_uniform
 
 batch_size = 128
 
 train_iter = data.BucketIterator(train, batch_size=batch_size,
                                  shuffle=True, device=DEVICE)
-sentence1_vocab = len(SENTENCE1.vocab)
+sentence1_vocab = len(SENTENCE.vocab)
 
 
 class ESIM(nn.Module):
@@ -51,7 +47,7 @@ class ESIM(nn.Module):
         self.dropout = 0.5
         self.hidden_size = 128
         self.embeds_dim = 300
-        self.embeds = nn.Embedding(len(SENTENCE1.vocab), self.embeds_dim)
+        self.embeds = nn.Embedding(len(SENTENCE.vocab), self.embeds_dim)
         self.bn_embeds = nn.BatchNorm1d(self.embeds_dim)
         self.lstm1 = nn.LSTM(self.embeds_dim, self.hidden_size, batch_first=True, bidirectional=True)
         self.lstm2 = nn.LSTM(self.hidden_size * 8, self.hidden_size, batch_first=True, bidirectional=True)
@@ -111,8 +107,8 @@ class ESIM(nn.Module):
         # embeds: batch_size * seq_len => batch_size * seq_len * dim
         # x1 = self.bn_embeds(self.embeds(sent1).transpose(1, 2).contiguous()).transpose(1, 2)
         # x2 = self.bn_embeds(self.embeds(sent2).transpose(1, 2).contiguous()).transpose(1, 2)
-        x1 = self.bn_embeds(self.embeds(sent1).transpose(1, 2).contiguous()).transpose(1, 2).transpose(0, 1)
-        x2 = self.bn_embeds(self.embeds(sent2).transpose(1, 2).contiguous()).transpose(1, 2).transpose(0, 1)
+        x1 = self.bn_embeds(self.embeds(sent1).transpose(1, 2).contiguous()).transpose(1, 2)
+        x2 = self.bn_embeds(self.embeds(sent2).transpose(1, 2).contiguous()).transpose(1, 2)
 
         # batch_size * seq_len * dim =>      batch_size * seq_len * hidden_size
         o1, _ = self.lstm1(x1)
@@ -167,11 +163,12 @@ def val_model(val_iter, net3):
 def main():
     model = ESIM().to(DEVICE)
     model.train()
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.01)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.05)
     crition = F.cross_entropy
     min_f = 0
-    for epoch in range(30):
+    for epoch in range(10):
         epoch_loss = 0
+        train_acc = 0
         for epoch, batch in enumerate(train_iter):
             optimizer.zero_grad()
             sentence1 = batch.sentence1
@@ -187,9 +184,17 @@ def main():
             loss.backward()
             optimizer.step()
             epoch_loss = epoch_loss + loss.data
+            # res = (torch.argmax(predicted, dim=-1) == label)
+            # res_list = res.cpu().numpy().tolist()
+            # t = []
+            # for i, v in enumerate(res_list):
+            #     if v == False:
+            #         t.append([sentence1.cpu().numpy().tolist()[i], sentence1.cpu().numpy().tolist()[i]])
+            # print(t)
+            train_acc += (torch.argmax(predicted, dim=-1) == label).sum().item()
         # 计算每一个epoch的loss
         # 计算验证集的准确度来确认是否存储这个model
-        print("epoch_loss", epoch_loss)
+        print("epoch_loss", epoch_loss, "train acc", train_acc / len(train))
         # f1, f2 = val_model(val_iter, model)
         # if (f1 + f2) / 2 > min_f:
         #     min_f = (f1 + f2) / 2
