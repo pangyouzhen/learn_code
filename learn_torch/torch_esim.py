@@ -1,6 +1,7 @@
 # https://blog.csdn.net/qq_44722174/article/details/104640018
 
 import datetime
+from typing import Callable, List
 
 import pandas as pd
 import torch
@@ -15,16 +16,16 @@ from learn_torch.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
 
 
-def tokenizer(text):
+def tokenizer(text: str) -> List:
     return [tok for tok in text]
 
 
-def tokenizer2(text):
+def tokenizer2(text: str) -> List:
     return text.split()
 
 
-def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size: int, vectors_name: str, vectors_path: str,
-                         DEVICE="cpu"):
+def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int, vectors_name: str, vectors_path: str,
+                         device=torch.device("cpu")):
     assert set(list(df)) == {'label', 'sentence1', 'sentence2'}
     LABEL = data.Field(sequential=False, use_vocab=False)
     SENTENCE = data.Field(sequential=True, tokenize=tokenizer, lower=True)
@@ -43,9 +44,9 @@ def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size: int, vectors_n
     # 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
     SENTENCE.vocab.vectors.unk_init = init.xavier_uniform
     train_iter = data.BucketIterator(train, batch_size=batch_size,
-                                     shuffle=True, device=DEVICE)
+                                     shuffle=True, device=device)
     # train_iter = data.BucketIterator(train, batch_size=batch_size, device=DEVICE)
-    return SENTENCE, LABEL, train_iter, vectors, num_class, train
+    return SENTENCE, train_iter, num_class, train
 
 
 # print(df[:5])
@@ -61,10 +62,10 @@ def init_text_match_data(df: pd.DataFrame, tokenizer, batch_size: int, vectors_n
 # print("batch label: ", batch.label.shape) -> [128]
 
 
-def init_model(SENTENCE: data.Field, vectors: Vectors, num_class: int, device: str,
+def init_model(SENTENCE: data.Field, num_class: int, device: torch.device,
                writer: SummaryWriter):
-    model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=vectors.dim,
-                 hidden_size=20, num_class=num_class)
+    model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=SENTENCE.vocab.vectors.shape[-1], hidden_size=20,
+                 num_class=num_class)
     # writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
     #                          torch.from_numpy(np.random.randint(100, size=(128, 41))).long()])
     print(SENTENCE.vocab.vectors.shape)
@@ -73,7 +74,7 @@ def init_model(SENTENCE: data.Field, vectors: Vectors, num_class: int, device: s
     return model
 
 
-def training(model, n_epoch, train_iter, device, train, writer, lr=0.05):
+def training(model, n_epoch: int, train_iter, device, train, writer, lr=0.05):
     logger.info("lr is {}, n_epoch is {}".format(lr, n_epoch))
     crition = F.cross_entropy
     # 训练
@@ -108,7 +109,8 @@ def training(model, n_epoch, train_iter, device, train, writer, lr=0.05):
                                                                                 train_acc / len(train)))
 
 
-def testing(model, n_epoch, test_iter, device, test, writer, lr=0.00001):
+def testing(model, n_epoch: int, test_iter: data.BucketIterator, device: torch.device, test: DataFrameDataset,
+            writer: SummaryWriter, lr: float = 0.00001):
     crition = F.cross_entropy
     # 训练
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)
@@ -139,29 +141,28 @@ def testing(model, n_epoch, test_iter, device, test, writer, lr=0.00001):
 
 def main():
     # quotechar 参数，比如句子中只有一个",数据错乱的情况下
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # DEVICE = torch.device("cpu")
-    print(DEVICE)
+    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cpu")
+    print(device)
     writer = SummaryWriter()
     n_epoch = 20
-    batch_size = 256
+    batch_size: int = 256
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)
     train_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
-    print(train_df)
-    SENTENCE, LABEL, train_iter, vectors, num_class, train = \
+    SENTENCE, train_iter, num_class, train = \
         init_text_match_data(train_df, tokenizer, batch_size,
                              vectors_name="sgns.sogounews.bigram-char",
-                             vectors_path="../data/", DEVICE=DEVICE)
-    model = init_model(SENTENCE, vectors, num_class, DEVICE, writer)
-    training(model, n_epoch, train_iter, DEVICE, train, writer)
+                             vectors_path="../data/", device=device)
+    model = init_model(SENTENCE, num_class, device, writer)
+    training(model, n_epoch, train_iter, device, train, writer)
     # 验证集
     test_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
-    SENTENCE1, LABEL, test_iter, vectors_dim, num_class, test = \
+    SENTENCE1, test_iter, num_class, test = \
         init_text_match_data(test_df, tokenizer, batch_size,
                              vectors_name="sgns.sogounews.bigram-char",
-                             vectors_path="../data/", DEVICE=DEVICE)
-    testing(model, n_epoch, test_iter, DEVICE, test, writer)
+                             vectors_path="../data/", device=device)
+    testing(model, n_epoch, test_iter, device, test, writer)
     writer.close()
 
 
