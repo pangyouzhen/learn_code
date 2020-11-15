@@ -1,6 +1,5 @@
-# https://blog.csdn.net/qq_44722174/article/details/104640018
-
 import datetime
+import json
 from typing import Callable, List
 
 import pandas as pd
@@ -79,6 +78,7 @@ def training(model, n_epoch: int, train_iter, device, train, writer, lr=0.05):
     crition = F.cross_entropy
     # 训练
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.95)
     for epoch in range(n_epoch):
         train_epoch_loss = 0
         train_acc = 0
@@ -105,6 +105,7 @@ def training(model, n_epoch: int, train_iter, device, train, writer, lr=0.05):
             train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
         writer.add_scalar("train_loss/epoch", train_epoch_loss / len(train), epoch)
         writer.add_scalar("train_acc/epoch", train_acc / len(train), epoch)
+        scheduler.step()
         logger.info("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
                                                                                 train_acc / len(train)))
 
@@ -137,6 +138,7 @@ def testing(model, n_epoch: int, test_iter: data.BucketIterator, device: torch.d
         writer.add_scalar("test_acc/epoch", test_acc / len(test), epoch)
         logger.info(
             "epoch is {} test_epoch_loss is {} test_acc is {}".format(epoch, test_epoch_loss, test_acc / len(test)))
+    torch.save(model, "./pkl/%s_esim.pkl" % datetime.datetime.now().strftime("%Y-%m-%d_%H-%M"))
 
 
 def main():
@@ -145,7 +147,7 @@ def main():
     # device = torch.device("cpu")
     print(device)
     writer = SummaryWriter()
-    n_epoch = 20
+    n_epoch = 10
     batch_size: int = 256
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)
@@ -157,13 +159,25 @@ def main():
     model = init_model(SENTENCE, num_class, device, writer)
     training(model, n_epoch, train_iter, device, train, writer)
     # 验证集
-    test_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
+    test_df = pd.read_csv("../full_data/ants/ants_torchtext_dev.csv", sep=",", encoding="utf-8")
     SENTENCE1, test_iter, num_class, test = \
         init_text_match_data(test_df, tokenizer, batch_size,
                              vectors_name="sgns.sogounews.bigram-char",
                              vectors_path="../data/", device=device)
     testing(model, n_epoch, test_iter, device, test, writer)
     writer.close()
+
+
+def process_dataset(file):
+    def split_multi_columns(x):
+        js = json.loads(x["json"])
+        return js["sentence1"], js["sentence2"], js["label"]
+
+    df = pd.read_csv(file, sep="\t", encoding="utf-8", names=["json"])
+    # 别忘了result_type 参数
+    df[['sentence1', 'sentence2', 'label']] = df.apply(lambda x: split_multi_columns(x), axis=1, result_type="expand")
+    df = df[['sentence1', 'sentence2', 'label']]
+    df.to_csv("../full_data/ants/ants_torchtext_dev.csv", index=False, encoding="utf-8")
 
 
 if __name__ == '__main__':
