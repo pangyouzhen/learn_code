@@ -73,7 +73,7 @@ def init_model(SENTENCE: data.Field, num_class: int, device: torch.device,
     return model
 
 
-def training(model, n_epoch: int, train_iter, device, train, writer, lr=0.05):
+def training(model: Esim, n_epoch: int, train_iter, device, train, writer, lr=0.05):
     logger.info("lr is {}, n_epoch is {}".format(lr, n_epoch))
     crition = F.cross_entropy
     # 训练
@@ -110,7 +110,7 @@ def training(model, n_epoch: int, train_iter, device, train, writer, lr=0.05):
                                                                                 train_acc / len(train)))
 
 
-def testing(model, n_epoch: int, test_iter: data.BucketIterator, device: torch.device, test: DataFrameDataset,
+def testing(model: Esim, n_epoch: int, test_iter: data.BucketIterator, device: torch.device, test: DataFrameDataset,
             writer: SummaryWriter, lr: float = 0.00001):
     crition = F.cross_entropy
     # 训练
@@ -168,7 +168,7 @@ def main():
     writer.close()
 
 
-def process_dataset(file):
+def process_dataset(file: str):
     def split_multi_columns(x):
         js = json.loads(x["json"])
         return js["sentence1"], js["sentence2"], js["label"]
