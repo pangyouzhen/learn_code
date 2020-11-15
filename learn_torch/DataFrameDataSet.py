@@ -1,10 +1,13 @@
+from typing import Dict, Callable, List
+
 from torchtext.data import Dataset, Example
+import pandas as pd
 
 
 class DataFrameDataset(Dataset):
     """Class for using pandas DataFrames as a datasource"""
 
-    def __init__(self, examples, fields, filter_pred=None):
+    def __init__(self, examples: pd.DataFrame, fields: Dict, filter_pred: Callable = None) -> None:
         """
         Create a dataset from a pandas dataframe of examples and Fields
         Arguments:
@@ -16,10 +19,11 @@ class DataFrameDataset(Dataset):
                 Default is None
         """
         super().__init__(examples, fields, filter_pred)
-        self.examples = examples.apply(SeriesExample.fromSeries, args=(fields,), axis=1).tolist()
+        # TODO apply type hint
+        self.examples: List['SeriesExample'] = examples.apply(SeriesExample.fromSeries, args=(fields,), axis=1).tolist()
         if filter_pred is not None:
             self.examples = filter(filter_pred, self.examples)
-        self.fields = dict(fields)
+        self.fields: Dict = dict(fields)
         # Unpack field tuples
         for n, f in list(self.fields.items()):
             if isinstance(n, tuple):
@@ -31,11 +35,12 @@ class SeriesExample(Example):
     """Class to convert a pandas Series to an Example"""
 
     @classmethod
-    def fromSeries(cls, data, fields):
+    def fromSeries(cls, data: pd.DataFrame, fields: Dict) -> 'SeriesExample':
         return cls.fromdict(data.to_dict(), fields)
 
+    # https://stackoverflow.com/questions/33533148/how-do-i-type-hint-a-method-with-the-type-of-the-enclosing-class
     @classmethod
-    def fromdict(cls, data, fields):
+    def fromdict(cls, data: Dict, fields: Dict) -> 'SeriesExample':
         ex = cls()
 
         for key, field in fields.items():

@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class Esim(nn.Module):
-    def __init__(self, sentence_vocab, embedding_dim, hidden_size, num_class):
+    def __init__(self, sentence_vocab: int, embedding_dim: int, hidden_size: int, num_class: int):
         super().__init__()
         self.dropout = 0.5
         self.embedding = nn.Embedding(num_embeddings=sentence_vocab, embedding_dim=embedding_dim)
@@ -26,7 +26,7 @@ class Esim(nn.Module):
             nn.Softmax(dim=-1)
         )
 
-    def forward(self, a, b):
+    def forward(self, a: torch.Tensor, b: torch.Tensor):
         # premise_embedding, hypothesis_embedding = self.embedding(premise, hypothesis)
         a_bar, b_bar = self.input_encoding(a, b)
         a_hat, b_hat = self.inference_modeling(a_bar, b_bar)
@@ -34,7 +34,7 @@ class Esim(nn.Module):
         result = self.prediction(v)
         return result
 
-    def input_encoding(self, a, b):
+    def input_encoding(self, a: torch.Tensor, b: torch.Tensor):
         # input: batch_size,seq_num
         a_embedding = self.embedding(a)
         b_embedding = self.embedding(b)
@@ -44,7 +44,7 @@ class Esim(nn.Module):
         # output: batch_size,seq_num,2 * hidden_size
         return a_bar, b_bar
 
-    def inference_modeling(self, a_bar, b_bar):
+    def inference_modeling(self, a_bar: torch.Tensor, b_bar: torch.Tensor):
         e_ij = torch.matmul(a_bar, b_bar.permute(0, 2, 1))
         # output： batch_size,seq_num_a,seq_num_b
         attention_a = F.softmax(e_ij)
@@ -54,7 +54,7 @@ class Esim(nn.Module):
         # output: batch_size, seq_num, 2 * hidden_size
         return a_hat, b_hat
 
-    def inference_composition(self, a_hat, b_hat, a_bar, b_bar):
+    def inference_composition(self, a_hat: torch.Tensor, b_hat: torch.Tensor, a_bar: torch.Tensor, b_bar: torch.Tensor):
         a_diff = a_bar - a_hat
         a_mul = torch.mul(a_bar, a_hat)
         m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=2)
@@ -81,7 +81,7 @@ class Esim(nn.Module):
         x = torch.cat([q1_rep, q2_rep], -1)
         return x
 
-    def prediction(self, v):
+    def prediction(self, v: torch.Tensor):
         # batch_size, 2 * seq_num_a + 2 * seq_num_b, 2 * hidden
         # feed_forward1 = self.linear1(v)
         # batch_size,2 * seq_num_a + 2 * seq_num_b,  2 * hidden

@@ -54,7 +54,7 @@ fn(**db_host["db"])
 # XML
 import xml.etree.ElementTree as ET
 
-tree = ET.parse("test.xml")
+tree: ET.ElementTree = ET.parse("test.xml")
 root = tree.getroot()
 all_name = [i.attrib['name'] for i in root.findall('./')]
 print(all_name)
