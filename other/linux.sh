@@ -88,3 +88,6 @@ nl .xsession-errors | sed -n "1~2p"
 #    Restart the panel, run xfce4-panel. This will respawn xfconfd automatically. Note if you need or want to restart xfconfd manually know that on my installation it was in /usr/lib/x86_64-linux-gnu/xfce4/xfconf/xfconfd which was outside of $PATH.
 
 # 更改xcfe的 alt键  tweak
+# uml 图 + 时序图
+# pip install pylint
+#pyreverse -ASmy -o png allennlp/data/
