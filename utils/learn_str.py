@@ -63,3 +63,15 @@ import uuid
 
 # uuid4 是基于 伪随机数的
 id = str(uuid.uuid4())
+
+# python 提取字符串中的汉字
+str1 = "｛我%$是，《速$@.度\发》中 /国、人"
+str2 = "[齐天大圣/孙悟空] 2016.09.17 六学家Zhang ~ 第1张.jpg"
+import re
+
+res1 = ''.join(re.findall('[\u4e00-\u9fa5]', str1))
+print(res1)
+
+# 保留字母，汉字，数字
+res2 = re.sub("[^a-zA-Z0-9\u4e00-\u9fa5]", '', str2)
+print(res2)
