@@ -7,8 +7,8 @@ class Date:
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
-    # @classmethod 应用场景：用作 这个类的初始化（类似java的构造方法），这种初始化不同于__init__，如果我想初始化
-    # date类，但是字符串是"2020/12/22"
+    # @classmethod 应用场景：用作 这个类的初始化（java的不同构造方法，java中可以有多个构造函数
+    # 这种初始化不同于__init__，如果我想初始化date类，但是字符串是"2020/12/22"
     @classmethod
     def create_from_str(cls, dates: str):
         year, month, day = dates.split("/")

@@ -91,3 +91,10 @@ nl .xsession-errors | sed -n "1~2p"
 # uml 图 + 时序图
 # pip install pylint
 #pyreverse -ASmy -o png allennlp/data/
+
+# pycharm struct 说明
+# c class
+# v 类变量
+# p 方法变属性
+# m 方法
+# f 属性
