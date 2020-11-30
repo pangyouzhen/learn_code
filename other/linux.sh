@@ -98,3 +98,6 @@ nl .xsession-errors | sed -n "1~2p"
 # p 方法变属性
 # m 方法
 # f 属性
+
+
+systemctl status systemd-timesyncd.service
