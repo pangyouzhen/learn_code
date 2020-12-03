@@ -11,7 +11,7 @@ docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
 # 127.0.0.1:5601
-
+sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 #git
 # git 生成ssh
 ls ~/.ssh

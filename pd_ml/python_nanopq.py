@@ -28,7 +28,8 @@ def search(codeword, pqcode, query):
     for m in range(M):
         query_sub = query[m * Ds:(m + 1) * Ds]
         # 将query 切分成M组，每一组都和codeword的对应组计算距离
-        dist_table[m, :] = cdist(query_sub,
+        # print(query_sub.shape)
+        dist_table[m, :] = cdist([query_sub],
                                  codeword[m], 'sqeuclidean')[0]
     dist = np.sum(dist_table[range(M), pqcode], axis=1)
     return dist
@@ -36,8 +37,13 @@ def search(codeword, pqcode, query):
 
 if __name__ == '__main__':
     M = 3
-    query = np.array([0.34, 0.22, 0.68, 1.02, 0.03, 0.71])
-    vec = np.random.randn(50000, 1024)
+    query = np.random.randn(1, 150)
+    q = query.tolist()[0]
+    print(len(q))
+    # query = np.array([0.34, 0.22, 0.68, 1.02, 0.03, 0.71])
+    vec = np.random.randn(1200, 150)
     codeword = train(vec, M)
     print("总共分为M, _K, Ds", codeword.shape)
     pqcode = encode_(codeword, vec)
+    res = (search(codeword, pqcode, q))
+    print(res)

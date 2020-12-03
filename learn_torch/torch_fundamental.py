@@ -80,6 +80,8 @@ x = torch.randn(1, 4, 5)
 print(x.size())
 print(x.unsqueeze(2).size())
 print(x.unsqueeze(1).size())
+#  squeeze 挤压，就是删减维度
+#  unsqueeze - squeeze的反义词，增加维度
 
 # view
 x = torch.randn(4, 4)

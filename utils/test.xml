@@ -1,0 +1,8 @@
+<item>
+<instance ref="rule">
+   <value>我行行员</value>
+</instance>
+<instance ref="rule2">
+   <value>我行行员1</value>
+</instance>
+</item>
