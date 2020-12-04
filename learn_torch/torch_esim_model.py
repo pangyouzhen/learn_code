@@ -100,4 +100,8 @@ class Esim(nn.Module):
 
 
 if __name__ == '__main__':
-    esim = Esim(200, 200, 100, 2, 2)
+    esim = Esim(200, 200, 100, 2)
+    print(esim)
+    print("---------------------")
+    for param in esim.named_parameters():
+        print(param[0], param[1].shape)

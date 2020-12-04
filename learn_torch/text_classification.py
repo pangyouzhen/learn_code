@@ -9,6 +9,7 @@ if not os.path.isdir('./.data'):
     os.mkdir('./.data')
 train_dataset, test_dataset = DATASETS['AG_NEWS'](
     root='./.data', ngrams=NGRAMS, vocab=None, downloads=False, path="./.data/ag_news_csv.tar.gz")
+# 这里生成的embeding 已经embedding了
 BATCH_SIZE = 16
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
