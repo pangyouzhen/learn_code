@@ -12,6 +12,11 @@ torch.manual_seed(0)
 
 # transformer
 # SNE -> TNE
+# pytorch中文档：
+# S：src_seq_length
+# T: target_seq_length
+# N: batch_size
+# E: embedding_dim
 from torch.nn.modules.transformer import Transformer
 
 trans = Transformer(d_model=10, nhead=2)
@@ -47,6 +52,8 @@ output2, (h1, c1) = bilstm(input1)
 assert output2.size() == (5, 3, 40)
 
 #  embedding, embedding就是lookup，寻找
+# input: (*) -> output: (*,E)
+# Embedding的两个参数从 多大的数据中查找，查找的每个字或词的维度是多少
 m = nn.Embedding(num_embeddings=10, embedding_dim=3)
 # 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got learn_torch.FloatTensor
 n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
@@ -330,4 +337,22 @@ input = torch.randn(20, 16, 50)
 output = m(input)
 print(output.shape)
 
+# 神经网络的初始化方法，
+# 正太分布 初始化
+w = torch.empty(3, 5)
+nn.init.xavier_normal_(w, gain=nn.init.calculate_gain("relu"))
+#  均匀分布 初始化
+# nn.init.xavier_uniform_(w,)
+#  初始化为常数
+# nn.init.constant_(w)
+# 多头注意力机制
+from torch.nn.modules.activation import MultiheadAttention
 
+query = torch.randn(11, 20, 40)
+key = torch.randn(6, 20, 40)
+value = torch.randn(6, 20, 40)
+attn = MultiheadAttention(embed_dim=40, num_heads=4)
+print(attn)
+for param in attn.named_parameters():
+    # print(param,param.size())
+    print(param[0], "++", param[1].shape)

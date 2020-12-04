@@ -10,6 +10,7 @@ from torch.nn import init
 from torch.utils.tensorboard import SummaryWriter
 from torchtext import data
 from torchtext.vocab import Vectors
+import torchsnooper
 
 from learn_torch.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
@@ -79,35 +80,36 @@ def training(model: Esim, n_epoch: int, train_iter, device, train, writer, lr=0.
     # 训练
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.95)
-    for epoch in range(n_epoch):
-        train_epoch_loss = 0
-        train_acc = 0
-        # Example object has no attribute sentence2，看前面 assert 那个
-        for epoch2, batch in enumerate(train_iter):
-            target = batch.label
-            # target.shape == 128
-            target = target.to(device)
-            optimizer.zero_grad()
-            sentence1 = batch.sentence1
-            # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
-            sentence1 = sentence1.permute(1, 0)
-            sentence2 = batch.sentence2
-            sentence2 = sentence2.permute(1, 0)
+    with torchsnooper.snoop():
+        for epoch in range(n_epoch):
+            train_epoch_loss = 0
+            train_acc = 0
+            # Example object has no attribute sentence2，看前面 assert 那个
+            for epoch2, batch in enumerate(train_iter):
+                target = batch.label
+                # target.shape == 128
+                target = target.to(device)
+                optimizer.zero_grad()
+                sentence1 = batch.sentence1
+                # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
+                sentence1 = sentence1.permute(1, 0)
+                sentence2 = batch.sentence2
+                sentence2 = sentence2.permute(1, 0)
 
-            out = model(sentence1, sentence2)
-            # tt = pd.DataFrame([target.cpu().numpy(),  out.cpu().detach().numpy(),
-            #               torch.argmax(out, dim=-1).cpu().numpy()])
-            loss = crition(out, target)
-            loss.backward()
-            optimizer.step()
-            train_epoch_loss = train_epoch_loss + loss.data
-            # print((torch.argmax(out, dim=-1) == target).sum())
-            train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-        writer.add_scalar("train_loss/epoch", train_epoch_loss / len(train), epoch)
-        writer.add_scalar("train_acc/epoch", train_acc / len(train), epoch)
-        scheduler.step()
-        logger.info("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
-                                                                                train_acc / len(train)))
+                out = model(sentence1, sentence2)
+                # tt = pd.DataFrame([target.cpu().numpy(),  out.cpu().detach().numpy(),
+                #               torch.argmax(out, dim=-1).cpu().numpy()])
+                loss = crition(out, target)
+                loss.backward()
+                optimizer.step()
+                train_epoch_loss = train_epoch_loss + loss.data
+                # print((torch.argmax(out, dim=-1) == target).sum())
+                train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+            writer.add_scalar("train_loss/epoch", train_epoch_loss / len(train), epoch)
+            writer.add_scalar("train_acc/epoch", train_acc / len(train), epoch)
+            scheduler.step()
+            logger.info("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
+                                                                                    train_acc / len(train)))
 
 
 def testing(model: Esim, n_epoch: int, test_iter: data.BucketIterator, device: torch.device, test: DataFrameDataset,
@@ -147,7 +149,7 @@ def main():
     # device = torch.device("cpu")
     print(device)
     writer = SummaryWriter()
-    n_epoch = 10
+    n_epoch = 5
     batch_size: int = 256
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)

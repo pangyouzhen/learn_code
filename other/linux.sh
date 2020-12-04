@@ -99,5 +99,10 @@ nl .xsession-errors | sed -n "1~2p"
 # m 方法
 # f 属性
 
-
+#时间同步服务
 systemctl status systemd-timesyncd.service
+xrandr --output HDMI-1 --above eDP-1
+lspci
+inxi -G
+unzip -n geekzw-funNLP-master.zip -d ./funNlp
+
