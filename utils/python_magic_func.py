@@ -47,6 +47,18 @@ class Tag2(Tag):
 
 tag2 = Tag2(["python", "java"])
 
+# mixin
+# 多重类的组合。而不是在原始类上扩展
+# 比如 bird 类和runable 类 -> 两者组合可以是鸵鸟，如果鸵鸟只继承bird，那么需要自己扩展相关的方法
+# requests 包里面 的Session 就是用了mixin
+
+# 线程池和进程池
+# 线程池和进程池是一个普遍的做法
+# 可以看下session中是如何进行构建线程池的
+# TCP 中的五元组
+
+
+
 for i in tag2:
     print(i)
 print(tag2[:1])
