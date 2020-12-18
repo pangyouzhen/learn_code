@@ -14,3 +14,5 @@ clf = clf.fit(X, Y)
 
 # GBDT
 from sklearn.ensemble import GradientBoostingClassifier
+gbdt = GradientBoostingClassifier()
+gbdt.fit(X,Y)

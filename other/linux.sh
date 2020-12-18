@@ -10,6 +10,8 @@ docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
 docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
+docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
+docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
 # 127.0.0.1:5601
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 #git
@@ -101,8 +103,25 @@ nl .xsession-errors | sed -n "1~2p"
 
 #时间同步服务
 systemctl status systemd-timesyncd.service
+# 将当前时间写入硬件时间
+sudo hwclock -w
 xrandr --output HDMI-1 --above eDP-1
 lspci
 inxi -G
 unzip -n geekzw-funNLP-master.zip -d ./funNlp
 
+# 将vim的内容复制到系统剪切板 "*y
+# 服务器上没界面，不好操作，本地环境不好用 jupyter notebook
+
+#删除软链接
+rm 软链接
+# 注意这里不能加 /加上就成了删除源文件了
+ln -s 源文件 软链接
+# 使用命令时 最好先用man 等linux 常用的来看，后面再去百度，一定改掉这个习惯
+# 将上一个的输出变成下一个的输入 $ 符号  wc -l $(ls)
+# 递增序列
+cat -n file.txt > newfile.txt
+nl -n ln  garch.py > /tmp/garcH_test.py
+
+# 获取输出结果的第一个
+utility 2>&1 | head -n 1
