@@ -124,4 +124,9 @@ cat -n file.txt > newfile.txt
 nl -n ln  garch.py > /tmp/garcH_test.py
 
 # 获取输出结果的第一个
-utility 2>&1 | head -n 1
+#utility 2>&1 | head -n 1
+
+# 2>&1 的使用
+# 标准输出和标准错误是严格分开的，比如 有一个脚本 中间某个命令报错 单纯使用 > 错误不会输出到文件的，
+# 此时必须使用 2>&1 错误才能输出到文件
+# /dev/null 是空设备，输入的所有东西都将被丢弃
