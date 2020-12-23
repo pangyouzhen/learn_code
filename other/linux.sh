@@ -130,3 +130,14 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 # 标准输出和标准错误是严格分开的，比如 有一个脚本 中间某个命令报错 单纯使用 > 错误不会输出到文件的，
 # 此时必须使用 2>&1 错误才能输出到文件
 # /dev/null 是空设备，输入的所有东西都将被丢弃
+
+# linux
+# !!  上一个命令
+# ！$ 上一个命令的参数
+# 获取文件的目录
+# locate transformer_.py | head -n 1 | xargs dirname
+
+
+jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > /tmp/jupyter.log 2>&1 &
+scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
+#因为scp的输出不是标准输出 直接>是无效的

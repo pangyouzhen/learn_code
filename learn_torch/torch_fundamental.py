@@ -356,3 +356,11 @@ print(attn)
 for param in attn.named_parameters():
     # print(param,param.size())
     print(param[0], "++", param[1].shape)
+
+# pytorch 归一化层：BatchNorm、LayerNorm、InstanceNorm、GroupNorm
+# Norm 最归一化，所以输入输出的维度是不变化的
+# BatchNorm：batch方向做归一化
+# LayerNorm：channel方向做归一化
+# InstanceNorm： 一个channel内做归一化
+# GroupNorm：将channel方向分group，
+# SwitchableNorm是将BN、LN、IN结合
