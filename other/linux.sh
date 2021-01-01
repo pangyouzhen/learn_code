@@ -12,6 +12,8 @@ docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
+# 使用nvidia docker
+docker run -it -p 8500:8500 --runtime=nvidia -d tensorflow
 # 127.0.0.1:5601
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 #git
@@ -141,3 +143,4 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > /tmp/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
 #因为scp的输出不是标准输出 直接>是无效的
+sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png

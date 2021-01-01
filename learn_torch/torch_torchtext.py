@@ -197,3 +197,9 @@ for epoch in range(n_epoch):
         torch.save(model.state_dict(), 'params.pkl')
         best_val_acc = acc
     print('val acc: %.4f' % (acc))
+
+#  torchtext 的使用
+# 1. 读取datasets: 不过将类似pandas csv 中names换成了 Field
+# 2. 转化成词向量: filed_name.build_vocab(train, vectors=vectors)
+# 3. 转化成batch: data.BucketIterator(train, batch_size=128, sort_key=lambda x: len(x.Phrase),
+#                                  shuffle=True, device=DEVICE)

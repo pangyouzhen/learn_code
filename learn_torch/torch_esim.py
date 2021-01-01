@@ -34,7 +34,7 @@ def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int,
     # torchtext.Vectors 会自动识别 headers
     vectors: Vectors = Vectors(name=vectors_name, cache=vectors_path)
     # 获取词向量的维度
-    vectors_dim = vectors.dim
+    vectors_dim: int = vectors.dim
     # 获取分类的维度
     num_class = len(set([i.label for i in train.examples]))
     print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
