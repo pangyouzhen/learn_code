@@ -172,3 +172,6 @@ class AdamWeightDecayOptimizer(tf.train.Optimizer):
     if m is not None:
       param_name = m.group(1)
     return param_name
+
+# 单机多卡进行训练
+# https://cloud.tencent.com/developer/article/1610628
