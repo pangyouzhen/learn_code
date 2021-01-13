@@ -23,7 +23,7 @@ import copy
 import json
 import math
 import re
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 import six
@@ -266,6 +266,11 @@ class BertModel(object):
 
 def gelu(x):
     """Gaussian Error Linear Unit.
+    高斯误差线性单元
+
+    RELU(x) = max(0,x)
+    TODO
+    GELU(x) = 0.5x(1+tanh(sqrt(2/pai)(x + 0.44715x^3)))
 
     This is a smoother version of the RELU.
     Original paper: https://arxiv.org/abs/1606.08415
@@ -369,14 +374,18 @@ def layer_norm(input_tensor, name=None):
 
 
 def layer_norm_and_dropout(input_tensor, dropout_prob, name=None):
-    """Runs layer normalization followed by dropout."""
+    """Runs layer normalization followed by dropout.
+    一个是正则化，一个是dropout，dropout类似bagging的思想，可以提高模型的泛化能力。
+    """
     output_tensor = layer_norm(input_tensor, name)
     output_tensor = dropout(output_tensor, dropout_prob)
     return output_tensor
 
 
 def create_initializer(initializer_range=0.02):
-    """Creates a `truncated_normal_initializer` with the given range."""
+    """Creates a `truncated_normal_initializer` with the given range.
+    根据给定范围创建截尾正太分布器
+    """
     return tf.truncated_normal_initializer(stddev=initializer_range)
 
 
@@ -387,7 +396,7 @@ def embedding_lookup(input_ids,
                      word_embedding_name="word_embeddings",
                      use_one_hot_embeddings=False):
     """Looks up words embeddings for id tensor.
-
+    根据id寻找词向量
     Args:
       input_ids: int32 Tensor of shape [batch_size, seq_length] containing word
         ids.
@@ -438,12 +447,15 @@ def embedding_postprocessor(input_tensor,
                             initializer_range=0.02,
                             max_position_embeddings=512,
                             dropout_prob=0.1):
-    """Performs various post-processing on a word embedding tensor.
-
+    """Performsembedding_postprocessor various post-processing on a word embedding tensor.
+    对词向量进行后处理，主要实现论文中后两层的embedding，后处理主要进行了 token_type_embeddings 和 position embedding + normal_dropout 的操作
     Args:
       input_tensor: float Tensor of shape [batch_size, seq_length,
         embedding_size].
       use_token_type: bool. Whether to add embeddings for `token_type_ids`.
+
+      论文中输入三层embedding： token embedding + segment embedding（判断是否是一个句子）+ postion embedding
+
       token_type_ids: (optional) int32 Tensor of shape [batch_size, seq_length].
         Must be specified if `use_token_type` is True.
       token_type_vocab_size: int. The vocabulary size of `token_type_ids`.
@@ -526,7 +538,7 @@ def embedding_postprocessor(input_tensor,
 
 def create_attention_mask_from_input_mask(from_tensor, to_mask):
     """Create 3D attention mask from a 2D tensor mask.
-
+    将[batch_size,seq_length]的2维向量转化成 [batch_size,seq_length,seq_length]的三维向量
     Args:
       from_tensor: 2D or 3D Tensor of shape [batch_size, from_seq_length, ...].
       to_mask: int32 Tensor of shape [batch_size, to_seq_length].
@@ -661,8 +673,10 @@ def attention_layer(from_tensor,
     #   T = `to_tensor` sequence length
     #   N = `num_attention_heads`
     #   H = `size_per_head`
-
     from_tensor_2d = reshape_to_matrix(from_tensor)
+    #     : input: [B,F,T] output:[B*F,T]
+    # to_tensor: input [B,T,H], output:[B*T,H]
+    # TODO 这里的是H [batch_size, to_seq_length, to_width]  to_width==size_per_head ??
     to_tensor_2d = reshape_to_matrix(to_tensor)
 
     # `query_layer` = [B*F, N*H]
@@ -895,7 +909,7 @@ def transformer_model(input_tensor,
         return final_output
 
 
-def get_shape_list(tensor:tf.Tensor, expected_rank=None, name=None) -> List[int]:
+def get_shape_list(tensor: tf.Tensor, expected_rank: Union[int, List[int]] = None, name=None) -> List[int]:
     """Returns a list of the shape of tensor, preferring static dimensions.
     获取张量的维度形状，bert为了动态获取张量维度，会经常用到这个函数
     Args:
@@ -933,7 +947,9 @@ def get_shape_list(tensor:tf.Tensor, expected_rank=None, name=None) -> List[int]
 
 
 def reshape_to_matrix(input_tensor):
-    """Reshapes a >= rank 2 tensor to a rank 2 tensor (i.e., a matrix)."""
+    """Reshapes a >= rank 2 tensor to a rank 2 tensor (i.e., a matrix).
+    将一个秩大于2的tensor转化成矩阵
+    """
     ndims = input_tensor.shape.ndims
     if ndims < 2:
         raise ValueError("Input tensor must have at least rank 2. Shape = %s" %
@@ -947,7 +963,9 @@ def reshape_to_matrix(input_tensor):
 
 
 def reshape_from_matrix(output_tensor, orig_shape_list):
-    """Reshapes a rank 2 tensor back to its original rank >= 2 tensor."""
+    """Reshapes a rank 2 tensor back to its original rank >= 2 tensor.
+    将tensor 转化为原tensor
+    """
     if len(orig_shape_list) == 2:
         return output_tensor
 

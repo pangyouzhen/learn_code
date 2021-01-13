@@ -305,7 +305,11 @@ class BasicTokenizer(object):
 
 
 class WordpieceTokenizer(object):
-    """Runs WordPiece tokenziation."""
+    """Runs WordPiece tokenziation.
+    https://zhuanlan.zhihu.com/p/191648421
+    子词任务：主要解决的问题： 英文中的时态问题 looked，look; OOV 问题？,
+    Byte Pair Encoding (BPE): 拆分成最小字符的，然后经过合并处理
+    """
 
     def __init__(self, vocab, unk_token="[UNK]", max_input_chars_per_word=200):
         self.vocab = vocab

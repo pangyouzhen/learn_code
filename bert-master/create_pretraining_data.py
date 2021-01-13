@@ -315,6 +315,7 @@ def create_instances_from_document(
                 tokens = []
                 segment_ids = []
                 tokens.append("[CLS]")
+                #  首个字符增加[CLS]，在分类任务中可以作为全句的句向量
                 segment_ids.append(0)
                 for token in tokens_a:
                     tokens.append(token)
