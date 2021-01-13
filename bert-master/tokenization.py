@@ -21,7 +21,7 @@ from __future__ import print_function
 import collections
 import re
 import unicodedata
-from typing import Dict
+from typing import Dict, List
 
 import six
 import tensorflow as tf
@@ -151,7 +151,7 @@ def convert_ids_to_tokens(inv_vocab, ids):
     return convert_by_vocab(inv_vocab, ids)
 
 
-def whitespace_tokenize(text):
+def whitespace_tokenize(text:str) -> List[str]:
     """Runs basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip()
     if not text:
@@ -195,8 +195,11 @@ class BasicTokenizer(object):
         """
         self.do_lower_case = do_lower_case
 
-    def tokenize(self, text):
-        """Tokenizes a piece of text."""
+    def tokenize(self, text: str) -> List[str]:
+        """Tokenizes a piece of text.
+        今天天气很好,11我想出去了，骄傲哈哈 ->
+         ['今', '天', '天', '气', '很', '好', ',', '11', '我', '想', '出', '去', '了', '，', '骄', '傲', '哈', '哈']
+        """
         text = convert_to_unicode(text)
         text = self._clean_text(text)
 
@@ -405,4 +408,6 @@ def _is_punctuation(char):
 
 if __name__ == '__main__':
     baseToken = BasicTokenizer()
-    print(baseToken._tokenize_chinese_chars("今天天气很好"))
+    print(baseToken.tokenize("今天天气很好,11我想出去了，骄傲哈哈"))
+    wordpiece = WordpieceTokenizer("/data/project/bert/chinese_L-12_H-768_A-12/vocab.txt")
+    print(wordpiece.tokenize("今天"))

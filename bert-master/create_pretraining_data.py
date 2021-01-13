@@ -20,6 +20,8 @@ from __future__ import print_function
 
 import collections
 import random
+from typing import List, Any
+
 import tokenization
 import tensorflow as tf
 
@@ -66,10 +68,17 @@ flags.DEFINE_float(
 
 
 class TrainingInstance(object):
-    """A single training instance (sentence pair)."""
+    """A single training instance (sentence pair).
+    tokens:  处理之后的句子，包括增加[CLS] 标识，进行[MASK],分隔句子[SEP],等等
+    ['[CLS]', '无', '款', , '[MASK]', '息', '个', '人', '##钟', '私', '[MASK]', '合', '评', '估', '是', '指', '什', '么', '[MASK]', '一', '般', '电', '话', '多', '久', '会', '发', '过', '来', '呢', '一', '般', '审', '核', '通', '过', '要', '[MASK]', '[MASK]', '录', '吗', '么', '时', '间', '[MASK]', '款', '[MASK]', '下', '午', '[MASK]', '冲', '进', '去', '了', '[MASK]', '[SEP]', '为', '什', '么', '不', '开', '通', 'qq', '申'...]
+    segment_ids: 句子的分隔的id
+    mask_lm_positions: 对哪个位置进行mask标识
+    mask_lm_labels: 原始mask的字是啥
+    """
 
-    def __init__(self, tokens, segment_ids, masked_lm_positions, masked_lm_labels,
-                 is_random_next):
+    def __init__(self, tokens: List[str], segment_ids: List[int], masked_lm_positions: List[int],
+                 masked_lm_labels: List[str],
+                 is_random_next: bool):
         self.tokens = tokens
         self.segment_ids = segment_ids
         self.is_random_next = is_random_next
@@ -177,8 +186,8 @@ def create_float_feature(values):
 
 
 def create_training_instances(input_files, tokenizer: tokenization.FullTokenizer, max_seq_length: int,
-                              dupe_factor: int, short_seq_prob: int, masked_lm_prob:int,
-                              max_predictions_per_seq:int, rng:random.Random):
+                              dupe_factor: int, short_seq_prob: int, masked_lm_prob: int,
+                              max_predictions_per_seq: int, rng: random.Random) -> List[TrainingInstance]:
     """Create `TrainingInstance`s from raw text."""
     all_documents = [[]]
 
@@ -221,10 +230,11 @@ def create_training_instances(input_files, tokenizer: tokenization.FullTokenizer
 
 
 def create_instances_from_document(
-        all_documents, document_index, max_seq_length, short_seq_prob,
-        masked_lm_prob, max_predictions_per_seq, vocab_words, rng):
+        all_documents: List[List[List[str]]], document_index: int, max_seq_length: int, short_seq_prob: int,
+        masked_lm_prob: int, max_predictions_per_seq: int, vocab_words: List[str], rng: random.Random) -> List[
+    TrainingInstance]:
     """Creates `TrainingInstance`s for a single document."""
-    document = all_documents[document_index]
+    document: List[List[str]] = all_documents[document_index]
 
     # Account for [CLS], [SEP], [SEP]
     max_num_tokens = max_seq_length - 3
@@ -250,7 +260,7 @@ def create_instances_from_document(
     current_length = 0
     i = 0
     while i < len(document):
-        segment = document[i]
+        segment: List[str] = document[i]
         current_chunk.append(segment)
         current_length += len(segment)
         if i == len(document) - 1 or current_length >= target_seq_length:
