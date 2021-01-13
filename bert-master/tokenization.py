@@ -120,7 +120,7 @@ def printable_text(text):
         raise ValueError("Not running on Python2 or Python 3?")
 
 
-def load_vocab(vocab_file: str) -> Dict:
+def load_vocab(vocab_file: str) -> Dict[str, int]:
     """Loads a vocabulary file into a dictionary."""
     vocab = collections.OrderedDict()
     index = 0
@@ -135,7 +135,7 @@ def load_vocab(vocab_file: str) -> Dict:
     return vocab
 
 
-def convert_by_vocab(vocab, items):
+def convert_by_vocab(vocab: Dict, items: List[str]) -> List[int]:
     """Converts a sequence of [tokens|ids] using the vocab."""
     output = []
     for item in items:
@@ -151,7 +151,7 @@ def convert_ids_to_tokens(inv_vocab, ids):
     return convert_by_vocab(inv_vocab, ids)
 
 
-def whitespace_tokenize(text:str) -> List[str]:
+def whitespace_tokenize(text: str) -> List[str]:
     """Runs basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip()
     if not text:
@@ -177,7 +177,7 @@ class FullTokenizer(object):
 
         return split_tokens
 
-    def convert_tokens_to_ids(self, tokens):
+    def convert_tokens_to_ids(self, tokens: List[str]) -> List[int]:
         return convert_by_vocab(self.vocab, tokens)
 
     def convert_ids_to_tokens(self, ids):

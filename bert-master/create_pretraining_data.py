@@ -102,8 +102,9 @@ class TrainingInstance(object):
         return self.__str__()
 
 
-def write_instance_to_example_files(instances, tokenizer, max_seq_length,
-                                    max_predictions_per_seq, output_files):
+def write_instance_to_example_files(instances: List[TrainingInstance], tokenizer: tokenization.FullTokenizer,
+                                    max_seq_length: int,
+                                    max_predictions_per_seq: int, output_files: str):
     """Create TF example files from `TrainingInstance`s."""
     writers = []
     for output_file in output_files:

@@ -88,6 +88,7 @@ class BertConfig(object):
     return config
 
   @classmethod
+  # classmethod 经常用作初始化，用于新构建类，弥补__init__的不足
   def from_json_file(cls, json_file):
     """Constructs a `BertConfig` from a json file of parameters."""
     with tf.gfile.GFile(json_file, "r") as reader:
