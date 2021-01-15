@@ -21,6 +21,7 @@ from __future__ import print_function
 import re
 import tensorflow as tf
 
+# https://zhuanlan.zhihu.com/p/168787370
 
 def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
   """Creates an optimizer training op."""
@@ -29,6 +30,7 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
   learning_rate = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
 
   # Implements linear decay of the learning rate.
+  #  学习率的线性衰减
   learning_rate = tf.train.polynomial_decay(
       learning_rate,
       global_step,
@@ -39,6 +41,7 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
 
   # Implements linear warmup. I.e., if global_step < num_warmup_steps, the
   # learning rate will be `global_step/num_warmup_steps * init_lr`.
+  #  学习率的预热
   if num_warmup_steps:
     global_steps_int = tf.cast(global_step, tf.int32)
     warmup_steps_int = tf.constant(num_warmup_steps, dtype=tf.int32)
@@ -85,13 +88,21 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
 
 
 class AdamWeightDecayOptimizer(tf.train.Optimizer):
-  """A basic Adam optimizer that includes "correct" L2 weight decay."""
+  """A basic Adam optimizer that includes "correct" L2 weight decay.
+  包含修正L2正则化（权重衰减）的Adam优化器
+  # TODO
+  1. Adam算法
+  2. Adagrad 算法
+  3. Rmsprop 算法
+  4. SGD算法
+  5. Momentum算法
+  """
 
   def __init__(self,
                learning_rate,
-               weight_decay_rate=0.0,
-               beta_1=0.9,
-               beta_2=0.999,
+               weight_decay_rate=0.0, # 权重衰减比率
+               beta_1=0.9, #梯度一阶矩参数
+               beta_2=0.999, #梯度二阶矩参数
                epsilon=1e-6,
                exclude_from_weight_decay=None,
                name="AdamWeightDecayOptimizer"):
