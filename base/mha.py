@@ -24,11 +24,10 @@ def attention(query, key, value, mask=None, dropout=None):
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, h, d_model, dropout=0.1, ):
-        super(MultiHeadAttention).__init__()
+        super(MultiHeadAttention, self).__init__()
         assert d_model % h == 0
         self.d_k = d_model // h
         self.h = h
-        # TODO clones 函数原作者没提供
         self.linears = clones(nn.Linear(d_model, d_model), 4)
         # AttributeError: cannot assign module before Module.__init__() call
         self.attn = None
@@ -46,9 +45,9 @@ class MultiHeadAttention(nn.Module):
 
 
 if __name__ == '__main__':
-    query = torch.randn([30, 8, 10, 64])
-    key = torch.randn([30, 8, 11, 64])
-    value = torch.randn([30, 8, 11, 64])
+    query = torch.randn([30, 10, 512])
+    key = torch.randn([30, 11, 512])
+    value = torch.randn([30, 11, 512])
     # res, p_attn = attention(query, key, value)
     # print(res.shape, p_attn.shape)
     mha = MultiHeadAttention(8, 512)
