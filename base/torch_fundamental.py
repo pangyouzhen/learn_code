@@ -37,9 +37,9 @@ assert torch.bmm(m, n).size() == (10, 3, 6)
 # lstm
 lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
+# input: (seq_len, batch, input_size)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
-# TODO lstm 为什么输出的是元组，h0，和c0 输出代表的意思是？
 output, (h0, c0) = lstm(input1, (h0, c0))
 assert output.size() == (5, 3, 20)
 output2, (h1, c1) = lstm(input1)
