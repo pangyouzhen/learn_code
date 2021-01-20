@@ -61,6 +61,8 @@ sh -x xxx.sh
 
 # grep awk sed
 # grep 正则
+#在Perl正则模式下,
+grep -P
 grep 10.. .xsession-errors
 # sh 中 * + ? 重复，这里的+ ?用的时候需要 变成\+ \?
 # () 在 grep 正则中也要 \( \)
@@ -144,3 +146,10 @@ jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > /tmp/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
 #因为scp的输出不是标准输出 直接>是无效的
 sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
+
+kill -9 pid
+#彻底杀死一个进程
+kill -STOP pid
+#暂停一个进程
+kill -CONT pid
+#重启一个进程
