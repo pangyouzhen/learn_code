@@ -29,19 +29,25 @@ class MultiHeadAttention(nn.Module):
         self.d_k = d_model // h
         self.h = h
         self.linears = clones(nn.Linear(d_model, d_model), 4)
-        # AttributeError: cannot assign module before Module.__init__() call
         self.attn = None
         self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, query, key, value, mask=None):
+        # 和 from torch.nn.modules.activation import MultiheadAttention 是一样的
+        # query:`(L, N, E)`, key: :math:`(S, N, E)`, value: :math:`(S, N, E)` -> math:`(L, N, E)`
         if mask is not None:
             mask = mask.unsqueeze(1)
         nbatches = query.size(0)
         query, key, value = [l(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2) for l, x in
                              zip(self.linears, (query, key, value))]
+        # 这里是前三个Linear Networks的具体应用，
+        # 例如query=(30,10, 512) -> Linear network -> (30, 10, 512)
+        # -> view -> (30,10, 8, 64) -> transpose(1,2) -> (30, 8, 10, 64)
+        # ，其他的key和value也是类似地，
         x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
         x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
         return self.linears[-1](x)
+          # 得到(30, 10, 512).
 
 
 if __name__ == '__main__':

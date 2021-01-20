@@ -7,7 +7,7 @@ import math
 
 class CustomLSTM(nn.Module):
     def __init__(self, input_sz, hidden_sz, ):
-        super(CustomLSTM,self).__init__()
+        super(CustomLSTM, self).__init__()
         self.input_sz = input_sz
         self.hidden_sz = hidden_sz
 
@@ -32,6 +32,11 @@ class CustomLSTM(nn.Module):
         self.b_o = nn.Parameter(torch.Tensor(hidden_sz))
 
         self.init_weights()
+
+    def init_weights(self):
+        stdv = 1.0 / math.sqrt(self.hidden_size)
+        for weight in self.parameters():
+            weight.data.uniform_(-stdv, stdv)
 
     def forward(self):
         pass
