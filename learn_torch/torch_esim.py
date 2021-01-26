@@ -63,7 +63,7 @@ def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int,
 
 
 def init_model(SENTENCE: data.Field, num_class: int, device: torch.device,
-               writer: SummaryWriter):
+               writer):
     model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=SENTENCE.vocab.vectors.shape[-1], hidden_size=20,
                  num_class=num_class)
     # writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
@@ -111,7 +111,7 @@ def training(model: Esim, n_epoch: int, train_iter, device, train, writer, lr=0.
 
 
 def testing(model: Esim, n_epoch: int, test_iter: data.BucketIterator, device: torch.device, test: DataFrameDataset,
-            writer: SummaryWriter, lr: float = 0.00001):
+            writer, lr: float = 0.00001):
     crition = F.cross_entropy
     # 训练
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)

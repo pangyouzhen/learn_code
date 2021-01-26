@@ -91,6 +91,8 @@ class AdamWeightDecayOptimizer(tf.train.Optimizer):
   """A basic Adam optimizer that includes "correct" L2 weight decay.
   包含修正L2正则化（权重衰减）的Adam优化器
   # TODO
+  SGD
+  \theta = \theta - \eta \nabla_\theta J(\theta;x^{(i)};y^{(i)}))
   1. Adam算法
   2. Adagrad 算法
   3. Rmsprop 算法

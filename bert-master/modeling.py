@@ -269,9 +269,7 @@ def gelu(x):
     高斯误差线性单元
 
     RELU(x) = max(0,x)
-    TODO
-    GELU(x) = 0.5x(1+tanh(sqrt(2/pai)(x + 0.44715x^3)))
-
+    GELU(x) = 0.5x(1+tanh(\sqrt{2/\pi}(x + 0.44715x^3)))
     This is a smoother version of the RELU.
     Original paper: https://arxiv.org/abs/1606.08415
     Args:

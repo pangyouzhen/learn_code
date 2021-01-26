@@ -253,7 +253,12 @@ class XnliProcessor(DataProcessor):
 
 
 class MnliProcessor(DataProcessor):
-  """Processor for the MultiNLI data set (GLUE version)."""
+  """Processor for the MultiNLI data set (GLUE version).
+  文本匹配任务
+MultiNLI：433K个句子对，与SNLI相似，
+但是SNLI中对应的句子都用同一种表达方式，但是MultiNLI涵盖了口头和书面语表达，可能表示形式会不同(Mismatched)
+
+  """
 
   def get_train_examples(self, data_dir):
     """See base class."""
@@ -294,7 +299,12 @@ class MnliProcessor(DataProcessor):
 
 
 class MrpcProcessor(DataProcessor):
-  """Processor for the MRPC data set (GLUE version)."""
+  """Processor for the MRPC data set (GLUE version).
+  MRPC(The Microsoft Research Paraphrase Corpus，微软研究院释义语料库)，
+  相似性和释义任务，是从在线新闻源中自动抽取句子对语料库，
+  并人工注释句子对中的句子是否在语义上等效。
+  类别并不平衡，其中68%的正样本，所以遵循常规的做法，报告准确率（accuracy）和F1值。
+  """
 
   def get_train_examples(self, data_dir):
     """See base class."""
