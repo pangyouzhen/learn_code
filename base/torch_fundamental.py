@@ -10,6 +10,20 @@ from torch import optim
 np.random.seed(0)
 torch.manual_seed(0)
 
+# TODO
+#  输入：input: batch_size,seq_length
+#  embedding:
+#       定义： nn.Embedding(vocab_size, embedding_dim)
+#       输出: batch_size, seq_length, embedding_dim
+#  encoding:
+#       LSTM
+#           定义: nn.LSTM(embedding_dim, hidden_dim ,num_layers=1, bidirectional=*)
+#               forward 可以随机初始化 h0，c0 (num_layers,seq_length,hidden_dim)
+#           输出：lstm: batch_size, seq_length, hidden_size 或者是 2*hidden_size
+#       transformer:
+#       cnn
+
+
 # transformer
 # SNE -> TNE
 # pytorch中文档：
@@ -37,7 +51,7 @@ assert torch.bmm(m, n).size() == (10, 3, 6)
 # lstm
 lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
-# input: (seq_len, batch, input_size)
+# input: (batch_size, seq_len, embeding_dim)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
 output, (h0, c0) = lstm(input1, (h0, c0))

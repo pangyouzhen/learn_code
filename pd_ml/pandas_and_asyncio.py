@@ -6,8 +6,8 @@ import aiohttp
 import json
 from loguru import logger
 
-sema = asyncio.BoundedSemaphore(10)
-df = pd.read_excel("./data/df.xlsx")
+sema = asyncio.BoundedSemaphore(1)
+df = pd.read_excel("../data/df.xlsx")
 df["result"] = None
 
 logger.add("./a.log")
@@ -35,11 +35,12 @@ async def process_url(df: pd.DataFrame, ind_query: Tuple) -> None:
         #         这里本身就是 =await 是异步的，所以不存在同步异步的问题
         except Exception as e:
             logger.error(e)
+            raise
 
 
 # json.loads(payload)  就是将 str转化为字典，post 的参数中json 需要的是一个字典
 # postman 中转化出来的是 str 需要改为data = payload.encode("utf-8")
-# a = json.loads("...")
+# a = json.loads("...
 # a.pop("preProcess")
 # a["data"] = a["data"].strip("\"")
 
