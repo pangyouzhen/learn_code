@@ -1,3 +1,8 @@
+from typing import List, Tuple, Dict
+
+# https://pytorch.org/tutorials/beginner/nlp/advanced_tutorial.html
+# https://www.cnblogs.com/hapjin/p/9033471.html
+# https://www.cnblogs.com/pinard/p/6945257.html
 import torch
 import torch.autograd as autograd
 import torch.nn as nn
@@ -11,7 +16,7 @@ def argmax(vec):
     return idx.item()
 
 
-def prepare_sequence(seq, to_ix):
+def prepare_sequence(seq: List[str], to_ix: Dict):
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
@@ -35,15 +40,66 @@ class BiLSTM_CRF(nn.Module):
         self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
                             num_layers=1, bidirectional=True)
 
+        self.hidden2tag = nn.Linear(hidden_dim, self.tagset_size)
+
+        self.transitions = nn.Parameter(
+            torch.randn(self.tagset_size, self.tagset_size)
+        )
+
+        self.transitions.data[tag_to_ix[START_TAG], :] = -10000
+        self.transitions.data[:, tag_to_ix[STOP_TAG]] = -10000
+
+        self.hidden = self.init_hidden()
+
     def init_hidden(self):
         return [torch.randn(2, 1, self.hidden_dim // 2),
                 torch.randn(2, 1, self.hidden_dim // 2)]
 
     def _get_lstm_features(self, sentence):
         self.hidden = self.init_hidden()
+        embeds = self.word_embeds(sentence).view(len(sentence), 1, -1)
+        lstm_out, self.hidden = self.lstm(embeds, self.hidden)
+        lstm_out = lstm_out.view(len(sentence), self.hidden_dim)
+        lstm_features = self.hidden2tag(lstm_out)
+        return lstm_features
 
-    def forward(self, sentence):
+    def _viterbi_decode(self, feats):
+        #  TODO
+        #  维特比算法的状态转移方程
+        # v_t(j)=max_{i=1}^{N}v_{t-1}(i)a_{ij}b_j(o_t)
+        backpointers = []
+        init_vvars = torch.full((1, self.tagset_size), -10000.)
+        init_vvars[0][self.tag_to_ix[START_TAG]] = 0
+
+        forward_var = init_vvars
+        for feat in feats:
+            bptrs_t = []
+            viterbivars_t = []
+            for next_tag in range(self.tagset_size):
+                next_tag_var = forward_var + self.transitions[next_tag]
+                best_tag_id = argmax(next_tag_var)
+                bptrs_t.append(best_tag_id)
+                viterbivars_t.append(next_tag_var[0][best_tag_id].view(1))
+            forward_var = (torch.cat(viterbivars_t) + feat).view(1, -1)
+            backpointers.append(bptrs_t)
+
+        terminal_var = forward_var + self.transitions[self.tag_to_ix[STOP_TAG]]
+        best_tag_id = argmax(terminal_var)
+        path_score = terminal_var[0][best_tag_id]
+
+        best_path = [best_tag_id]
+        for bptrs_t in reversed(backpointers):
+            best_tag_id = bptrs_t[best_tag_id]
+            best_path.append(best_tag_id)
+        start = best_path.pop()
+        assert start == self.tag_to_ix[START_TAG]
+        best_path.reverse()
+        return path_score, best_path
+
+    def forward(self, sentence: torch.Tensor):
         lstm_fetas = self._get_lstm_features(sentence)
+        score, tag_seq = self._viterbi_decode(lstm_fetas)
+        return score, tag_seq
 
 
 START_TAG = "<START>"
@@ -52,7 +108,7 @@ EMBEDDING_DIM = 5
 HIDDEN_DIM = 4
 
 # Make up some training data
-training_data = [(
+training_data: List[Tuple[List[str], List[str]]] = [(
     "the wall street journal reported today that apple corporation made money".split(),
     "B I I I O O O B I O O".split()
 ), (
@@ -74,4 +130,5 @@ optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
 with torch.no_grad():
     precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
     precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long)
+    #  输入的是tensor 没有batch_size [0,1,2,3,4,5,6]
     print(model(precheck_sent))
