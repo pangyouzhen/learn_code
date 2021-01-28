@@ -10,7 +10,7 @@ from torch import optim
 np.random.seed(0)
 torch.manual_seed(0)
 
-# TODO
+# ！！！！！
 #  输入：input: batch_size,seq_length
 #  embedding:
 #       定义： nn.Embedding(vocab_size, embedding_dim)
@@ -21,7 +21,11 @@ torch.manual_seed(0)
 #               forward 可以随机初始化 h0，c0 (num_layers,seq_length,hidden_dim)
 #           输出：lstm: batch_size, seq_length, hidden_size 或者是 2*hidden_size
 #       transformer:
-#       cnn
+#           embedding 之后需要经过 PositionEncoding(d_model = embeding_dim) 维度不变（batch_size,seq_length,embedding）
+#           定义 transformer(d_model=embedding_dim, nhead= embedding 的整数倍)
+#           输出： tgt_excepted_size, seq_length, embedding_dim
+#       cnn:
+#
 
 
 # transformer
@@ -33,6 +37,7 @@ torch.manual_seed(0)
 # E: embedding_dim
 from torch.nn.modules.transformer import Transformer
 
+# 内置的Transformer 是没有 embedding 和 PositionEncoding 的
 trans = Transformer(d_model=10, nhead=2)
 src = torch.randn(20, 32, 10)
 tgt = torch.randn(10, 32, 10)

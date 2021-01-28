@@ -61,7 +61,7 @@ sh -x xxx.sh
 
 # grep awk sed
 # grep 正则
-#在Perl正则模式下,
+#在Perl正则模式下, -e
 grep -P
 grep 10.. .xsession-errors
 # sh 中 * + ? 重复，这里的+ ?用的时候需要 变成\+ \?
