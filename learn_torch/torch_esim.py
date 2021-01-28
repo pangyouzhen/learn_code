@@ -91,6 +91,7 @@ def training(model: Esim, n_epoch: int, train_iter, device, train, writer, lr=0.
             target = target.to(device)
             optimizer.zero_grad()
             sentence1 = batch.sentence1
+            # TODO
             # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
             sentence1 = sentence1.permute(1, 0)
             sentence2 = batch.sentence2

@@ -11,21 +11,27 @@ np.random.seed(0)
 torch.manual_seed(0)
 
 # ！！！！！
-#  输入：input: batch_size,seq_length
+# 这里是 seq_length，batch_size
+#  输入：input: seq_length，batch_size
 #  embedding:
 #       定义： nn.Embedding(vocab_size, embedding_dim)
-#       输出: batch_size, seq_length, embedding_dim
+#       输出: seq_length，batch_size, embedding_dim
 #  encoding:
 #       LSTM
 #           定义: nn.LSTM(embedding_dim, hidden_dim ,num_layers=1, bidirectional=*)
 #               forward 可以随机初始化 h0，c0 (num_layers,seq_length,hidden_dim)
-#           输出：lstm: batch_size, seq_length, hidden_size 或者是 2*hidden_size
+#           输出：lstm: seq_length，batch_size, hidden_size 或者是 2*hidden_size
 #       transformer:
 #           embedding 之后需要经过 PositionEncoding(d_model = embeding_dim) 维度不变（batch_size,seq_length,embedding）
 #           定义 transformer(d_model=embedding_dim, nhead= embedding 的整数倍)
 #           输出： tgt_excepted_size, seq_length, embedding_dim
 #       cnn:
 #
+
+# Linear: 线性层-矩阵相乘
+m = nn.Linear(in_features=20, out_features=30)
+n = torch.randn(50, 20)
+assert m(n).size() == (50, 30)
 
 
 # transformer
@@ -43,10 +49,12 @@ src = torch.randn(20, 32, 10)
 tgt = torch.randn(10, 32, 10)
 assert trans(src, tgt).size() == (10, 32, 10)
 
-# Linear 矩阵相乘
-m = nn.Linear(in_features=20, out_features=30)
-n = torch.randn(50, 20)
-assert m(n).size() == (50, 30)
+encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)
+transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
+src = torch.rand(10, 32, 512)
+out = transformer_encoder(src)
+assert (out.size() == (10, 32, 512))
+
 
 # bmm
 m = torch.randn(10, 3, 4)

@@ -1,24 +1,23 @@
 import math
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from torch.nn.modules.transformer import Transformer
 
-
-# 源代码解读
 
 class TransformerModel(nn.Module):
 
-    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
+    def __init__(self, num_embeddings, embedding_dim, nhead, dim_feedforward, nlayers, dropout=0.5):
         super(TransformerModel, self).__init__()
         from torch.nn import TransformerEncoder, TransformerEncoderLayer
         self.model_type = 'Transformer'
         self.src_mask = None
-        self.pos_encoder = PositionalEncoding(ninp, dropout)
-        encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+        self.pos_encoder = PositionalEncoding(embedding_dim, dropout)
+        encoder_layers = TransformerEncoderLayer(d_model=embedding_dim, nhead=nhead, dim_feedforward=dim_feedforward,
+                                                 dropout=dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
-        self.encoder = nn.Embedding(ntoken, ninp)
-        self.ninp = ninp
-        self.decoder = nn.Linear(ninp, ntoken)
+        self.encoder = nn.Embedding(num_embeddings, embedding_dim)
+        self.embedding_dim = embedding_dim
+        self.decoder = nn.Linear(embedding_dim, num_embeddings)
 
         self.init_weights()
 
@@ -34,16 +33,37 @@ class TransformerModel(nn.Module):
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, src):
+        # src: seq_length,batch_size
         if self.src_mask is None or self.src_mask.size(0) != src.size(0):
             device = src.device
             mask = self._generate_square_subsequent_mask(src.size(0)).to(device)
             self.src_mask = mask
 
-        src = self.encoder(src) * math.sqrt(self.ninp)
+        src = self.encoder(src) * math.sqrt(self.embedding_dim)
+        # src: seq_length,batch_size,embedding_dim
         src = self.pos_encoder(src)
+        # src: seq_length,batch_size,embedding_dim
         output = self.transformer_encoder(src, self.src_mask)
+        # output: seq_length,batch_size,embedding_dim
         output = self.decoder(output)
+        # output: seq_length,batch_size,num_embeddings
         return output
+
+
+class ExpendTransformer(nn.Module):
+    def __init__(self, ntoken, ninp):
+        super(ExpendTransformer, self).__init__()
+        self.encoder = nn.Embedding(ntoken, ninp)
+        self.pos_encoder = PositionalEncoding(ninp, dropout)
+        self.transformer = Transformer()
+
+    def forward(self, src):
+        src = self.encoder(src)
+        src = self.pos_encoder(src)
+        #  TODO
+        # 内置的transformer 需要tgt，但是这个重写的TransformerModel的decode 直接用线性层代替了
+        out = self.transformer(src)
+        return out
 
 
 class PositionalEncoding(nn.Module):
@@ -114,13 +134,15 @@ train_data = batchify(train_txt, batch_size)
 val_data = batchify(val_txt, eval_batch_size)
 test_data = batchify(test_txt, eval_batch_size)
 
-ntokens = len(TEXT.vocab.stoi)  # the size of vocabulary
-emsize = 200  # embedding dimension
-nhid = 200  # the dimension of the feedforward network model in nn.TransformerEncoder
+num_embeddings = len(TEXT.vocab.stoi)  # the size of vocabulary
+embedding_dim = 200  # embedding dimension
+dim_feedforward = 200  # the dimension of the feedforward network model in nn.TransformerEncoder
 nlayers = 2  # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
 nhead = 2  # the number of heads in the multiheadattention models
 dropout = 0.2  # the dropout value
-model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, dropout).to(device)
+model = TransformerModel(num_embeddings, embedding_dim, nhead, dim_feedforward, nlayers, dropout).to(device)
+# todo error
+# model = ExpendTransformer(ntokens, emsize).to(device)
 
 criterion = nn.CrossEntropyLoss()
 lr = 5.0  # learning rate
@@ -139,8 +161,8 @@ def train():
         data, targets = get_batch(train_data, i)
         optimizer.zero_grad()
         output = model(data)
-        # data.shape = [35,20,28785]  targets.shape = [700], output.view(-1,ntokens) = [700,28785]
-        # data.shape = [bptt,batch_size,ntokens]
+        # data.shape = [seq_length,batch_size]
+        # output.shape = [seq_length, batch_size,num_embeddings]
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
@@ -193,5 +215,3 @@ for epoch in range(1, epochs + 1):
         best_model = model
 
     scheduler.step()
-
-
