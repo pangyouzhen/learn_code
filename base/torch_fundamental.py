@@ -33,7 +33,6 @@ m = nn.Linear(in_features=20, out_features=30)
 n = torch.randn(50, 20)
 assert m(n).size() == (50, 30)
 
-
 # transformer
 # SNE -> TNE
 # pytorch中文档：
@@ -54,7 +53,6 @@ transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
 src = torch.rand(10, 32, 512)
 out = transformer_encoder(src)
 assert (out.size() == (10, 32, 512))
-
 
 # bmm
 m = torch.randn(10, 3, 4)
@@ -383,6 +381,13 @@ print(attn)
 for param in attn.named_parameters():
     # print(param,param.size())
     print(param[0], "++", param[1].shape)
+
+x = torch.randn(3, 4)
+print(x)
+indicies = torch.LongTensor([0, 2])
+# 进行切片，根据dim和indicies 获取相关数据
+print(torch.index_select(x, 0, indicies))
+print(torch.index_select(x, 1, indicies))
 
 # pytorch 归一化层：BatchNorm、LayerNorm、InstanceNorm、GroupNorm
 # Norm 最归一化，所以输入输出的维度是不变化的

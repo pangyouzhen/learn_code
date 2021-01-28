@@ -24,9 +24,12 @@ def get_data(file):
 
 
 def main():
-    p = Pool(psutil.cpu_count() - 1)
+    p = Pool(max(psutil.cpu_count() - 1, 1))
     for i in path.glob("*.csv"):
         p.apply_async(get_data, args=(i.name,))
+    # +close & joinl 想要子进程执行，就告诉主进程：你等着所有子进程执行完毕后，在运行剩余部分。
+    p.close()
+    p.join()
 
 
 if __name__ == '__main__':
