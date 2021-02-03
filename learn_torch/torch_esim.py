@@ -22,7 +22,7 @@ def tokenizer(text: str) -> List:
 def tokenizer2(text: str) -> List:
     return text.split()
 
-
+# TODO 这个esim效果为什么这么差
 def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int, vectors_name: str, vectors_path: str,
                          device=torch.device("cpu")):
     assert set(list(df)) == {'label', 'sentence1', 'sentence2'}

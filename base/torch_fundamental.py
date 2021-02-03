@@ -54,11 +54,6 @@ src = torch.rand(10, 32, 512)
 out = transformer_encoder(src)
 assert (out.size() == (10, 32, 512))
 
-# bmm
-m = torch.randn(10, 3, 4)
-n = torch.randn(10, 4, 6)
-assert torch.bmm(m, n).size() == (10, 3, 6)
-
 # lstm
 lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
@@ -147,10 +142,29 @@ print(torch.argmax(a))
 print(torch.argmax(a, dim=0))
 print(torch.argmax(a, dim=1))
 
-# element wise
+## pytorch 两种矩阵相乘的方式
+
+# torch.mul() 矩阵点乘 == a *b，也就是element wise 对应位相乘
+# torch.matmul() 矩阵相乘，对应 python 中 x @ y  \otimes
+
+# element wise --- Hadamard product.  \odot
 m = torch.Tensor([[1, 2, 3], [4, 5, 6]])
-n = torch.Tensor([[4, 5, 6], [1, 2, 3]])
+n = torch.Tensor([[4, 5, 6], [1, 7, 3]])
+assert bool((torch.mul(m, n) == m * n).all()) == True
 print(torch.mul(m, n).size())
+
+# tensor product 也是矩阵相乘: \otimes
+# 同时也和 torch.bmm 相等
+tensor1 = torch.randn(10, 3, 4)
+tensor2 = torch.randn(10, 4, 5)
+assert bool((torch.matmul(tensor1, tensor2) == (tensor1 @ tensor2)).all()) == True
+print(torch.matmul(tensor1, tensor2).size())
+
+# bmm 适用于3维，matmul 普遍适用，mm只适用二维
+m = torch.randn(10, 3, 4)
+n = torch.randn(10, 4, 6)
+assert torch.bmm(m, n).size() == (10, 3, 6)
+
 
 # dropout 主要解决过拟合的问题
 m = nn.Dropout(p=0.2)
@@ -168,10 +182,6 @@ a = torch.tensor([4, 5, 6, 7])
 masked = torch.tensor([1, 1, 0, 0]).bool()
 b = a.masked_fill(mask=masked, value=torch.tensor(0))
 print(b)
-
-# learn_torch 中的两种相乘方式
-# learn_torch.mul() 矩阵点乘，也就是element wise 对应位相乘
-# learn_torch.matmul() 矩阵相乘，对应 python 中 x @ y ,learn_torch.mm 只适用于二维
 
 #  pytorch 模型的训练步骤
 # 1. 数据 2. 模型 3. 损失函数 4. 优化和拟合
@@ -350,9 +360,6 @@ print(loss2)
 # crition = torch.nn.BCELoss()
 # print(crition(target, out) == loss)
 
-tensor1 = torch.randn(10, 3, 4)
-tensor2 = torch.randn(10, 4, 5)
-print(torch.matmul(tensor1, tensor2).size())
 
 m = nn.Conv1d(in_channels=16, out_channels=33, kernel_size=3)
 # input： N,in_channels,L_in
