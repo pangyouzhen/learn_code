@@ -165,7 +165,6 @@ m = torch.randn(10, 3, 4)
 n = torch.randn(10, 4, 6)
 assert torch.bmm(m, n).size() == (10, 3, 6)
 
-
 # dropout 主要解决过拟合的问题
 m = nn.Dropout(p=0.2)
 inputs = torch.randn(20, 16)
@@ -403,3 +402,9 @@ print(torch.index_select(x, 1, indicies))
 # InstanceNorm： 一个channel内做归一化
 # GroupNorm：将channel方向分group，
 # SwitchableNorm是将BN、LN、IN结合
+
+# torch 随机数
+#  生成标准正太分布，所以转换long完成后 会有负数，没法直接输入到embedding中
+print(torch.randn(10, 2).long())
+# 生成[0,1)之间的均匀分布，所以转换long完成后都是0值
+print(torch.rand(10, 3).long())

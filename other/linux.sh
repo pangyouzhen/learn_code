@@ -153,3 +153,9 @@ kill -STOP pid
 #暂停一个进程
 kill -CONT pid
 #重启一个进程
+
+
+#找出本文件夹下文件大于2000M的文件并删除
+find ./ -type f -size +2000M -exec rm {} \;
+#按照文件大小排序
+ls -Slh
