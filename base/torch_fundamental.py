@@ -55,13 +55,21 @@ out = transformer_encoder(src)
 assert (out.size() == (10, 32, 512))
 
 # lstm
+# https://zhuanlan.zhihu.com/p/79064602
 lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
 # input: (batch_size, seq_len, embeding_dim)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
 output, (h0, c0) = lstm(input1, (h0, c0))
+output_1, (h0_1, c0_1) = lstm(input1)
+print(output_1.size())
+print(h0_1.size())
+print(c0_1.size())
 assert output.size() == (5, 3, 20)
+# TODO
+# 这里究竟用output 还是用 h0
+# h_n of shape (num_layers * num_directions, batch, hidden_size)
 output2, (h1, c1) = lstm(input1)
 assert output2.size() == (5, 3, 20)
 
@@ -85,14 +93,14 @@ m2 = nn.Embedding(10, 3, padding_idx=0)
 input = torch.LongTensor([[0, 2, 0, 5]])
 assert m2(input).size() == (1, 4, 3)
 
-weight = torch.FloatTensor([[1, 2.3, 3], [4, 5.1, 6.3]])
+weight = torch.Tensor([[1, 2.3, 3], [4, 5.1, 6.3]])
 embedding = nn.Embedding.from_pretrained(weight)
 input = torch.LongTensor([1])
 print(embedding(input))
 # assert embedding(input) == torch.Tensor([[4, 5.1, 6.3]])
 
-weight = torch.FloatTensor([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
-                            [5, 5, 5], [6, 6, 6], [7, 7, 7], [8, 8, 8], [9, 9, 9]])
+weight = torch.Tensor([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
+                       [5, 5, 5], [6, 6, 6], [7, 7, 7], [8, 8, 8], [9, 9, 9]])
 embedding = nn.Embedding.from_pretrained(weight)
 n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
 print(embedding(n))
@@ -388,6 +396,7 @@ for param in attn.named_parameters():
     # print(param,param.size())
     print(param[0], "++", param[1].shape)
 
+# 切片
 x = torch.randn(3, 4)
 print(x)
 indicies = torch.LongTensor([0, 2])
@@ -403,8 +412,24 @@ print(torch.index_select(x, 1, indicies))
 # GroupNorm：将channel方向分group，
 # SwitchableNorm是将BN、LN、IN结合
 
-# torch 随机数
+## torch 随机数
 #  生成标准正太分布，所以转换long完成后 会有负数，没法直接输入到embedding中
-print(torch.randn(10, 2).long())
+print(torch.randn(10, 2))
 # 生成[0,1)之间的均匀分布，所以转换long完成后都是0值
-print(torch.rand(10, 3).long())
+print(torch.rand(10, 3))
+#  生成 0-10 之间的整数
+print(torch.randint(10, (2, 2)).type())
+# 因为embedding层 是根据索引去找，所以是需要传入的是longtensor
+# Longtensor 是64位的整数
+# Inttensor 是32位的整数
+# torch.Tensor是默认的tensor类型（torch.FlaotTensor）的简称
+
+# MAE 默认是取均值
+loss = nn.L1Loss()
+input = torch.randn((5, 1, 3), requires_grad=True)
+target = torch.randn((4, 1, 3))
+output = loss(input, target)
+output.backward()
+
+
+# 常见错误 RuntimeError: Boolean value of Tensor with more than one value is ambiguous 维度没有对齐

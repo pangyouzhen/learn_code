@@ -12,20 +12,22 @@ class LstmSiamese(nn.Module):
         self.lstm = nn.LSTM(embedding_dim, hidden_size, num_layers, bidirectional=True)
 
     def forward(self, input1, input2):
+        # (batch_size, seq_length)
         input1_embedding = self.embedding(input1)
         input2_embedding = self.embedding(input2)
+        # (batch_size, seq_length, embedding_dim)
         input1_lstm, (h1_hidden, h1_cell) = self.lstm(input1_embedding)
         input2_lstm, (h2_hidden, h2_cell) = self.lstm(input2_embedding)
-        dist = torch.cdist(h1_hidden, h2_hidden, p=2.0, compute_mode='use_mm_for_euclid_dist_if_necessary')
+        # (batch_size, seq_length, hidden_size *2)
+        print(input1_lstm[:, -1:, :].size())
+        print(input2_lstm[:, -1:, :].size())
+        loss = nn.L1Loss()
+        dist = loss(input1_lstm[:, -1:, :], input2_lstm[:, -1:, :])
         return dist
 
 
 if __name__ == '__main__':
     lstmSiamese = LstmSiamese(num_embeddings=20, embedding_dim=10, hidden_size=2, num_layers=2)
-    input1 = torch.randn(10, 4).long()
-    print(input1)
-    # print(input1.type())
-    input2 = torch.randn(10, 3).long()
-    # print(input2.type())
-    print(input2)
+    input1 = torch.randint(10, (5, 3))
+    input2 = torch.randint(10, (5, 4))
     print(lstmSiamese(input1, input2))
