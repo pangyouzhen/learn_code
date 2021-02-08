@@ -39,9 +39,12 @@ class Esim(nn.Module):
         a_embedding = self.embedding(a)
         b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
-        a_bar, (a0, a1) = self.lstm(a_embedding)
-        b_bar, (b0, b1) = self.lstm(b_embedding)
-        # output: batch_size,seq_num,2 * hidden_size
+        a_bar, (a0, a1) = self.lstm(a_embedding.transpose(0, 1))
+        b_bar, (b0, b1) = self.lstm(b_embedding.transpose(0, 1))
+        # output: seq_num,batch_size,2 * hidden_size
+        a_bar = a_bar.transpose(0, 1)
+        b_bar = b_bar.transpose(0, 1)
+        # output:batch_size, seq_num,  2 * hidden_size
         return a_bar, b_bar
 
     def inference_modeling(self, a_bar: torch.Tensor, b_bar: torch.Tensor):

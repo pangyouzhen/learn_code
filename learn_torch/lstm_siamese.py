@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 torch.manual_seed(0)
 
@@ -26,13 +25,15 @@ class LstmSiamese(nn.Module):
         # (batch_size, seq_length, hidden_size *2)
         print(input1_lstm[:, -1:, :].size())
         print(input2_lstm[:, -1:, :].size())
-        loss = nn.L1Loss()
-        dist = loss(input1_lstm[:, -1:, :], input2_lstm[:, -1:, :])
-        return dist
+        temp = torch.abs(input1_lstm[:, -1:, :] - input2_lstm[:, -1:, :])
+        return torch.sum(temp, dim=-1)
 
 
 if __name__ == '__main__':
     lstmSiamese = LstmSiamese(num_embeddings=20, embedding_dim=10, hidden_size=2, num_layers=2)
     input1 = torch.randint(10, (5, 3))
+    print(input1)
     input2 = torch.randint(10, (5, 4))
-    print(lstmSiamese(input1, input2))
+    print(input2)
+    res = lstmSiamese(input1, input2)
+    assert res.size() == (5, 1)
