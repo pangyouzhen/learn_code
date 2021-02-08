@@ -1,21 +1,18 @@
 from typing import Any
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-import numpy as np
-from torch import optim
 
 np.random.seed(0)
 torch.manual_seed(0)
 
 # ！！！！！
-# 这里是 seq_length，batch_size
-#  输入：input: seq_length，batch_size
+#  输入：input: batch_size ,seq_length，
 #  embedding:
 #       定义： nn.Embedding(vocab_size, embedding_dim)
-#       输出: seq_length，batch_size, embedding_dim
+#       输出: batch_size,seq_length,embedding_dim
 #  encoding:
 #       LSTM
 #           定义: nn.LSTM(embedding_dim, hidden_dim ,num_layers=1, bidirectional=*)
@@ -27,6 +24,8 @@ torch.manual_seed(0)
 #           输出： tgt_excepted_size, seq_length, embedding_dim
 #       cnn:
 #
+#  sigmoid 函数： \frac{1}{1+e^{-x}}
+#  softmax 函数： 归一化指数函数，用在多分类
 
 # Linear: 线性层-矩阵相乘
 m = nn.Linear(in_features=20, out_features=30)
@@ -58,7 +57,7 @@ assert (out.size() == (10, 32, 512))
 # https://zhuanlan.zhihu.com/p/79064602
 lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
 input1 = torch.randn(5, 3, 10)
-# input: (batch_size, seq_len, embeding_dim)
+# input: (seq_len, batch_size, embeding_dim)
 h0 = torch.randn(2, 3, 20)
 c0 = torch.randn(2, 3, 20)
 output, (h0, c0) = lstm(input1, (h0, c0))
@@ -139,6 +138,7 @@ x = torch.randn(3, 4, 5, 6)
 print(x.size())
 print(x.permute(3, 2, 1, 0).size())
 
+#  max softmax
 a = torch.Tensor(
     [
         [1, 5, 5, 2],
@@ -146,9 +146,13 @@ a = torch.Tensor(
         [-3, 7, -9, 10]
     ]
 )
+
 print(torch.argmax(a))
 print(torch.argmax(a, dim=0))
 print(torch.argmax(a, dim=1))
+print(torch.max(a, dim=1))
+print(type(torch.max(a, dim=1)))
+print(torch.max(a, dim=1).indices)
 
 ## pytorch 两种矩阵相乘的方式
 
@@ -278,71 +282,19 @@ print(m(input).shape)
 # print(m3(input).shape)
 
 # 损失函数-交叉熵
-# Input: (minibatch,C) where C = number of classe
-# target: (minibatch)
 
-
+# https://www.zhihu.com/question/294679135
 x_input = torch.randn(3, 3)  # 随机生成输入
-print('x_input:\n', x_input)
 y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
-
-# 计算输入softmax，此时可以看到每一行加到一起结果都是1
-softmax_func = nn.Softmax(dim=1)
-soft_output = softmax_func(x_input)
-print('soft_output:\n', soft_output)
-
-# 在softmax的基础上取log
-log_output = torch.log(soft_output)
-print('log_output:\n', log_output)
-
-# 对比softmax与log的结合与nn.LogSoftmaxloss(负对数似然损失)的输出结果，发现两者是一致的。
-logsoftmax_func = nn.LogSoftmax(dim=1)
-logsoftmax_output = logsoftmax_func(x_input)
-print('logsoftmax_output:\n', logsoftmax_output)
-
-# pytorch中关于NLLLoss的默认参数配置为：reducetion=True、size_average=True
-nllloss_func = nn.NLLLoss()
-nlloss_output = nllloss_func(logsoftmax_output, y_target)
-print('nlloss_output:\n', nlloss_output)
 
 # 直接使用pytorch中的loss_func=nn.CrossEntropyLoss()看与经过NLLLoss的计算是不是一样
 crossentropyloss = nn.CrossEntropyLoss()
 crossentropyloss_output = crossentropyloss(x_input, y_target)
 print('crossentropyloss_output:\n', crossentropyloss_output)
 
-# x_input:
-#  tensor([[-0.5683,  0.6400, -1.5926],
-#         [ 0.9784, -0.3355, -0.5546],
-#         [-0.1254, -1.1503, -0.2112]])
-# soft_output:
-#  tensor([[0.2125, 0.7113, 0.0763],
-#         [0.6736, 0.1810, 0.1454],
-#         [0.4392, 0.1576, 0.4031]])
-# log_output:
-#  tensor([[-1.5490, -0.3407, -2.5733],
-#         [-0.3952, -1.7091, -1.9282],
-#         [-0.8227, -1.8476, -0.9085]])
-# logsoftmax_output:
-#  tensor([[-1.5490, -0.3407, -2.5733],
-#         [-0.3952, -1.7091, -1.9282],
-#         [-0.8227, -1.8476, -0.9085]])
-# y_target = torch.tensor([1, 2, 0])
-# nlloss_output:
-#  (0.3407 + 1.9282 + 0.8227) /3
-#  tensor(1.0305)
-# crossentropyloss_output:
-#  tensor(1.0305)
+# 常见错误
+# target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
 
-
-# 这个为什么会报 target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
-# x_input = torch.randn(3, 2)
-# y_target = torch.tensor([1, 2, 0])
-# crossentropyloss = nn.CrossEntropyLoss()
-# crossentropyloss_output = crossentropyloss(x_input, y_target)
-
-score = torch.randn(3, 2)
-label = torch.Tensor([1, 0, 1]).long()
-crossentropyloss_output2 = crossentropyloss(score, label)
 
 m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)
 m2 = torch.nn.MaxPool1d(kernel_size=3, stride=2)
@@ -431,5 +383,14 @@ target = torch.randn((4, 1, 3))
 output = loss(input, target)
 output.backward()
 
+# 常见错误 RuntimeError: Boolean value of Tensor with more than one value is ambiguous
+# 这个问题的原因是 最常見的地方在於 Loss Function 的使用，通常是誤用了 Class 作為輸入。如果得到了這個報錯，可以檢查是否 Loss function 的地方有誤用。
 
-# 常见错误 RuntimeError: Boolean value of Tensor with more than one value is ambiguous 维度没有对齐
+from torch.nn import init
+
+linear = nn.Linear(1, 1, bias=False)
+net = nn.Sequential(linear, linear)
+print(net)
+for name, param in net.named_parameters():
+    init.constant_(param, val=3)
+    print(name, param.data)
