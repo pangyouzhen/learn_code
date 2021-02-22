@@ -159,3 +159,11 @@ kill -CONT pid
 find ./ -type f -size +2000M -exec rm {} \;
 #按照文件大小排序
 ls -Slh
+
+# 列举定时任务
+crontab -l
+# 编辑定时任务
+crontab -e
+#查看crontab 执行情况
+tail -100f /var/log/cron
+#00 18 * * * /usr/bin/python3 /data/project/stock/main.py
