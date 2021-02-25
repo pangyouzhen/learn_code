@@ -42,7 +42,9 @@ class DfAsyncPost:
         :rtype: object
         """
         ind = ind_query[0]
-        query = ind_query[1].split("$$$")
+        if not ind_query[1]:
+            return
+        query = str(ind_query[1]).split("$$$")
         payload = self.payload % tuple(query)
         with (await self.sema):
             try:

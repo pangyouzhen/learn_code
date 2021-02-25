@@ -3,8 +3,10 @@ from sklearn.model_selection import train_test_split
 import jieba
 import pandas as pd
 
-#  后面可以将jieba替换成fast jieba
-
+# 后面可以将jieba替换成fast jieba
+# 关于pandas中的面向过程和面向对象编程的疑问
+#  pandas中主要的目标是对数据进行探查，在于快速挖掘数据的相关模式
+#  面向对象编程更多在于复用，所以pandas更适合面向过程
 df = pd.read_csv("../full_data/train.csv")
 df = df[["Phrase", "Sentiment"]]
 jieba.load_userdict("./")

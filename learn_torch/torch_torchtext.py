@@ -144,7 +144,10 @@ for epoch in range(n_epoch):
 
     for batch_idx, batch in enumerate(train_iter):
         # 124849 / 128 batch_size -> 975 batch
-        datae = batch.Phrase
+        # 得到的默认是 （seq_length,batch_size）
+        data = batch.Phrase
+        # TODO 这里出现大量全是1 index的
+        print(data)
         # type(data) == Tensor
         # data.shape == (...==seq_num,128)
         # print("shape data is %s %s %s" % (batch_idx, data.shape[0], data.shape[1]))

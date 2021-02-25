@@ -3,17 +3,13 @@ from utils import nlp
 import pandas as pd
 
 
-class Nlp:
-    def __init__(self):
-        pass
+class Seg(DfAsyncPost):
+    url = "",
+    payload = "{\"query\":\"%s\"}",
+    df_response = "nlp_seg"
 
-    @property
-    def seg(self):
-        return DfAsyncPost(
-            url="",
-            payload="{\"query\":\"%s\"}",
-            df_response="nlp_seg"
-        )
+    def __init__(self, url=url, payload=payload, df_response=df_response):
+        super().__init__(url, payload, df_response)
 
 
 def init_df():

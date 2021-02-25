@@ -12,7 +12,8 @@ from torchtext import data
 from torchtext.vocab import Vectors
 
 from learn_torch.DataFrameDataSet import DataFrameDataset
-from learn_torch.torch_esim_model import Esim
+# from learn_torch.torch_esim_model import Esim
+from learn_torch.torch_esim_model_git import Esim
 
 
 def tokenizer(text: str) -> List:
@@ -22,10 +23,10 @@ def tokenizer(text: str) -> List:
 def tokenizer2(text: str) -> List:
     return text.split()
 
+
 # TODO 这个esim效果为什么这么差
 def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int, vectors_name: str, vectors_path: str,
                          device=torch.device("cpu")):
-    assert set(list(df)) == {'label', 'sentence1', 'sentence2'}
     LABEL: data.Field = data.Field(sequential=False, use_vocab=False)
     SENTENCE: data.Field = data.Field(sequential=True, tokenize=tokenizer, lower=True)
     train: DataFrameDataset = DataFrameDataset(df,
@@ -61,11 +62,19 @@ def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int,
 # print("batch text: ", batch.sentence2.shape) -> [63, 128]
 # print("batch label: ", batch.label.shape) -> [128]
 
+class Args():
+    def __init__(self, hidden_size, embeds_dim, linear_size):
+        self.hidden_size = hidden_size
+        self.embeds_dim = embeds_dim
+        self.linear_size = linear_size
+
 
 def init_model(SENTENCE: data.Field, num_class: int, device: torch.device,
                writer):
-    model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=SENTENCE.vocab.vectors.shape[-1], hidden_size=20,
-                 num_class=num_class)
+    # model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=SENTENCE.vocab.vectors.shape[-1], hidden_size=20,
+    #              num_class=num_class)
+    args = Args(20, SENTENCE.vocab.vectors.shape[-1], 10)
+    model = Esim(args)
     # writer.add_graph(model, [torch.from_numpy(np.random.randint(100, size=(128, 38))).long(),
     #                          torch.from_numpy(np.random.randint(100, size=(128, 41))).long()])
     print(SENTENCE.vocab.vectors.shape)
@@ -90,6 +99,7 @@ def training(model: Esim, n_epoch: int, train_iter, device, train, writer, lr=0.
             # target.shape == 128
             target = target.to(device)
             optimizer.zero_grad()
+            # TODO  sentence1 很多均为1的，数据或者torchtext 有误
             sentence1 = batch.sentence1
             # (seq_num_a,batch_size) -> (batch_size,seq_num_a)
             sentence1 = sentence1.permute(1, 0)
@@ -151,7 +161,7 @@ def main():
     batch_size: int = 256
     datetime_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     logger.add("./log/%s.log" % datetime_now)
-    train_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
+    train_df = preprocess_df()
     SENTENCE, train_iter, num_class, train = \
         init_text_match_data(train_df, tokenizer, batch_size,
                              vectors_name="sgns.sogounews.bigram-char",
@@ -166,6 +176,17 @@ def main():
                              vectors_path="../data/", device=device)
     testing(model, n_epoch, test_iter, device, test, writer)
     writer.close()
+
+
+def preprocess_df():
+    train_df = pd.read_csv("../full_data/ants/ants_torchtext_train.csv", sep=",", encoding="utf-8")
+    train_df["sentence1_len"] = train_df["sentence1"].apply(len)
+    train_df["sentence2_len"] = train_df["sentence2"].apply(len)
+    print(train_df["sentence1_len"], train_df["sentence2_len"])
+    print(train_df.describe())
+    train_df = train_df[(train_df['sentence1_len'] <= 15) & (train_df['sentence2_len'] <= 15)]
+    train_df = train_df[["sentence1", "sentence2", "label"]]
+    return train_df
 
 
 def process_dataset(file: str):

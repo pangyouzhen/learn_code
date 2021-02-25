@@ -39,11 +39,13 @@ class Esim(nn.Module):
         a_embedding = self.embedding(a)
         b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
-        a_bar, (a0, a1) = self.lstm(a_embedding.transpose(0, 1))
-        b_bar, (b0, b1) = self.lstm(b_embedding.transpose(0, 1))
+        a_embedding = a_embedding.permute(1, 0, 2)
+        b_embedding = b_embedding.permute(1, 0, 2)
+        a_bar, (a0, a1) = self.lstm(a_embedding)
+        b_bar, (b0, b1) = self.lstm(b_embedding)
         # output: seq_num,batch_size,2 * hidden_size
-        a_bar = a_bar.transpose(0, 1)
-        b_bar = b_bar.transpose(0, 1)
+        a_bar = a_bar.permute(1, 0, 2)
+        b_bar = b_bar.permute(1, 0, 2)
         # output:batch_size, seq_num,  2 * hidden_size
         return a_bar, b_bar
 
