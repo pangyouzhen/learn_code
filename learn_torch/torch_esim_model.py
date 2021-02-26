@@ -8,8 +8,10 @@ class Esim(nn.Module):
         super().__init__()
         self.dropout = 0.5
         self.embedding = nn.Embedding(num_embeddings=sentence_vocab, embedding_dim=embedding_dim)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True)
-        self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True,
+                            batch_first=True)
+        self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True,
+                             batch_first=True)
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
         # self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
         self.fc = nn.Sequential(
@@ -39,13 +41,9 @@ class Esim(nn.Module):
         a_embedding = self.embedding(a)
         b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
-        a_embedding = a_embedding.permute(1, 0, 2)
-        b_embedding = b_embedding.permute(1, 0, 2)
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
         # output: seq_num,batch_size,2 * hidden_size
-        a_bar = a_bar.permute(1, 0, 2)
-        b_bar = b_bar.permute(1, 0, 2)
         # output:batch_size, seq_num,  2 * hidden_size
         return a_bar, b_bar
 

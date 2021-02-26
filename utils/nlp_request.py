@@ -2,14 +2,18 @@ from utils.df_async_post import DfAsyncPost
 from utils import nlp
 import pandas as pd
 
+url = ""
+payload = "{\"query\":\"%s\"}"
 
-class Seg(DfAsyncPost):
-    url = "",
-    payload = "{\"query\":\"%s\"}",
-    df_response = "nlp_seg"
 
-    def __init__(self, url=url, payload=payload, df_response=df_response):
+class Nlp(DfAsyncPost):
+    def __init__(self, url, payload, df_response):
         super().__init__(url, payload, df_response)
+
+    @classmethod
+    def seg(cls, df_reponse="nlp_seg"):
+        nlp = cls(url, payload, df_reponse)
+        return nlp
 
 
 def init_df():

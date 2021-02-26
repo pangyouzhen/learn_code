@@ -16,7 +16,7 @@ def argmax(vec):
     return idx.item()
 
 
-def prepare_sequence(seq: List[str], to_ix: Dict):
+def prepare_sequence(seq: List[str], to_ix: Dict) -> torch.Tensor:
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
@@ -37,7 +37,7 @@ class BiLSTM_CRF(nn.Module):
         self.tagset_size = len(tag_to_ix)
 
         self.word_embeds = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim // 2,
                             num_layers=1, bidirectional=True)
 
         self.hidden2tag = nn.Linear(hidden_dim, self.tagset_size)
@@ -51,16 +51,21 @@ class BiLSTM_CRF(nn.Module):
 
         self.hidden = self.init_hidden()
 
-    def init_hidden(self):
+    def init_hidden(self) -> List[torch.Tensor]:
         return [torch.randn(2, 1, self.hidden_dim // 2),
                 torch.randn(2, 1, self.hidden_dim // 2)]
 
     def _get_lstm_features(self, sentence):
         self.hidden = self.init_hidden()
+        # seq_len
         embeds = self.word_embeds(sentence).view(len(sentence), 1, -1)
+        #  seq_len,1,embedding_dim
         lstm_out, self.hidden = self.lstm(embeds, self.hidden)
+        # (seq_len, batch, num_directions * hidden_size) -> (11, 1, 2 * 2)
         lstm_out = lstm_out.view(len(sentence), self.hidden_dim)
+        # (seq_len, num_directions * hidden_size)
         lstm_features = self.hidden2tag(lstm_out)
+        # (seq_len, tagset_size)
         return lstm_features
 
     def _viterbi_decode(self, feats):
@@ -97,7 +102,9 @@ class BiLSTM_CRF(nn.Module):
         return path_score, best_path
 
     def forward(self, sentence: torch.Tensor):
+        # bilstm: seq_length
         lstm_fetas = self._get_lstm_features(sentence)
+        # crf
         score, tag_seq = self._viterbi_decode(lstm_fetas)
         return score, tag_seq
 

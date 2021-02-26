@@ -75,3 +75,10 @@ print(res1)
 # 保留字母，汉字，数字
 res2 = re.sub("[^a-zA-Z0-9\u4e00-\u9fa5]", '', str2)
 print(res2)
+
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--config_file", "-c", required=False, type=str, default="config.yaml")
+args = parser.parse_args()

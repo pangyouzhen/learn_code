@@ -10,7 +10,8 @@ from torchtext.vocab import Vectors
 from loguru import logger
 
 from learn_torch.DataFrameDataSet import DataFrameDataset
-from learn_torch.torch_esim_model import Esim
+from learn_torch.torch_esim_model_git import Esim
+
 
 logger.add("./log/ll.log")
 
@@ -30,7 +31,7 @@ def tokenizer(text: str) -> List:
     return [tok for tok in text]
 
 
-batch_size = 128
+batch_size = 256
 device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 LABEL: data.Field = data.Field(sequential=False, use_vocab=False)
 SENTENCE: data.Field = data.Field(sequential=True, tokenize=tokenizer, lower=True)
@@ -52,16 +53,24 @@ SENTENCE.vocab.vectors.unk_init = init.xavier_uniform
 train_iter: data.BucketIterator = data.BucketIterator(train, batch_size=batch_size,
                                                       shuffle=True, device=device)
 
-model = Esim(sentence_vocab=len(SENTENCE.vocab), embedding_dim=SENTENCE.vocab.vectors.shape[-1], hidden_size=20,
-             num_class=num_class)
+class Args():
+    def __init__(self, hidden_size, embeds_dim, linear_size):
+        self.hidden_size = hidden_size
+        self.embeds_dim = embeds_dim
+        self.linear_size = linear_size
+
+
+args = Args(10, SENTENCE.vocab.vectors.shape[-1], 10)
+model = Esim(args)
 print(SENTENCE.vocab.vectors.shape)
-model.embedding.weight.data.copy_(SENTENCE.vocab.vectors)
+# model.embedding.weight.data.copy_(SENTENCE.vocab.vectors)
 model.to(device)
 
 lr = 0.001
 crition = F.cross_entropy
 # 训练
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)  # ,lr=0.000001)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.95)
 model.train()
 n_epoch = 20
 for epoch in range(n_epoch):
@@ -95,11 +104,11 @@ for epoch in range(n_epoch):
             # if dev_acc > best_acc:
             #     torch.save(model, f'{output_path}/{model_name}/model.pt')
             model.train()
-    logger.info("---------------")
-        # train_epoch_loss = train_epoch_loss + loss.data
-        # print((torch.argmax(out, dim=-1) == target).sum())
-        # train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-        # print("train_loss/epoch", train_epoch_loss / len(train), epoch)
-        # print("train_acc/epoch", train_acc / len(train), epoch)
-        # scheduler.step()
-        # print("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
+    logger.info("-----------------")
+            # train_epoch_loss = train_epoch_loss + loss.data
+            # print((torch.argmax(out, dim=-1) == target).sum())
+            # train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+            # print("train_loss/epoch", train_epoch_loss / len(train), epoch)
+            # print("train_acc/epoch", train_acc / len(train), epoch)
+            # scheduler.step()
+            # print("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
