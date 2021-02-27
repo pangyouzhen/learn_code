@@ -16,6 +16,7 @@ docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/rick
 docker run -it -p 8500:8500 --runtime=nvidia -d tensorflow
 # 127.0.0.1:5601
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
 #git
 # git 生成ssh
 ls ~/.ssh
