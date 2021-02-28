@@ -170,15 +170,10 @@ tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
 
 
-function lg() {
-#  lazygit
-    git add .
-    git commit -a -m "$1"
-    git push origin $(git branch | grep "*")
-}
 
 function lg() {
 #  lazygit
+    git pull origin $(git branch --show-current)
     git add .
     git commit -a -m "$1"
     git push origin $(git branch --show-current)
