@@ -176,3 +176,11 @@ function lg() {
     git commit -a -m "$1"
     git push origin $(git branch | grep "*")
 }
+
+function lg() {
+#  lazygit
+    git add .
+    git commit -a -m "$1"
+    git push origin $(git branch --show-current)
+}
+
