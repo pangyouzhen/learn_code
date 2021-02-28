@@ -168,3 +168,11 @@ crontab -e
 #查看crontab 执行情况
 tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
+
+
+function lg() {
+#  lazygit
+    git add .
+    git commit -a -m "$1"
+    git push origin $(git branch | grep "*")
+}
