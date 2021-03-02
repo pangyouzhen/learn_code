@@ -1,9 +1,8 @@
 from utils.df_async_post import DfAsyncPost
-from utils import nlp
 import pandas as pd
 
 url = ""
-payload = "{\"query\":\"%s\"}"
+payload = "{\"query\":\"{}\"}"
 
 
 class Nlp(DfAsyncPost):

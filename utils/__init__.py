@@ -1,3 +1,3 @@
-from utils.nlp_request import Seg
+from utils.nlp_request import Nlp
 
-nlp = Seg()
+seg = Nlp.seg()

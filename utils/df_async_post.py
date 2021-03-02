@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict, List
 
 import pandas as pd
 import asyncio
@@ -14,7 +14,7 @@ class DfAsyncPost:
     针对dataframe的异步post请求
     """
 
-    def __init__(self, url, payload, df_response, headers=None, sema=5):
+    def __init__(self, url: str, payload: str, df_response: str, headers: Dict = None, sema: int = 5):
         """
         url:  url
         payload : post请求的内容
@@ -45,7 +45,7 @@ class DfAsyncPost:
         if not ind_query[1]:
             return
         query = str(ind_query[1]).split("$$$")
-        payload = self.payload % tuple(query)
+        payload = self.payload.format(*tuple(query))
         with (await self.sema):
             try:
                 async with aiohttp.ClientSession() as session:
@@ -65,28 +65,28 @@ class DfAsyncPost:
     # a.pop("preProcess")
     # a["data"] = a["data"].strip("\"")
 
-    async def gather_data(self, df: pd.DataFrame, df_request_name) -> None:
+    async def gather_data(self, df: pd.DataFrame, df_request_name: str) -> None:
         await asyncio.gather(
             *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
 
-    def run(self, df, df_request_name):
+    def run(self, df: pd.DataFrame, df_request_name: str) -> pd.DataFrame:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.gather_data(df, df_request_name))
         loop.close()
         return df
 
-    def get_gater_data(self, df, df_request_name):
+    def get_gater_data(self, df: pd.DataFrame, df_request_name: str) -> asyncio.Future:
         return asyncio.gather(
             *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
 
     @staticmethod
-    def multi_run(df, df_request_name, *args):
+    def multi_run(df: pd.DataFrame, df_request_name: str, *args):
         """
         针对同一个df中的一列，请求多个接口的情况，每个接口response作为单独一列，常用来进行效果对比
         :rtype:
         """
         loop = asyncio.get_event_loop()
-        groups = [asyncio.gather(i.get_gater_data(df, df_request_name)) for i in args]
+        groups: List[asyncio.Future] = [asyncio.gather(i.get_gater_data(df, df_request_name)) for i in args]
         all_groups = asyncio.gather(*groups)
         loop.run_until_complete(all_groups)
         loop.close()

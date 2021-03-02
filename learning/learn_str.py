@@ -9,7 +9,8 @@ encoding = chardet.detect(raw)['encoding']
 # python 3.8 高级用法
 # print(f"{encoding=}")
 print(encoding)
-
+# 打印当前文件的名字，可以将文件名保存成这个
+print(Path(__file__).stem)
 # 单个文件转换编码
 # iconv - f GBK - t UTF-8 file1 - ofile2
 # 多个文件 默认是default文件夹下面
@@ -82,7 +83,6 @@ args = parser.parse_args()
 
 def f(*kw):
     print(kw)
-
 
 f(["a", "b", "c"])
 f(("今天",))
