@@ -51,13 +51,7 @@ def fn(ip, port=9):
 
 fn(**db_host["db"])
 
-# XML
-import xml.etree.ElementTree as ET
-
-tree: ET.ElementTree = ET.parse("test.xml")
-root = tree.getroot()
-all_name = [i.attrib['name'] for i in root.findall('./')]
-print(all_name)
+# XML用bs4解析
 
 import uuid
 
@@ -82,3 +76,18 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--config_file", "-c", required=False, type=str, default="config.yaml")
 args = parser.parse_args()
+
+
+# 元组拆包 *
+
+def f(*kw):
+    print(kw)
+
+
+f(["a", "b", "c"])
+f(("今天",))
+f("今天天气很好啊")
+f(*["A", "B", "C"])
+f(*"明天咋样")
+f(*("明早上",))
+f(*("哈哈哈哈"))
