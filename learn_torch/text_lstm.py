@@ -70,7 +70,7 @@ class TextLstm(nn.Module):
         # batch_size,seq_length,hidden_size
         out = x[:, -1, :]
         # batch_size,seq_length,hidden_size
-        pre_label = torch.sigmoid(self.linear(out))
+        pre_label = torch.softmax(self.linear(out), dim=-1)
         return pre_label
 
 

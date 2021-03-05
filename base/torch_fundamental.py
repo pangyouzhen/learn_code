@@ -38,7 +38,12 @@ batch_size = 5
 seq_length = 4
 embedding_dim = 20
 hidden_size = 30
+num_class = 5
+# 两分类
 
+target = np.random.randint(num_class, size=batch_size)
+target = torch.from_numpy(target).long()
+print(target)
 # embedding
 x = np.random.randint(10, size=(batch_size, seq_length))
 x = torch.from_numpy(x).long()
@@ -49,7 +54,7 @@ m = nn.Embedding(num_embeddings=10, embedding_dim=embedding_dim)
 x_embedding = m(x)
 print(x_embedding.size())
 assert x_embedding.size() == (batch_size, seq_length, embedding_dim)
-
+####################################################################################
 # lstm
 # https://zhuanlan.zhihu.com/p/79064602
 # input: (batch_size,seq_len, embeding_dim)
@@ -58,7 +63,7 @@ x_lstm, _ = lstm(x_embedding)
 #  (batch_size,seq_len, hidden_size)
 assert x_lstm.size() == (batch_size, seq_length, hidden_size)
 assert x_lstm[:, -1, :].size() == (batch_size, hidden_size)
-
+ln = nn.Linear(in_features=hidden_size, out_features=num_class)
 # transformer
 # SNE -> TNE
 # pytorch中文档：
@@ -66,11 +71,13 @@ assert x_lstm[:, -1, :].size() == (batch_size, hidden_size)
 # T: target_seq_length
 # N: batch_size
 # E: embedding_dim
-
+####################################################################################
 # PositionEncoding
+# (batch_size, seq_length, embedding_dim)
 posEncoding = PositionalEncoding(embedding_dim)
 x_posend = posEncoding(x_embedding)
 assert x_posend.size() == (batch_size, seq_length, embedding_dim)
+# (batch_size, seq_length, embedding_dim)
 
 # transformer
 from torch.nn.modules.transformer import Transformer
