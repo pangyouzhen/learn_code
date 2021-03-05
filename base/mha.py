@@ -47,7 +47,7 @@ class MultiHeadAttention(nn.Module):
         x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
         x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
         return self.linears[-1](x)
-          # 得到(30, 10, 512).
+        # 得到(30, 10, 512).
 
 
 if __name__ == '__main__':

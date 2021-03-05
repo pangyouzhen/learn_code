@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from utils.torch_utils import PositionalEncoding
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -32,6 +33,32 @@ m = nn.Linear(in_features=20, out_features=30)
 n = torch.randn(50, 20)
 assert m(n).size() == (50, 30)
 
+# embedding
+batch_size = 5
+seq_length = 4
+embedding_dim = 20
+hidden_size = 30
+
+# embedding
+x = np.random.randint(10, size=(batch_size, seq_length))
+x = torch.from_numpy(x).long()
+#  embedding, embedding就是lookup，寻找
+# input: (*) -> output: (*,E)
+print("最原始的输入:", x.size())
+m = nn.Embedding(num_embeddings=10, embedding_dim=embedding_dim)
+x_embedding = m(x)
+print(x_embedding.size())
+assert x_embedding.size() == (batch_size, seq_length, embedding_dim)
+
+# lstm
+# https://zhuanlan.zhihu.com/p/79064602
+# input: (batch_size,seq_len, embeding_dim)
+lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, batch_first=True, dropout=0.2)
+x_lstm, _ = lstm(x_embedding)
+#  (batch_size,seq_len, hidden_size)
+assert x_lstm.size() == (batch_size, seq_length, hidden_size)
+assert x_lstm[:, -1, :].size() == (batch_size, hidden_size)
+
 # transformer
 # SNE -> TNE
 # pytorch中文档：
@@ -39,13 +66,23 @@ assert m(n).size() == (50, 30)
 # T: target_seq_length
 # N: batch_size
 # E: embedding_dim
+
+# PositionEncoding
+posEncoding = PositionalEncoding(embedding_dim)
+x_posend = posEncoding(x_embedding)
+assert x_posend.size() == (batch_size, seq_length, embedding_dim)
+
+# transformer
 from torch.nn.modules.transformer import Transformer
 
 # 内置的Transformer 是没有 embedding 和 PositionEncoding 的
-trans = Transformer(d_model=10, nhead=2)
-src = torch.randn(20, 32, 10)
-tgt = torch.randn(10, 32, 10)
-assert trans(src, tgt).size() == (10, 32, 10)
+tgt_seq_length = 2
+trans = Transformer(d_model=embedding_dim, nhead=4)
+tgt = torch.randn(tgt_seq_length, batch_size, embedding_dim)
+src = x_posend.permute(1, 0, 2)
+x_trans = trans(src, tgt)
+print(x_trans.size())
+assert x_trans.size() == (tgt_seq_length, batch_size, embedding_dim)
 
 encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)
 transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
@@ -53,50 +90,8 @@ src = torch.rand(10, 32, 512)
 out = transformer_encoder(src)
 assert (out.size() == (10, 32, 512))
 
-# lstm
-# https://zhuanlan.zhihu.com/p/79064602
-lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2)
-input1 = torch.randn(5, 3, 10)
-# input: (seq_len, batch_size, embeding_dim)
-h0 = torch.randn(2, 3, 20)
-c0 = torch.randn(2, 3, 20)
-output, (h0, c0) = lstm(input1, (h0, c0))
-output_1, (h0_1, c0_1) = lstm(input1)
-print(output_1.size())
-print(h0_1.size())
-print(c0_1.size())
-assert output.size() == (5, 3, 20)
-# TODO
-# 这里究竟用output 还是用 h0
-# h_n of shape (num_layers * num_directions, batch, hidden_size)
-output2, (h1, c1) = lstm(input1)
-assert output2.size() == (5, 3, 20)
-
-bilstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=2, bidirectional=True)
-input1 = torch.randn(5, 3, 10)
-output2, (h1, c1) = bilstm(input1)
-# bidirectional (batch_size,seq_num,2 * hidden_size)
-assert output2.size() == (5, 3, 40)
-
-#  embedding, embedding就是lookup，寻找
-# input: (*) -> output: (*,E)
-# Embedding的两个参数从 多大的数据中查找，查找的每个字或词的维度是多少
-m = nn.Embedding(num_embeddings=10, embedding_dim=3)
-# 常见错误  Expected tensor for argument #1 'indices' to have scalar type Long; but got learn_torch.FloatTensor
-n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
-print(n.type())
-assert m(n).size() == (2, 4, 3)
-
-# TODO 增加padding_idx的作用是什么？
-m2 = nn.Embedding(10, 3, padding_idx=0)
-input = torch.LongTensor([[0, 2, 0, 5]])
-assert m2(input).size() == (1, 4, 3)
-
-weight = torch.Tensor([[1, 2.3, 3], [4, 5.1, 6.3]])
-embedding = nn.Embedding.from_pretrained(weight)
-input = torch.LongTensor([1])
-print(embedding(input))
-# assert embedding(input) == torch.Tensor([[4, 5.1, 6.3]])
+# weight = torch.Tensor([[1, 2.3, 3], [4, 5.1, 6.3]])
+# embedding = nn.Embedding.from_pretrained(weight)
 
 weight = torch.Tensor([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
                        [5, 5, 5], [6, 6, 6], [7, 7, 7], [8, 8, 8], [9, 9, 9]])
@@ -105,23 +100,23 @@ n = torch.LongTensor([[1, 3, 4, 5], [2, 3, 6, 7]])
 print(embedding(n))
 
 # squeeze
-x = torch.randn(3, 1, 4, 1)
-print(x.size())
-print(x.squeeze().size())
+x_embedding = torch.randn(3, 1, 4, 1)
+print(x_embedding.size())
+print(x_embedding.squeeze().size())
 
 # unsqueeze
-x = torch.randn(1, 4, 5)
-print(x.size())
-print(x.unsqueeze(2).size())
-print(x.unsqueeze(1).size())
+x_embedding = torch.randn(1, 4, 5)
+print(x_embedding.size())
+print(x_embedding.unsqueeze(2).size())
+print(x_embedding.unsqueeze(1).size())
 #  squeeze 挤压，就是删减维度
 #  unsqueeze - squeeze的反义词，增加维度
 
 # view
-x = torch.randn(4, 4)
-print(x.view(-1, 8).size())
-print(x.view(-1, 8).is_contiguous())
-print(x.view(-1, 8).contiguous())
+x_embedding = torch.randn(4, 4)
+print(x_embedding.view(-1, 8).size())
+print(x_embedding.view(-1, 8).is_contiguous())
+print(x_embedding.view(-1, 8).contiguous())
 
 # conv2d
 m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=3, stride=2)
@@ -129,14 +124,14 @@ input1 = torch.randn(20, 16, 50, 100)
 print(m(input1).size())
 
 # transpose
-x = torch.randn(3, 4)
-print(x.size())
-print(x.transpose(1, 0).size())
+x_embedding = torch.randn(3, 4)
+print(x_embedding.size())
+print(x_embedding.transpose(1, 0).size())
 
 #  permute
-x = torch.randn(3, 4, 5, 6)
-print(x.size())
-print(x.permute(3, 2, 1, 0).size())
+x_embedding = torch.randn(3, 4, 5, 6)
+print(x_embedding.size())
+print(x_embedding.permute(3, 2, 1, 0).size())
 
 #  max softmax
 a = torch.Tensor(
@@ -201,23 +196,23 @@ print(b)
 #  判断数据是float 还是long
 import numpy as np
 
-x = np.random.randint(10, size=(2, 3))
-x = torch.from_numpy(x).long()
-print(x.type())
+x_embedding = np.random.randint(10, size=(2, 3))
+x_embedding = torch.from_numpy(x_embedding).long()
+print(x_embedding.type())
 
 # softmax
-x = torch.rand(2, 5).int().float()
-print(F.softmax(x))
-print(F.softmax(x, dim=0))
-print(F.softmax(x, dim=1).sum())
+x_embedding = torch.rand(2, 5).int().float()
+print(F.softmax(x_embedding))
+print(F.softmax(x_embedding, dim=0))
+print(F.softmax(x_embedding, dim=1).sum())
 
-print(F.softmax(x, dim=1))
-print(F.softmax(x, dim=1).sum())
+print(F.softmax(x_embedding, dim=1))
+print(F.softmax(x_embedding, dim=1).sum())
 
 print("激活函数-----")
-print(F.tanh(x).size())
+print(F.tanh(x_embedding).size())
 
-print(torch.sigmoid(x).size())
+print(torch.sigmoid(x_embedding).size())
 
 #  cat
 #  cat 除了指定的轴维度不同，其他的必须相同
@@ -349,12 +344,12 @@ for param in attn.named_parameters():
     print(param[0], "++", param[1].shape)
 
 # 切片
-x = torch.randn(3, 4)
-print(x)
+x_embedding = torch.randn(3, 4)
+print(x_embedding)
 indicies = torch.LongTensor([0, 2])
 # 进行切片，根据dim和indicies 获取相关数据
-print(torch.index_select(x, 0, indicies))
-print(torch.index_select(x, 1, indicies))
+print(torch.index_select(x_embedding, 0, indicies))
+print(torch.index_select(x_embedding, 1, indicies))
 
 # pytorch 归一化层：BatchNorm、LayerNorm、InstanceNorm、GroupNorm
 # Norm 最归一化，所以输入输出的维度是不变化的
