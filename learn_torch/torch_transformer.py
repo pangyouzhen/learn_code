@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.transformer import Transformer
 
-
 class TransformerModel(nn.Module):
 
     def __init__(self, num_embeddings, embedding_dim, nhead, dim_feedforward, nlayers, dropout=0.5):

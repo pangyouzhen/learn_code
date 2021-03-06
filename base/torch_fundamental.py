@@ -39,6 +39,7 @@ seq_length = 4
 embedding_dim = 20
 hidden_size = 30
 num_class = 5
+num_embeddings = 10
 # 两分类
 
 target = np.random.randint(num_class, size=batch_size)
@@ -50,7 +51,7 @@ x = torch.from_numpy(x).long()
 #  embedding, embedding就是lookup，寻找
 # input: (*) -> output: (*,E)
 print("最原始的输入:", x.size())
-m = nn.Embedding(num_embeddings=10, embedding_dim=embedding_dim)
+m = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=embedding_dim)
 x_embedding = m(x)
 print(x_embedding.size())
 assert x_embedding.size() == (batch_size, seq_length, embedding_dim)
@@ -87,23 +88,22 @@ assert x_posend.size() == (batch_size, seq_length, embedding_dim)
 from torch.nn.modules.transformer import Transformer
 
 # 内置的Transformer 是没有 embedding 和 PositionEncoding 的
+encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=4)
+transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
+src = x_posend.permute(1, 0, 2)
+out = transformer_encoder(src)
+assert (out.size() == (seq_length, batch_size, embedding_dim))
+out = out.permute(1, 0, 2)
+# batch_size,seq_length,embedding_dim
+trans_ln = nn.Linear(in_features=embedding_dim, out_features=num_embeddings)
+
+####################################################################################
 tgt_seq_length = 2
 trans = Transformer(d_model=embedding_dim, nhead=4)
 tgt = torch.randn(tgt_seq_length, batch_size, embedding_dim)
-src = x_posend.permute(1, 0, 2)
 x_trans = trans(src, tgt)
 print(x_trans.size())
 assert x_trans.size() == (tgt_seq_length, batch_size, embedding_dim)
-
-
-####################################################################################
-
-
-encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)
-transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
-src = torch.rand(10, 32, 512)
-out = transformer_encoder(src)
-assert (out.size() == (10, 32, 512))
 
 # weight = torch.Tensor([[1, 2.3, 3], [4, 5.1, 6.3]])
 # embedding = nn.Embedding.from_pretrained(weight)
