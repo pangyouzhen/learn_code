@@ -63,7 +63,11 @@ x_lstm, _ = lstm(x_embedding)
 #  (batch_size,seq_len, hidden_size)
 assert x_lstm.size() == (batch_size, seq_length, hidden_size)
 assert x_lstm[:, -1, :].size() == (batch_size, hidden_size)
+x_lstm = x_lstm[:, -1, :]
 ln = nn.Linear(in_features=hidden_size, out_features=num_class)
+x_ln = ln(x_lstm)
+x_softmax = torch.softmax(x_ln, dim=-1)
+x_argmax = torch.argmax(x_softmax, dim=-1)
 # transformer
 # SNE -> TNE
 # pytorch中文档：
@@ -90,6 +94,10 @@ src = x_posend.permute(1, 0, 2)
 x_trans = trans(src, tgt)
 print(x_trans.size())
 assert x_trans.size() == (tgt_seq_length, batch_size, embedding_dim)
+
+
+####################################################################################
+
 
 encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)
 transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
