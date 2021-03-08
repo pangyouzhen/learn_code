@@ -1,11 +1,8 @@
-import torch.nn as nn
-from torchtext.vocab import Vocab
 import torch
 import pandas as pd
-from torchtext.data import Field, BucketIterator
-from torch.nn import init
+from torchtext.data import Field
 
-from learn_torch.DataFrameDataSet import DataFrameDataset
+from utils.DataFrameDataSet import DataFrameDataset
 
 # device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device("cpu")

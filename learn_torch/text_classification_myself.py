@@ -9,7 +9,7 @@ from torchtext.datasets import TextClassificationDataset
 from torchtext.datasets.text_classification import _csv_iterator, _create_data_from_iterator
 from torchtext.vocab import Vectors, build_vocab_from_iterator
 
-from learn_torch.DataFrameDataSet import DataFrameDataset
+from utils.DataFrameDataSet import DataFrameDataset
 
 
 def init_text_match_data(df: pd.DataFrame, tokenizer: Callable, batch_size: int, vectors_name: str, vectors_path: str,

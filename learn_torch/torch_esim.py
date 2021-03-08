@@ -9,7 +9,7 @@ from torchtext import data
 from torchtext.vocab import Vectors
 from loguru import logger
 
-from learn_torch.DataFrameDataSet import DataFrameDataset
+from utils.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
 
 logger.add("./log/ll.log")

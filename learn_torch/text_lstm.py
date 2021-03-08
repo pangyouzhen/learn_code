@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from sklearn import metrics
 from torchtext import data
 from loguru import logger
-from learn_torch.DataFrameDataSet import DataFrameDataset
+from utils.DataFrameDataSet import DataFrameDataset
 import pandas as pd
 
 train_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/train.txt", sep="\t", names=["sentence", "label"])
