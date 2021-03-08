@@ -42,8 +42,9 @@ num_class = 5
 num_embeddings = 10
 # 两分类
 
-target = np.random.randint(num_class, size=batch_size)
-target = torch.from_numpy(target).long()
+# target = np.random.randint(num_class, size=batch_size)
+# target = torch.from_numpy(target).long()
+target = torch.randint(num_class, size=(batch_size,))
 print(target)
 # embedding
 x = np.random.randint(10, size=(batch_size, seq_length))
@@ -192,11 +193,10 @@ m = nn.Dropout(p=0.2)
 inputs = torch.randn(20, 16)
 print(m(inputs).size())
 
-# layerNorm 主要加快模型的训练速度，对原始的输入维度没有影响
+# layerNorm ，对原始的输入维度没有影响
 inputs = torch.randn(20, 5, 10, 10)
 m = nn.LayerNorm(10)
 print(m(inputs).size())
-# layerNorm 是怎么样起作用的，归一化处理？
 
 # mask fill
 a = torch.tensor([4, 5, 6, 7])
@@ -404,3 +404,22 @@ print(net)
 for name, param in net.named_parameters():
     init.constant_(param, val=3)
     print(name, param.data)
+
+# torch
+a = torch.randint(10, size=(3, 2, 6, 7)).float()
+# size 是4个元素的元组，所以一共四层[
+# dim=-1 就是针对最里层的标量进行,求均值等操作就-1维度的数据削去了
+# dim= 1 就是从按外层算第0，1个[
+assert torch.mean(a, dim=1).size() == (3, 6, 7)
+assert torch.mean(a, dim=-1).size() == (3, 2, 6)
+# a = torch.randint(10, size=(3, 6, 7)).float()
+# layerNorm 计算过程
+a = torch.FloatTensor([[1, 2, 4, 1],
+                       [6, 3, 2, 4],
+                       [2, 4, 6, 1]])
+a_mean = torch.mean(a, dim=-1)
+a_var = torch.var(a, dim=-1, unbiased=False)
+a_mean_expand = a_mean.unsqueeze(dim=-1).expand(3, 4)
+a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(3, 4) + 1e-5)
+res = (a - a_mean_expand) / (a_var_expand)
+print(res)
