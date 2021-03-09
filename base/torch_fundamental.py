@@ -375,21 +375,12 @@ print(torch.index_select(x_embedding, 1, indicies))
 # SwitchableNorm是将BN、LN、IN结合
 
 ## torch 随机数
-#  生成标准正太分布，所以转换long完成后 会有负数，没法直接输入到embedding中
-print(torch.randn(10, 2))
-# 生成[0,1)之间的均匀分布，所以转换long完成后都是0值
-print(torch.rand(10, 3))
-#  生成 0-10 之间的整数
-print(torch.randint(10, (2, 2)).type())
-# 因为embedding层 是根据索引去找，所以是需要传入的是longtensor
-# Longtensor 是64位的整数
-# Inttensor 是32位的整数
 # torch.Tensor是默认的tensor类型（torch.FlaotTensor）的简称
 
 # MAE 默认是取均值
 loss = nn.L1Loss()
 input = torch.randn((5, 1, 3), requires_grad=True)
-target = torch.randn((4, 1, 3))
+target = torch.randn((5, 1, 3))
 output = loss(input, target)
 output.backward()
 
@@ -414,12 +405,16 @@ assert torch.mean(a, dim=1).size() == (3, 6, 7)
 assert torch.mean(a, dim=-1).size() == (3, 2, 6)
 # a = torch.randint(10, size=(3, 6, 7)).float()
 # layerNorm 计算过程
-a = torch.FloatTensor([[1, 2, 4, 1],
-                       [6, 3, 2, 4],
-                       [2, 4, 6, 1]])
+a = torch.FloatTensor([[[1, 2, 4, 1],
+                        [6, 3, 2, 4],
+                        [2, 4, 6, 1]]])
 a_mean = torch.mean(a, dim=-1)
 a_var = torch.var(a, dim=-1, unbiased=False)
-a_mean_expand = a_mean.unsqueeze(dim=-1).expand(3, 4)
-a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(3, 4) + 1e-5)
+a_mean_expand = a_mean.unsqueeze(dim=-1).expand(1, 3, 4)
+a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(1, 3, 4) + 1e-5)
 res = (a - a_mean_expand) / (a_var_expand)
-print(res)
+lm = nn.LayerNorm(4)
+print("----------------")
+print((lm(a).data).equal(res.data))
+print(lm(a).data)
+print(res.data)
