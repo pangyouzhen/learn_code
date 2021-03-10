@@ -405,6 +405,7 @@ assert torch.mean(a, dim=1).size() == (3, 6, 7)
 assert torch.mean(a, dim=-1).size() == (3, 2, 6)
 # a = torch.randint(10, size=(3, 6, 7)).float()
 # layerNorm 计算过程
+print("--------------layernorm--------------")
 a = torch.FloatTensor([[[1, 2, 4, 1],
                         [6, 3, 2, 4],
                         [2, 4, 6, 1]]])
@@ -414,7 +415,26 @@ a_mean_expand = a_mean.unsqueeze(dim=-1).expand(1, 3, 4)
 a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(1, 3, 4) + 1e-5)
 res = (a - a_mean_expand) / (a_var_expand)
 lm = nn.LayerNorm(4)
-print("----------------")
-print((lm(a).data).equal(res.data))
 print(lm(a).data)
 print(res.data)
+print("--------------batchnorm--------------")
+# TODO error
+# a_mean_bm = torch.mean(a, dim=0)
+# a_var_bm = torch.var(a, dim=0, unbiased=False)
+# a_mean_expand_bm = a_mean_bm.unsqueeze(dim=0).expand(1, 3, 4)
+# a_var_expand_bm = torch.sqrt(a_var_bm.unsqueeze(dim=0).expand(1, 3, 4) + 1e-5)
+# bm = nn.BatchNorm1d(4)
+# res2 = (a - a_mean_bm) / (a_var_expand_bm)
+# print(a_mean_expand_bm)
+# print(a_var_expand_bm)
+# print(bm(a).data)
+# print(res2.data)
+
+print("------------------self_attention----------------")
+from torch.nn.modules.transformer import MultiheadAttention
+
+# a = torch.randint(100, size=(5, 4, 6)).float()
+a = torch.randn(size=(5, 4, 6))
+self_attention = MultiheadAttention(embed_dim=6, num_heads=1)
+attn_output, _ = self_attention(a, a, a)
+print(attn_output)
