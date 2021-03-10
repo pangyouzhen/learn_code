@@ -1,9 +1,3 @@
-1. 一个epoch是对sample的一次训练
-2. batch 就是将sample绩效宁分割，分成batch个，所以神经网络的第一个入参的维度是batch_size, batch_size 对模型的训练有什么影响，如何进行调节
-3. Normalization 归一化和规范化，将是数据转化为 均值为0，方差为1 的正态分布
-4. batch normal 和 layer normal 有什么区别
-5. attention 的计算公式 attention(Q,K,V)  = softmax(sim (Q,k)) * V
-6. 与之对应的是self attention 中的QKV是怎样对应的，
 7. 深度学习中解决过拟合的问题的方法有哪些
 8. esim的网络结构
 9. transformer的网络结构，bert的网络结构，qanet的网络结构，bert的效果优化优化在什么地方
