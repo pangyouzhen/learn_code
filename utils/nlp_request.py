@@ -18,9 +18,3 @@ class Nlp(DfAsyncPost):
 def init_df():
     df = pd.read_excel()
     return df
-
-
-if __name__ == '__main__':
-    df = init_df()
-    df = nlp.run(df, "用户问")
-    print(df[:5])

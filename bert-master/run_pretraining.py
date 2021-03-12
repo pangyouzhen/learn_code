@@ -70,6 +70,13 @@ flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
 
 flags.DEFINE_integer("num_train_steps", 100000, "Number of training steps.")
 
+# TODO warmup 的作用是什么
+# TODO 为什么要用MHA
+# 数据增强是怎么做的
+# bert模型解冻
+# GPT模型
+# cnn如何应用在长文本
+
 flags.DEFINE_integer("num_warmup_steps", 10000, "Number of warmup steps.")
 
 flags.DEFINE_integer("save_checkpoints_steps", 1000,
