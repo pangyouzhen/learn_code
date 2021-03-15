@@ -25,7 +25,7 @@ from torch.nn import init
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-
+#  TODO 等torchtext 1.0 上线后进行重构，0.8-0.9 版本暂时不修改
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # spacy ,en,ch 语料库的安装方法
