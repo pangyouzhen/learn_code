@@ -34,6 +34,11 @@ git branch -a | grep -v master > file.log
 git branch -r | grep -v master | xargs git branch -r -D
 # docker 打包镜像
 # docker load 镜像
+#git 撤销命令
+
+#git checkout . 撤销所有修改
+#git reset HEAD . 用在add之后
+#git reset --soft HEAD^ 用在commit之后
 
 # systemctl & systemd
 sudo systemctl restart lightdm
@@ -178,6 +183,16 @@ function lg() {
     git commit -a -m "$1"
     git push origin $(git branch --show-current)
 }
+
+# 针对老版本git 没有 -show-current
+function lg() {
+#  lazygit
+    git pull origin $(git branch | grep '*' | awk '{print $2}')
+    git add .
+    git commit -a -m "$1"
+    git push origin $(git branch | grep '*' | awk '{print $2}')
+}
+
 
 
 # manjaro bash 解压方法
