@@ -1,9 +1,8 @@
 import torch
 import torch.nn.functional as F
+import torchtext.legacy.data as data
 from torch.nn import init
-from torchtext import data
 from torchtext.vocab import Vectors
-import pandas as pd
 
 from learn_torch.torch_esim_model import Esim
 

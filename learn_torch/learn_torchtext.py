@@ -1,6 +1,6 @@
 import torch
 import pandas as pd
-from torchtext.data import Field
+from torchtext.legacy.data import Field
 
 from utils.DataFrameDataSet import DataFrameDataset
 

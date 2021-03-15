@@ -1,6 +1,6 @@
 from typing import Dict, Callable, List
 
-from torchtext.data import Dataset, Example
+from torchtext.legacy.data import Dataset,Example
 import pandas as pd
 
 

@@ -18,7 +18,8 @@ from torch import optim
 # 3. 定义Field
 import spacy
 import torch
-from torchtext import data, datasets
+import torchtext.legacy.data as data
+from torchtext import datasets
 from torchtext.vocab import Vectors
 from torch.nn import init
 import torch.nn as nn
