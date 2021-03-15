@@ -167,7 +167,7 @@ print(torch.max(a, dim=1).indices)
 
 ## pytorch 两种矩阵相乘的方式
 
-# torch.mul() 矩阵点乘 == a *b，也就是element wise 对应位相乘
+# torch.mul() 矩阵点乘 == a*b，也就是element wise 对应位相乘
 # torch.matmul() 矩阵相乘，对应 python 中 x @ y  \otimes
 
 # element wise --- Hadamard product.  \odot

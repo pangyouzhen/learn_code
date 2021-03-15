@@ -8,7 +8,8 @@ import torch.nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.nn import init
-from torchtext import data
+from torchtext.legacy.data import Field
+from torchtext.legacy import data
 from torchtext.vocab import Vectors
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -18,8 +19,8 @@ def tokenizer(text):
     return [tok for tok in text]
 
 
-LABEL = data.Field(sequential=False, use_vocab=False)
-SENTENCE = data.Field(sequential=True, tokenize=tokenizer, lower=True)
+LABEL = Field(sequential=False, use_vocab=False)
+SENTENCE = Field(sequential=True, tokenize=tokenizer, lower=True)
 
 train = data.TabularDataset('../full_data/ants/ants_torchtext_train.csv', format='csv', skip_header=True,
                             fields=[('sentence1', SENTENCE), ('sentence2', SENTENCE), ('label', LABEL)])
