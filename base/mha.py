@@ -3,39 +3,53 @@ import torch
 import math
 import torch.nn as nn
 import torch.nn.functional as F
-
+from torch.nn.modules.transformer import MultiheadAttention
 from learn_torch.transformer_ import clones
 
 
 # 直接对应公式即可
-def attention(query, key, value):
+class Attention(nn.Module):
     # dk为词向量的维度。其目的在于调节的作用，使得内积不易过大。
-    d_k = query.size(-1)
-    scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
-    p_attn = F.softmax(scores, dim=-1)
-    return torch.matmul(p_attn, value), p_attn
+    def __init__(self):
+        super(Attention, self).__init__()
+
+    def forward(self, query, key, value):
+        d_k = query.size(-1)
+        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
+        return torch.matmul(torch.softmax(scores, dim=-1), value)
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, head, d_model, dropout=0.1, ):
+    def __init__(self, num_head, embed_dim, dropout=0.1, ):
+        # embed_dim 其实是d_model
         super(MultiHeadAttention, self).__init__()
-        assert d_model % head == 0
-        self.d_ = d_model // head
-        self.h = head
-        self.linears = clones(nn.Linear(d_model, d_model), 4)
-        self.attn = None
+        self.num_head = num_head
+        assert embed_dim % num_head == 0
+        self.dim_head = embed_dim // num_head
+        self.fc_q = nn.Linear(embed_dim, embed_dim)
+        self.fc_k = nn.Linear(embed_dim, embed_dim)
+        self.fc_v = nn.Linear(embed_dim, embed_dim)
+        self.attn = Attention()
+        self.fc = nn.Linear(embed_dim, embed_dim)
         self.dropout = nn.Dropout(p=dropout)
+        self.layer_norm = nn.LayerNorm(embed_dim)
 
-    def forward(self, query, key, value):
-        nbatches = query.size(0)
-        print(query.size())
-        # TODO 这里的compl 怎么理解，应该是输出一个tensor？
-        query, key, value = [l(x).view(nbatches, -1, self.h, self.d_).transpose(1, 2) for l, x in
-                             zip(self.linears, (query, key, value))]
-        print(query.size())
-        x, self.attn = attention(query, key, value)
-        x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_)
-        return self.linears[-1](x)
+    def forward(self, x):
+        batch_size = query.size(0)
+        Q = self.fc_q(x)
+        K = self.fc_k(x)
+        V = self.fc_v(x)
+        Q = Q.view(batch_size * self.num_head, -1, self.dim_head)
+        K = K.view(batch_size * self.num_head, -1, self.dim_head)
+        V = V.view(batch_size * self.num_head, -1, self.dim_head)
+        context = self.attention(Q, K, V)
+        context = context.view(batch_size, -1, self.dim_head * self.num_head)
+        out = self.fc(context)
+        out = self.dropout(out)
+        # 残差
+        out = out + x
+        out = self.layer_norm(out)
+        return out
 
 
 if __name__ == '__main__':

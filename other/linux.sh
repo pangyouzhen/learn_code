@@ -146,7 +146,7 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 # ！$ 上一个命令的参数
 # 获取文件的目录
 # locate transformer_.py | head -n 1 | xargs dirname
-
+cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5p')
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > /tmp/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
