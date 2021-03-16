@@ -5,7 +5,8 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 from torch.nn import init
-from torchtext import data
+# TODO torchtext
+from torchtext.legacy import data
 from torchtext.vocab import Vectors
 from loguru import logger
 

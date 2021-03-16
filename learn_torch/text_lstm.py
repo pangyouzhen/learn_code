@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 from sklearn import metrics
-from torchtext import data
+from torchtext.legacy import data
 from loguru import logger
 from utils.DataFrameDataSet import DataFrameDataset
 import pandas as pd

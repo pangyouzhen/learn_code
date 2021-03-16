@@ -9,22 +9,6 @@ from utils.torch_utils import PositionalEncoding
 np.random.seed(0)
 torch.manual_seed(0)
 
-# ！！！！！
-#  输入：input: batch_size ,seq_length，
-#  embedding:
-#       定义： nn.Embedding(vocab_size, embedding_dim)
-#       输出: batch_size,seq_length,embedding_dim
-#  encoding:
-#       LSTM
-#           定义: nn.LSTM(embedding_dim, hidden_dim ,num_layers=1, bidirectional=*)
-#               forward 可以随机初始化 h0，c0 (num_layers,seq_length,hidden_dim)
-#           输出：lstm: seq_length，batch_size, hidden_size 或者是 2*hidden_size
-#       transformer:
-#           embedding 之后需要经过 PositionEncoding(d_model = embeding_dim) 维度不变（batch_size,seq_length,embedding）
-#           定义 transformer(d_model=embedding_dim, nhead= embedding 的整数倍)
-#           输出： tgt_excepted_size, seq_length, embedding_dim
-#       cnn:
-#
 #  sigmoid 函数： \frac{1}{1+e^{-x}}
 #  softmax 函数： 归一化指数函数，用在多分类
 
