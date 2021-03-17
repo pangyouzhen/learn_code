@@ -12,9 +12,18 @@ docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
-# 使用nvidia docker
-docker run -it -p 8500:8500 --runtime=nvidia -d tensorflow
-# 127.0.0.1:5601
+
+#docker19后新功能
+#1，就是docker不需要root权限来启动和运行了
+#Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
+#解决办法
+chmod 666 /var/run/docker.sock
+#2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
+#docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
+#解决办法
+yay -S nvidia-container-runtime
+
+
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
 #git
