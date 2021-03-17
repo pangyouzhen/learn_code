@@ -393,8 +393,12 @@ print("--------------layernorm--------------")
 a = torch.FloatTensor([[[1, 2, 4, 1],
                         [6, 3, 2, 4],
                         [2, 4, 6, 1]]])
+print(a.size() == (1, 3, 4))
+assert a[0].size() == (3, 4)
 a_mean = torch.mean(a, dim=-1)
+assert a_mean.size() == (1, 3)
 a_var = torch.var(a, dim=-1, unbiased=False)
+assert a_var.size() == (1, 3)
 a_mean_expand = a_mean.unsqueeze(dim=-1).expand(1, 3, 4)
 a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(1, 3, 4) + 1e-5)
 res = (a - a_mean_expand) / (a_var_expand)
@@ -422,3 +426,61 @@ a = torch.randn(size=(5, 4, 6))
 self_attention = MultiheadAttention(embed_dim=6, num_heads=1)
 attn_output, _ = self_attention(a, a, a)
 print(attn_output)
+print("--------------torch index -------------")
+import torch
+
+a = torch.randint(10, size=(4, 3, 28, 28)).float()
+# Pytorch风格的索引
+assert a[0].size() == (3, 28, 28)
+assert a[0, 0].size() == (28, 28)
+assert a[0, 0, 0].size() == (28,)
+print(a[0, 0, 0, 0])
+print(a[0, 0, 0, 0].size())
+# python风格的索引
+assert torch.mean(a, dim=-1).size() == (4, 3, 28)
+assert a[:2].size() == (2, 3, 28, 28)
+assert a[:2, :1, :, :].shape == (2, 1, 28, 28)
+assert a[:2, 1:, :, :].shape == (2, 2, 28, 28)
+# 注意:1 和1是不同的
+assert a[:2, 1, :, :] == (2, 28, 28)
+assert a[:2, -2:, :, :].shape == (2, 2, 28, 28)
+assert a[:, :, 0:28:2, 0:28:2].shape == (4, 3, 14, 14)
+assert a[:, :, ::2, ::2].shape == (4, 3, 14, 14)
+# index_select（）
+# 选择特定下标有时候很有用，比如上面的a这个Tensor可以看作4张RGB（3
+# 通道）的MNIST图像，长宽都是28px。那么在第一维度上可以选择特定的图片，在第二维度上选择特定的通道，在第三维度上选择特定的行等：
+
+# 选择第一张和第三张图
+assert a.index_select(0, torch.tensor([0, 2])).shape == (2, 3, 28, 28)
+# 选择R通道和B通道
+assert a.index_select(1, torch.tensor([0, 2])).shape == (4, 2, 28, 28)
+# 选择图像的0~8行
+assert a.index_select(2, torch.arange(8)).shape == (4, 3, 8, 28)
+
+# 使用 ... 索引任意多的维度
+assert a[...].shape == (4, 3, 28, 28)
+assert a[0, ...].shape == (3, 28, 28)
+assert a[:, 1, ...].shape == (4, 28, 28)
+assert a[..., :1].shape == (4, 3, 28, 1)
+
+#  使用mask索引
+import torch
+
+a = torch.randn(3, 4)
+print(a)
+
+# 生成a这个Tensor中大于0.5的元素的掩码
+mask = a.ge(0.5)
+print(mask)
+
+# 取出a这个Tensor中大于0.5的元素
+# 注意：最后取出的 大于0.5的Tensor的shape已经被打平。
+val = torch.masked_select(a, mask)
+print(val)
+print(val.shape)
+# take索引是在原来Tensor的shape基础上打平，然后在打平后的Tensor上进行索引。
+import torch
+
+a = torch.tensor([[3, 7, 2], [2, 8, 3]])
+print(a)
+print(torch.take(a, torch.tensor([0, 1, 5])))
