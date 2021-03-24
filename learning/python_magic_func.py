@@ -1,3 +1,11 @@
+
+# __new__ 的使用场景
+# 1. 允许继承不可变类型： 比如int, float 等，实际中用不到
+# 1. 用于在MetaClass中使用
+# 1. 单例模式, datetime 中不是这种情况
+# 实际中不要使用这个方法
+
+
 class Tag:
     def __init__(self):
         pass

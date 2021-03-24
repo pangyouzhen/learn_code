@@ -12,6 +12,7 @@ docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
+docker run -it -p:4444:4444 retreatguru/headless-chromedriver
 
 
 docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 -v /home/$USER/milvus/db:/var/lib/milvus/db -v /home/$USER/milvus/conf:/var/lib/milvus/conf -v /home/$USER/milvus/logs:/var/lib/milvus/logs -v /home/$USER/milvus/wal:/var/lib/milvus/wal milvusdb/milvus:0.10.5-gpu-d010621-4eda95
@@ -19,7 +20,7 @@ docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
 #解决办法
-chmod 666 /var/run/docker.sock
+sudo chmod 666 /var/run/docker.sock
 #2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
 #docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
 #解决办法
@@ -48,6 +49,7 @@ git branch -r | grep -v master | xargs git branch -r -D
 #git 撤销命令
 
 #git checkout . 撤销所有修改
+# git restore --staged .
 #git reset HEAD . 用在add之后
 #git reset --soft HEAD^ 用在commit之后
 
@@ -229,5 +231,13 @@ ex ()
   fi
 }
 
-#压缩命令
+# bottle_display
+#http://127.0.0.1:8003/visualize.html#mode=edit
+
+#压缩命令/
 tar -zcvf abc.tgz ./abc
+
+# 多个jdk 时
+#sudo pacman -S jdk8-openjdk
+# ls /usr/lib/jvm/
+#从上面的结果中选择一个  sudo archlinux-java set java-12-jdk
