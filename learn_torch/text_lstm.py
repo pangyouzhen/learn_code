@@ -8,7 +8,10 @@ from torchtext.legacy import data
 from loguru import logger
 from utils.DataFrameDataSet import DataFrameDataset
 import pandas as pd
+from torch.utils.data import Dataset, DataLoader
+from torchtext.vocab import Vocab
 
+#  TODO 移除 torchtext 和原先的dataframe set, 使用torch 内置的dataloader
 train_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/train.txt", sep="\t", names=["sentence", "label"])
 dev_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/dev.txt", sep="\t", names=["sentence", "label"])
 # 数据探查
@@ -21,6 +24,9 @@ del train_df["context_len"]
 def tokenizer(text: str) -> List:
     return [tok for tok in text]
 
+
+train_df["sen_"] = train_df["sentence"].apply(tokenizer)
+a = train_df["sen_"].tolist()
 
 # vectors_name = "sgns.sogounews.bigram-char"
 # vectors_path = "../data/"
@@ -69,7 +75,7 @@ class TextLstm(nn.Module):
         x, _ = self.lstm(x)
         # batch_size,seq_length,hidden_size
         out = x[:, -1, :]
-        # batch_size,seq_length,hidden_size
+        # batch_size,1,hidden_size
         pre_label = torch.softmax(self.linear(out), dim=-1)
         return pre_label
 

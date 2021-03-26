@@ -79,12 +79,11 @@ fsck -l
 sh -x xxx.sh
 
 # grep awk sed
-# grep 正则
-#在Perl正则模式下, -e
+# grep 正则  grep的正则使用 -E 参数,使用perl 的正则形式和python正则相差不大
 grep -P
+#grep -v  取反操作
 grep 10.. .xsession-errors
 # sh 中 * + ? 重复，这里的+ ?用的时候需要 变成\+ \?
-# () 在 grep 正则中也要 \( \)
 # sed 打印第10行
 sed -n "10p" .xsession-errors
 sed -n "10,20p" .xsession-errors
