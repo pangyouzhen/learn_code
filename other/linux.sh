@@ -5,6 +5,16 @@ xmodmap -e 'keycode 69 = Tab ISO_Left_Tab Tab ISO_Left_Tab'
 xmodmap -pke
 
 #docker 相关
+
+#ubuntu
+docker run -it -d ubuntu:latest --name ubuntu
+docker exec -it ubuntu bash
+sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+# 一些操作
+docker commit -m d2eb5b9b61f5 nsg_annoy:v1.0
+docker save ubuntu:latest > /tmp/annoy_nsg.tar
+tar -zcvf nsg-annoy.tgz nsg_annoy.tar
+
 # 移除退出的docker
 docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
 docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1

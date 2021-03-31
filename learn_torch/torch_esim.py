@@ -9,6 +9,7 @@ from torch.nn import init
 from torchtext.legacy import data
 from torchtext.vocab import Vectors
 from loguru import logger
+from esim.data import NLIDataset, Preprocessor
 
 from utils.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
@@ -97,10 +98,10 @@ for epoch in range(n_epoch):
             #     torch.save(model, f'{output_path}/{model_name}/model.pt')
             model.train()
     logger.info("---------------")
-        # train_epoch_loss = train_epoch_loss + loss.data
-        # print((torch.argmax(out, dim=-1) == target).sum())
-        # train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
-        # print("train_loss/epoch", train_epoch_loss / len(train), epoch)
-        # print("train_acc/epoch", train_acc / len(train), epoch)
-        # scheduler.step()
-        # print("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
+    # train_epoch_loss = train_epoch_loss + loss.data
+    # print((torch.argmax(out, dim=-1) == target).sum())
+    # train_acc += (torch.argmax(out, dim=-1) == target).sum().item()
+    # print("train_loss/epoch", train_epoch_loss / len(train), epoch)
+    # print("train_acc/epoch", train_acc / len(train), epoch)
+    # scheduler.step()
+    # print("epoch is {} train_epoch_loss is {} train_acc is {}".format(epoch, train_epoch_loss,
