@@ -3,7 +3,7 @@ import pymongo
 
 
 class lazy:
-    def __init(self, func):
+    def __init__(self, func):
         self.func = func
 
     def __get__(self, instance, cls):
