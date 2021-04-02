@@ -7,3 +7,6 @@
 1. 推荐系统知识结构的搭建
 1. torchtext 代码的移除
 1. grpc的调用tfserving
+1. rasa
+1. textCNN
+1. github actions
