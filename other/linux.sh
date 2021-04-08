@@ -260,3 +260,11 @@ ssh root@81.71.140.148
 #sudo pacman -S jdk8-openjdk
 # ls /usr/lib/jvm/
 #从上面的结果中选择一个  sudo archlinux-java set java-12-jdk
+
+
+sudo npm i jsdom -g
+
+
+#linux 杀掉自动重启的进程
+#https://www.cnblogs.com/Rui6/p/13983713.html
+
