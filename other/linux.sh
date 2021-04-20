@@ -268,3 +268,4 @@ sudo npm i jsdom -g
 #linux 杀掉自动重启的进程
 #https://www.cnblogs.com/Rui6/p/13983713.html
 
+docker build -t stock:v0.1 .
