@@ -269,3 +269,4 @@ sudo npm i jsdom -g
 #https://www.cnblogs.com/Rui6/p/13983713.html
 
 docker build -t stock:v0.1 .
+netstat -nltp | grep 8080
