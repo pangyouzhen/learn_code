@@ -6,5 +6,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list
     && npm i jsdom -g \
     && mkdir /data \
     && mkdir /data/stock \
-    && cd /data/stock
+    && cd /data/stock \
+    && git clone git@github.com:pangyouzhen/finance.git \
+    && pip3 install -r requirement
 #    && git clone
