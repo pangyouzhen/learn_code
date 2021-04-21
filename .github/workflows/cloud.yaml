@@ -24,14 +24,14 @@ jobs:
 
 
       #  Runs a set of commands using the runners shell
-      # step2: 将源码复制到服务器 #坑
+      # step2: 将源码复制到服务器
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v2.0.8
         env:
           SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.HOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          SOURCE: ''
+          SOURCE: './learn_torch'
           TARGET: '/tmp/'
           ARGS: '-avzr --delete'
 

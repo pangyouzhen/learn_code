@@ -2,7 +2,6 @@
 
 ## todo
 
-1. fasttext 代码的实现
 1. re2模型的实现
 1. 推荐系统知识结构的搭建
 1. grpc的调用tfserving
