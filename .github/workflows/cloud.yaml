@@ -20,18 +20,23 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # step1: 获取源码
+      - name: chekcout
+        uses: actions/checkout@v2
 
-      - uses: actions/checkout@v1
 
-#      Runs a set of commands using the runners shell
-      - name: SSH Remote Commands
-        uses: appleboy/ssh-action@v0.1.2
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secrets.PORT }}
-          script: docker build . --file Dockerfile --tag $IMAGE_NAME
+      #  Runs a set of commands using the runners shell
+      # step2: 将源码复制到服务器 #坑
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@v2.0.8
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          SOURCE: ''
+          TARGET: '/tmp/'
+          ARGS: '-avzr --delete'
+
 
       # Slack Notification
 #

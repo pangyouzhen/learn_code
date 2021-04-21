@@ -32,6 +32,7 @@ class DfAsyncPost:
             self.headers = {"Content-Type": "application/json"}
             self.headers_json = True
         self.sema = asyncio.BoundedSemaphore(sema)
+        self.session = aiohttp.ClientSession()
 
     @logger.catch()
     async def process_url(self, df: pd.DataFrame, ind_query: Tuple) -> None:
@@ -48,11 +49,11 @@ class DfAsyncPost:
         payload = self.payload.format(*tuple(query))
         with (await self.sema):
             try:
-                async with aiohttp.ClientSession() as session:
+                async with self.session:
                     if self.headers_json:
-                        resp = await session.post(self.url, json=json.loads(payload), headers=self.headers)
+                        resp = await self.session.post(self.url, json=json.loads(payload), headers=self.headers)
                     else:
-                        resp = await session.post(self.url, data=payload.encode("utf-8"), headers=self.headers)
+                        resp = await self.session.post(self.url, data=payload.encode("utf-8"), headers=self.headers)
                     await asyncio.sleep(0.5)
                     df.loc[ind, self.df_response] = await resp.text()
             except Exception as e:
