@@ -6,10 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import init
 # TODO torchtext
-from torchtext.legacy import data
-from torchtext.vocab import Vectors
 from loguru import logger
-from esim.data import NLIDataset, Preprocessor
 
 from utils.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
