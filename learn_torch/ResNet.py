@@ -9,6 +9,7 @@ torch.manual_seed(1)
 
 
 class ResBlock(nn.Module):
+    # todo
     def __init__(self, n_chans):
         super(ResBlock, self).__init__()
         self.conv = nn.Conv2d(n_chans, n_chans,
