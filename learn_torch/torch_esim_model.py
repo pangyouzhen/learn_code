@@ -41,6 +41,7 @@ class Esim(nn.Module):
         a_embedding = self.embedding(a)
         b_embedding = self.embedding(b)
         # output: batch_size,seq_num,embedding_dim
+        # 这里两个用的是同一个lstm, 而且是双向的lstm
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
         # output: seq_num,batch_size,2 * hidden_size

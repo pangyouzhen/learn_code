@@ -34,9 +34,6 @@ jobs:
           SOURCE: './other/dockerfile/Dockerfile'
           TARGET: '/tmp/'
           ARGS: '-avzr --delete'
-        run:
-          cd /tmp/
-          docker build -t stock:tmp .
 
 
       # Slack Notification
