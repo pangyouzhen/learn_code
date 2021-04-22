@@ -31,9 +31,12 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.HOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          SOURCE: './learn_torch'
+          SOURCE: './other/dockerfile/Dockerfile'
           TARGET: '/tmp/'
           ARGS: '-avzr --delete'
+        run:
+          cd /tmp/
+          docker build -t stock:tmp .
 
 
       # Slack Notification
