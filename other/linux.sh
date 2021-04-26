@@ -19,7 +19,7 @@ tar -zcvf nsg-annoy.tgz nsg_annoy.tar
 docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
 docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
-docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=password -d  mysql:latest
+docker run -it --name mysql --rm -p 3306:3306  -e MYSQL_ROOT_PASSWORD=SeaBiscuit~!@ -d  mysql:latest
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
 docker run -it -p:4444:4444 retreatguru/headless-chromedriver
