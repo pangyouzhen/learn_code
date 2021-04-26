@@ -1,17 +1,14 @@
 from typing import List
-
+from collections import Counter
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
 from sklearn import metrics
-from torchtext.legacy import data
 from loguru import logger
-from utils.DataFrameDataSet import DataFrameDataset
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
 from torchtext.vocab import Vocab
+from torch.utils.data import Dataset, DataLoader
 
-#  TODO 移除 torchtext 和原先的dataframe set, 使用torch 内置的dataloader
 train_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/train.txt", sep="\t", names=["sentence", "label"])
 dev_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/dev.txt", sep="\t", names=["sentence", "label"])
 # 数据探查
@@ -27,38 +24,24 @@ def tokenizer(text: str) -> List:
 
 train_df["sen_"] = train_df["sentence"].apply(tokenizer)
 a = train_df["sen_"].tolist()
-
-# vectors_name = "sgns.sogounews.bigram-char"
-# vectors_path = "../data/"
+c = Counter([j for i in a for j in i])
+vocab = Vocab(c)
+print(vocab)
+vectors_name = "sgns.sogounews.bigram-char"
+vectors_path = "../data/"
 
 batch_size = 128
 device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-LABEL: data.Field = data.Field(sequential=False, use_vocab=False)
-SENTENCE: data.Field = data.Field(sequential=True, tokenize=tokenizer)
-train: DataFrameDataset = DataFrameDataset(train_df,
-                                           fields={'sentence': SENTENCE, "label": LABEL})
-dev: DataFrameDataset = DataFrameDataset(dev_df,
-                                         fields={'sentence': SENTENCE, "label": LABEL})
+
+
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
 # vectors: Vectors = Vectors(name=vectors_name, cache=vectors_path)
 # 获取词向量的维度
 # vectors_dim: int = vectors.dim
 # 获取分类的维度
-num_class = len(set([i.label for i in train.examples]))
 # print("词向量的维度是", vectors_dim, "分类的维度是", num_class)
 # SENTENCE.build_vocab(train, vectors=vectors)  # , max_size=30000)
-SENTENCE.build_vocab(train)  # , max_size=30000)
-# 这里SENTENCE 根据vectors 构建了自己的词向量 ->> SENTENCE.vocab.vectors
-# 如果原始词向量中没有这个词-> 构建成一个0 tensor
-# 当 corpus 中有的 token 在 vectors 中不存在时 的初始化方式.
-# SENTENCE.vocab.vectors.unk_init = init.xavier_uniform
-train_iter: data.BucketIterator = data.BucketIterator(train, batch_size=batch_size,
-                                                      shuffle=True, device=device)
-
-dev_iter: data.BucketIterator = data.BucketIterator(dev, batch_size=batch_size,
-                                                    device=device)
-
 
 class TextLstm(nn.Module):
     def __init__(self, num_embeddings, embedding_dim, hidden_size, out_features):
@@ -80,7 +63,7 @@ class TextLstm(nn.Module):
         return pre_label
 
 
-model = TextLstm(num_embeddings=len(SENTENCE.vocab), embedding_dim=300,
+model = TextLstm(num_embeddings=300, embedding_dim=300,
                  hidden_size=128, out_features=10)
 # print(SENTENCE.vocab.vectors.shape)
 # model.embedding.weight.data.copy_(SENTENCE.vocab.vectors)

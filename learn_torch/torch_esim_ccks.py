@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-import torchtext.legacy.data as data
 from torch.nn import init
 from torchtext.vocab import Vectors
 
@@ -15,16 +14,7 @@ def tokenizer(text):
     return [tok for tok in text]
 
 
-LABEL = data.Field(sequential=False, use_vocab=False)
-SENTENCE1 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-SENTENCE2 = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-
-train = data.TabularDataset('../data/ccks2018/task3_train.txt', format='tsv', skip_header=True,
-                            fields=[('sentence1', SENTENCE1), ('sentence2', SENTENCE2), ('label', LABEL)])
 # 增加读取文件类型判断
-print(list(train[5].__dict__.keys()))
-assert list(train[5].__dict__.keys()) == ['sentence1', 'sentence2', 'label']
-
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
 vectors = Vectors(name="sgns.sogounews.bigram-char", cache="../data/")

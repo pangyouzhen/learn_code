@@ -255,7 +255,7 @@ ssh root@81.71.140.148
 #如果忘记了&可以ctrl+z 然后bg
 
 
-
+reredirect -m /tmp/docker.log 3204
 # 多个jdk 时
 #sudo pacman -S jdk8-openjdk
 # ls /usr/lib/jvm/

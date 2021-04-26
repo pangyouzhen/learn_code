@@ -5,10 +5,8 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 from torch.nn import init
-# TODO torchtext
 from loguru import logger
 
-from utils.DataFrameDataSet import DataFrameDataset
 from learn_torch.torch_esim_model import Esim
 
 logger.add("./log/ll.log")
@@ -31,10 +29,6 @@ def tokenizer(text: str) -> List:
 
 batch_size = 128
 device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-LABEL: data.Field = data.Field(sequential=False, use_vocab=False)
-SENTENCE: data.Field = data.Field(sequential=True, tokenize=tokenizer, lower=True)
-train: DataFrameDataset = DataFrameDataset(train_df,
-                                           fields={'sentence1': SENTENCE, 'sentence2': SENTENCE, "label": LABEL})
 # 使用本地词向量
 # torchtext.Vectors 会自动识别 headers
 vectors: Vectors = Vectors(name=vectors_name, cache=vectors_path)

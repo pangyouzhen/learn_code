@@ -8,8 +8,6 @@ import torch.nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.nn import init
-from torchtext.legacy.data import Field
-from torchtext.legacy import data
 from torchtext.vocab import Vectors
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
