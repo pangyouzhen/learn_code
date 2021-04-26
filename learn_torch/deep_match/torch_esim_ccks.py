@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torch.nn import init
 from torchtext.vocab import Vectors
 
-from learn_torch.torch_esim_model import Esim
+from learn_torch.deep_match.torch_esim_model import Esim
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("--------------------------------")

@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from torch.nn import init
 from loguru import logger
 
-from learn_torch.torch_esim_model import Esim
+from learn_torch.deep_match.torch_esim_model import Esim
 
 logger.add("./log/ll.log")
 
@@ -20,7 +20,7 @@ train_df = train_df[(train_df['sentence1_len'] <= 15) & (train_df['sentence2_len
 train_df = train_df[["sentence1", "sentence2", "label"]]
 print(train_df.shape)
 vectors_name = "sgns.sogounews.bigram-char"
-vectors_path = "../data/"
+vectors_path = "../../data/"
 
 
 def tokenizer(text: str) -> List:

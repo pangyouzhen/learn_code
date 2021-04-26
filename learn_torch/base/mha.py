@@ -1,10 +1,8 @@
 # https://www.cnblogs.com/xiximayou/p/13343856.html
-import torch
 import math
+
+import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn.modules.transformer import MultiheadAttention
-from learn_torch.transformer_ import clones
 
 
 # 直接对应公式即可
@@ -29,7 +27,7 @@ class MultiHeadAttention(nn.Module):
         self.fc_q = nn.Linear(embed_dim, embed_dim)
         self.fc_k = nn.Linear(embed_dim, embed_dim)
         self.fc_v = nn.Linear(embed_dim, embed_dim)
-        self.attn = Attention()
+        self.attention = Attention()
         self.fc = nn.Linear(embed_dim, embed_dim)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_norm = nn.LayerNorm(embed_dim)
@@ -57,7 +55,5 @@ if __name__ == '__main__':
     query = torch.randint(10, [2, 3, 8]).float()
     key = torch.randint(10, [2, 4, 8]).float()
     value = torch.randint(10, [2, 4, 8]).float()
-    # res, p_attn = attention(query, key, value)
-    # print(res.shape, p_attn.shape)
     mha = MultiHeadAttention(4, 8)
-    mha(query, key, value)
+    print(mha(query))

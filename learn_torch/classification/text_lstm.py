@@ -1,13 +1,13 @@
-from typing import List
 from collections import Counter
-import torch.nn as nn
-import torch
-import torch.nn.functional as F
-from sklearn import metrics
-from loguru import logger
+from typing import List
+
 import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from loguru import logger
+from sklearn import metrics
 from torchtext.vocab import Vocab
-from torch.utils.data import Dataset, DataLoader
 
 train_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/train.txt", sep="\t", names=["sentence", "label"])
 dev_df = pd.read_csv("/data/project/nlp_summary/data/THUCNews/data/dev.txt", sep="\t", names=["sentence", "label"])
@@ -28,7 +28,7 @@ c = Counter([j for i in a for j in i])
 vocab = Vocab(c)
 print(vocab)
 vectors_name = "sgns.sogounews.bigram-char"
-vectors_path = "../data/"
+vectors_path = "../../data/"
 
 batch_size = 128
 device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

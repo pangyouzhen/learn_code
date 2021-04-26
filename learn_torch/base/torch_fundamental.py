@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.torch_utils import PositionalEncoding
+from learn_torch.other.PositionalEncoding import PositionalEncoding
 
 np.random.seed(0)
 torch.manual_seed(0)
