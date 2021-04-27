@@ -3,11 +3,11 @@ import torch.nn as nn
 
 # TODO
 class TextCNN(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, a, b):
+    def __init__(self, num_embeddings, embedding_dim, input_channel, output_channel):
         super(TextCNN, self).__init__()
         self.embedding = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=embedding_dim)
-        self.cnn = nn.Conv1d(in_channels=a, out_channels=b, kernel_size=a)
-        self.b = b
+        self.cnn = nn.Conv1d(in_channels=input_channel, out_channels=output_channel, kernel_size=input_channel)
+        self.outputchannel = output_channel
 
     def forward(self, input):
         #  (batch_size,seq_length)
