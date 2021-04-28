@@ -1,12 +1,12 @@
 from importlib import import_module
 
-import torch
-from sklearn import metrics
-from torch.utils.data import Dataset, DataLoader
-import torch.nn.functional as F
-from tqdm import tqdm
 import numpy as np
 import pandas as pd
+import torch
+import torch.nn.functional as F
+from sklearn import metrics
+from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
 
 vocab_size = 5000
 batch_size = 128
