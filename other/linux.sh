@@ -270,3 +270,5 @@ sudo npm i jsdom -g
 
 docker build -t stock:v0.1 .
 netstat -nltp | grep 8080
+
+$ docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
