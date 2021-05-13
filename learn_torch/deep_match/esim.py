@@ -3,28 +3,42 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class Esim(nn.Module):
-    def __init__(self, sentence_vocab: int, embedding_dim: int, hidden_size: int, num_class: int):
-        super().__init__()
+class Config(object):
+    def __init__(self, num_embeddings, embedding_dim, out_features):
+        self.model_name = 'esim'
+        self.num_embeddings = num_embeddings
+        self.embedding_dim = embedding_dim
+        self.out_features = out_features
+        self.hidden_size = 128
+        self.num_layer = 2
+        self.dropout = 0.2
+        self.lr = 0.001
+
+
+class Model(nn.Module):
+    def __init__(self, config):
+        super(Model, self).__init__()
         self.dropout = 0.5
-        self.embedding = nn.Embedding(num_embeddings=sentence_vocab, embedding_dim=embedding_dim)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, bidirectional=True,
+        self.embedding = nn.Embedding(num_embeddings=config.num_embeddings, embedding_dim=config.embedding_dim)
+        self.lstm = nn.LSTM(input_size=config.embedding_dim, hidden_size=config.hidden_size, num_layers=2,
+                            bidirectional=True,
                             batch_first=True)
-        self.lstm2 = nn.LSTM(input_size=8 * hidden_size, hidden_size=hidden_size, num_layers=2, bidirectional=True,
+        self.lstm2 = nn.LSTM(input_size=8 * config.hidden_size, hidden_size=config.hidden_size, num_layers=2,
+                             bidirectional=True,
                              batch_first=True)
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
         # self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
         self.fc = nn.Sequential(
-            nn.BatchNorm1d(hidden_size * 8),
-            nn.Linear(hidden_size * 8, num_class),
+            nn.BatchNorm1d(config.hidden_size * 8),
+            nn.Linear(config.hidden_size * 8, config.out_features),
             nn.ELU(inplace=True),
-            nn.BatchNorm1d(num_class),
+            nn.BatchNorm1d(config.out_features),
             nn.Dropout(self.dropout),
-            nn.Linear(num_class, num_class),
+            nn.Linear(config.out_features, config.out_features),
             nn.ELU(inplace=True),
-            nn.BatchNorm1d(num_class),
-            nn.Dropout(self.dropout),
-            nn.Linear(num_class, num_class),
+            nn.BatchNorm1d(config.out_features),
+            nn.Dropout(config.dropout),
+            nn.Linear(config.out_features, config.out_features),
             nn.Softmax(dim=-1)
         )
 
@@ -104,7 +118,7 @@ class Esim(nn.Module):
 
 
 if __name__ == '__main__':
-    esim = Esim(200, 200, 100, 2)
+    esim = Model(200, 200, 100, 2)
     print(esim)
     print("---------------------")
     for param in esim.named_parameters():
