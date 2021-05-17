@@ -137,7 +137,7 @@ nl .xsession-errors | sed -n "1~2p"
 # f 属性
 
 #时间同步服务
-systemctl restart systemd-timesyncd.service
+sudo systemctl restart systemd-timesyncd.service
 # 将当前时间写入硬件时间
 sudo hwclock -w
 xrandr --output HDMI-1 --above eDP-1

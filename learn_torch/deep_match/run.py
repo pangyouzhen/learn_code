@@ -43,6 +43,7 @@ def get_data(path):
 
     df = pd.read_csv(path, sep="\t", names=["all_columns"])
     print(df[:5])
+    # todo error
     df[["sentence1"], ["sentence2"], ["label"]] = df.apply(parser_json, result_type="expand", axis=1)
     df["vector1"] = df["sentence1"].apply(word2ind)
     df["vector2"] = df["sentence2"].apply(word2ind)
