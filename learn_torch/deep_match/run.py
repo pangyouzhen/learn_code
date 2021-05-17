@@ -41,9 +41,10 @@ def get_data(path):
         t = json.loads(x["all_columns"])
         return t["sentence1"], t["sentence2"], t["label"]
 
-    df = pd.read_csv(path, sep="\t", names=["all_columns"])
+    df: pd.DataFrame = pd.read_csv(path, sep="\t", names=["all_columns"])
+    df["new"] = 1
     print(df[:5])
-    # todo error
+    # todo error pandas的__set__item__的key是一个元祖,hash的时候报错
     df[["sentence1"], ["sentence2"], ["label"]] = df.apply(parser_json, result_type="expand", axis=1)
     df["vector1"] = df["sentence1"].apply(word2ind)
     df["vector2"] = df["sentence2"].apply(word2ind)
