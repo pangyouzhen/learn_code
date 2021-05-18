@@ -76,7 +76,7 @@ def evaluate(model, dataloader_dev):
 if __name__ == "__main__":
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
-    model_name = 'fasttext'
+    model_name = 'text_lstm'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
 

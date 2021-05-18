@@ -14,7 +14,7 @@ batch_size = 128
 max_length = 32
 embed_dim = 300
 label_num = 2
-epoch = 5
+epoch = 10
 train_path = '../../full_data/ants/train.json'
 dev_path = '../../full_data/ants/train.json'
 vocab_path = '/data/project/nlp_summary/data/THUCNews/data/vocab.txt'
@@ -45,6 +45,7 @@ def get_data(path):
     df["new"] = 1
     print(df[:5])
     df[["sentence1", "sentence2", "label"]] = df.apply(parser_json, result_type="expand", axis=1)
+    df["label"] = df["label"].astype(int)
     df["vector1"] = df["sentence1"].apply(word2ind)
     df["vector2"] = df["sentence2"].apply(word2ind)
     x1 = np.array(df["vector1"].tolist())
@@ -73,8 +74,8 @@ def evaluate(model, dataloader_dev):
     predict_all = np.array([], dtype=int)
     labels_all = np.array([], dtype=int)
     with torch.no_grad():
-        for datas, labels in dataloader_dev:
-            output = model(datas)
+        for sentence1, sentence2, labels in dataloader_dev:
+            output = model(sentence1, sentence2)
             predic = torch.max(output.data, 1)[1].cpu()
             predict_all = np.append(predict_all, predic)
             labels_all = np.append(labels_all, labels.cpu())
@@ -113,9 +114,9 @@ if __name__ == "__main__":
         best_acc = 0
         for i in range(epoch):
             index = 0
-            for datas, labels in tqdm(dataloader):
+            for sentence1, sentence2, labels in tqdm(dataloader):
                 model.zero_grad()
-                output = model(datas)
+                output = model(sentence1, sentence2)
                 loss = F.cross_entropy(output, labels)
                 loss.backward()
                 optimizer.step()
