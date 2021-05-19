@@ -118,8 +118,18 @@ class Model(nn.Module):
 
 
 if __name__ == '__main__':
-    esim = Model(200, 200, 100, 2)
-    print(esim)
+    num_embeddings = 5000
+    batch_size = 128
+    max_length = 32
+    embedding_dim = 300
+    out_features = 10
+    epoch = 5
+    config = Config(num_embeddings, embedding_dim, out_features)
+    model = Model(config)
+    print(model)
     print("---------------------")
-    for param in esim.named_parameters():
+    for param in model.named_parameters():
         print(param[0], param[1].shape)
+    inputs1 = torch.randint(high=200, size=(batch_size, max_length))
+    inputs2 = torch.randint(high=200, size=(batch_size, max_length))
+    print(model(inputs1, inputs2))
