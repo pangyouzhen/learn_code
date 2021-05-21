@@ -37,7 +37,11 @@ def get_data(path):
         return a
 
     df = pd.read_csv(path, sep="\t", names=["sentence", "label"])
+    # print(df.describe())
+    print(df["label"].value_counts())
     df["vector"] = df["sentence"].apply(word2ind)
+    df["sentence_len"] = df["sentence"].apply(len)
+    print(df.describe())
     x = np.array(df["vector"].tolist())
     y = np.array(df["label"].tolist())
     label_num = len(set(df["label"].tolist()))
@@ -73,13 +77,12 @@ def evaluate(model, dataloader_dev):
     return acc
 
 
-if __name__ == "__main__":
+def main(label_num):
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
-    model_name = 'text_lstm'
+    model_name = 'text_cnn'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = module.Model(config).to(device)
     if debug:
@@ -121,3 +124,8 @@ if __name__ == "__main__":
                     model.train()
 
         print('train finish')
+
+
+if __name__ == "__main__":
+    # main(label_num)
+    get_data(train_path)

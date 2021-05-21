@@ -42,15 +42,19 @@ def get_data(path):
         return t["sentence1"], t["sentence2"], t["label"]
 
     df: pd.DataFrame = pd.read_csv(path, sep="\t", names=["all_columns"])
-    df["new"] = 1
     print(df[:5])
     df[["sentence1", "sentence2", "label"]] = df.apply(parser_json, result_type="expand", axis=1)
     df["label"] = df["label"].astype(int)
+    print(df.describe())
     df["vector1"] = df["sentence1"].apply(word2ind)
     df["vector2"] = df["sentence2"].apply(word2ind)
     x1 = np.array(df["vector1"].tolist())
     x2 = np.array(df["vector2"].tolist())
     y = np.array(df["label"].tolist())
+    print(df["label"].value_counts())
+    df["sentence1_len"] = df['sentence1'].apply(len)
+    df["sentence2_len"] = df["sentence2"].apply(len)
+    print(df.describe())
     label_num = len(set(df["label"].tolist()))
     return x1, x2, y, label_num
 
@@ -85,13 +89,12 @@ def evaluate(model, dataloader_dev):
     return acc
 
 
-if __name__ == "__main__":
+def main(label_num):
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
     model_name = 'esim'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = module.Model(config).to(device)
     if debug:
@@ -133,3 +136,8 @@ if __name__ == "__main__":
                     model.train()
 
         print('train finish')
+
+
+if __name__ == "__main__":
+    main(label_num)
+    # get_data(train_path)

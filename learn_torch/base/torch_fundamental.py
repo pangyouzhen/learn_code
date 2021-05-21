@@ -444,7 +444,7 @@ assert a[:2].size() == (2, 3, 28, 28)
 assert a[:2, :1, :, :].shape == (2, 1, 28, 28)
 assert a[:2, 1:, :, :].shape == (2, 2, 28, 28)
 # 注意:1 和1是不同的
-assert a[:2, 1, :, :] == (2, 28, 28)
+# assert a[:2, 1, :, :] == (2, 28, 28)
 assert a[:2, -2:, :, :].shape == (2, 2, 28, 28)
 assert a[:, :, 0:28:2, 0:28:2].shape == (4, 3, 14, 14)
 assert a[:, :, ::2, ::2].shape == (4, 3, 14, 14)
@@ -486,3 +486,55 @@ import torch
 a = torch.tensor([[3, 7, 2], [2, 8, 3]])
 print(a)
 print(torch.take(a, torch.tensor([0, 1, 5])))
+
+import torch
+import torch.nn as nn
+
+# max_sent_len=35, batch_size=50, embedding_size=300
+conv1 = nn.Conv1d(in_channels=300, out_channels=100, kernel_size=(3,))
+input = torch.randn(50, 35, 300)
+# batch_size x max_sent_len x embedding_size -> batch_size x embedding_size x max_sent_len
+input = input.permute(0, 2, 1)
+print("input:", input.size())
+output = conv1(input)
+print("output:", output.size())
+
+# 李宏毅的深度学习例子
+import torch
+import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+
+a = np.array(
+    [[1, 0, 0, 0, 0, 1],
+     [0, 1, 0, 0, 1, 0],
+     [0, 0, 1, 1, 0, 0],
+     [1, 0, 0, 0, 1, 0],
+     [0, 1, 0, 0, 1, 0],
+     [0, 0, 1, 0, 1, 0]]
+)
+
+a = torch.from_numpy(a)
+# conv = nn.Conv2d(in_channels=3, out_channels=4, kernel_size=(1, 2))
+# print(conv(a))
+
+filter_matrix = torch.Tensor([
+    [[1, -1, -1],
+     [-1, 1, -1],
+     [-1, -1, 1]],
+    [[-1, 1, -1],
+     [-1, 1, -1],
+     [-1, 1, -1]]
+])
+
+filter_matrix = filter_matrix.unsqueeze(1)
+# The shape of the filter kernel should be [number_of_filters, input_channels, height, width].
+print(filter_matrix.shape)
+print(a.shape)
+a = a.unsqueeze(0)
+a = a.unsqueeze(1)
+a = a.float()
+print(a.shape)
+
+out = F.conv2d(a, filter_matrix, stride=1)
+print(out)

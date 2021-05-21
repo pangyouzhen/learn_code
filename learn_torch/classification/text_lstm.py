@@ -34,3 +34,20 @@ class Model(nn.Module):
         # batch_size,1,hidden_size
         pre_label = torch.softmax(self.linear(out), dim=-1)
         return pre_label
+
+
+if __name__ == '__main__':
+    num_embeddings = 5000
+    batch_size = 128
+    max_length = 32
+    embedding_dim = 300
+    out_features = 10
+    epoch = 5
+    config = Config(num_embeddings, embedding_dim, out_features)
+    model = Model(config)
+    print(model)
+    print("---------------------")
+    for param in model.named_parameters():
+        print(param[0], param[1].shape)
+    inputs1 = torch.randint(high=200, size=(batch_size, 5))
+    print(model(inputs1))

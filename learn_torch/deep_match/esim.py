@@ -58,7 +58,6 @@ class Model(nn.Module):
         # 这里两个用的是同一个lstm, 而且是双向的lstm
         a_bar, (a0, a1) = self.lstm(a_embedding)
         b_bar, (b0, b1) = self.lstm(b_embedding)
-        # output: seq_num,batch_size,2 * hidden_size
         # output:batch_size, seq_num,  2 * hidden_size
         return a_bar, b_bar
 
@@ -75,11 +74,11 @@ class Model(nn.Module):
     def inference_composition(self, a_hat: torch.Tensor, b_hat: torch.Tensor, a_bar: torch.Tensor, b_bar: torch.Tensor):
         a_diff = a_bar - a_hat
         a_mul = torch.mul(a_bar, a_hat)
-        m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=2)
+        m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=-1)
         # output: batch_size, seq_num_a, 2 * hidden_size * 4
         b_diff = b_bar - b_hat
         b_mul = torch.mul(b_bar, b_hat)
-        m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=2)
+        m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=-1)
         # output: batch_size, seq_num_b, 2 * hidden_size * 4
         v_a, _ = self.lstm2(m_a)
         v_b, _ = self.lstm2(m_b)

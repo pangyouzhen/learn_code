@@ -15,6 +15,7 @@ class Config(object):
         self.lr = 0.001
         self.kernel = 3
 
+
 # todo
 class Model(nn.Module):
     def __init__(self, config):
@@ -29,7 +30,9 @@ class Model(nn.Module):
     def forward(self, a, b):
         # [batch_size,seq_length]
         a_embedding = self.embedding(a)
+        a_embedding = a_embedding.permute(0, 2, 1)
         b_embedding = self.embedding(b)
+        a_embedding = a_embedding.permute(0, 2, 1)
         # [batch_size, seq_length, embedding_dim]
         # 进行宽卷积
         a_conv1 = self.conv1(a_embedding)
