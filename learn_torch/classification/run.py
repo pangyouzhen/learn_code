@@ -127,5 +127,5 @@ def main(label_num):
 
 
 if __name__ == "__main__":
-    # main(label_num)
-    get_data(train_path)
+    main(label_num)
+    # get_data(train_path)

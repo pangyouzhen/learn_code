@@ -16,7 +16,6 @@ class Config(object):
         self.lr = 0.001
 
 
-# todo
 class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
@@ -24,18 +23,23 @@ class Model(nn.Module):
         self.cnn = nn.Conv2d(in_channels=1, out_channels=config.embedding_dim,
                              kernel_size=(config.kernel_size, config.embedding_dim))
         self.dropout = nn.Dropout(config.dropout)
-        self.fc = nn.Linear(in_features=config.out_features, out_features=config.out_features)
+        self.fc = nn.Linear(in_features=config.embedding_dim, out_features=config.out_features)
 
     def forward(self, input):
         #  (batch_size,seq_length)
         input_embedding = self.embedding(input)
         input_embedding = input_embedding.unsqueeze(1)
-        print(input_embedding.shape)
         #  (batch_size,1,seq_length,embedding_dim)
         cnn_encoding = self.cnn(input_embedding)
-        # (batch_size,embedding_dim,)
-        print(cnn_encoding.shape)
-        cnn = F.max_pool2d(cnn_encoding, kernel_size=config.out_features)
+        # 这里输入的最后两个维度 seq_length,embedding_dim 和 kernel_size 的维度对应计算
+        # (batch_size,embedding_dim,seq_length - kernel_size + 1, embedding_dim - embedding_dim +1)
+        cnn_encoding = F.relu(cnn_encoding)
+        cnn_encoding = cnn_encoding.squeeze(-1)
+        # (batch_size,embedding_dim, seq_length - kernel_size + 1)
+        cnn = F.max_pool1d(cnn_encoding, cnn_encoding.size(-1))
+        # (batch_size, embedding_dim, 1)
+        cnn = cnn.squeeze(-1)
+        # (batch_size, embedding_dim)
         out = self.dropout(cnn)
         out = self.fc(out)
         return out
