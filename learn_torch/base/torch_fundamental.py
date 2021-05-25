@@ -537,4 +537,4 @@ a = a.float()
 print(a.shape)
 
 out = F.conv2d(a, filter_matrix, stride=1)
-print(out)
+print(out.shape)

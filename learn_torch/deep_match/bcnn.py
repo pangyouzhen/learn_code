@@ -22,24 +22,30 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.dropout = 0.5
         self.embedding = nn.Embedding(num_embeddings=config.num_embeddings, embedding_dim=config.embedding_dim)
-        self.conv1 = nn.Conv1d(in_channels=config.embedding_dim, out_channels=config.out_features,
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=config.embedding_dim,
+                               kernel_size=(config.kernel, config.embedding_dim), padding=(1, 1))
+        self.conv2 = nn.Conv2d(in_channels=1, out_channels=config.embedding_dim,
+                               kernel_size=(config.kernel, config.embedding_dim), padding=(1, 1))
+        self.conv3 = nn.Conv2d(in_channels=config.out_features, out_channels=config.out_features,
                                kernel_size=config.kernel)
-        self.conv2 = nn.Conv1d(in_channels=config.out_features, out_channels=config.out_features,
+        self.conv4 = nn.Conv2d(in_channels=config.out_features, out_channels=config.out_features,
                                kernel_size=config.kernel)
 
     def forward(self, a, b):
         # [batch_size,seq_length]
         a_embedding = self.embedding(a)
-        a_embedding = a_embedding.permute(0, 2, 1)
         b_embedding = self.embedding(b)
-        a_embedding = a_embedding.permute(0, 2, 1)
         # [batch_size, seq_length, embedding_dim]
         # 进行宽卷积
+        a_embedding = a_embedding.unsqueeze(1)
+        b_embedding = b_embedding.unsqueeze(1)
         a_conv1 = self.conv1(a_embedding)
-        b_conv1 = self.conv1(b_embedding)
+        b_conv1 = self.conv2(b_embedding)
+        a_conv1 = a_conv1.squeeze(-1)
+        b_conv1 = b_conv1.squeeze(-1)
         # w-ap 区别于后面的all-ap
-        a_w_ap = F.avg_pool2d(a_conv1)
-        b_w_ap = F.avg_pool2d(b_conv1)
+        a_w_ap = F.avg_pool1d(a_conv1, kernel_size=a_conv1.size(-1))
+        b_w_ap = F.avg_pool1d(b_conv1, kernel_size=b_conv1.size(-1))
         #
         a_conv2 = self.conv2(a_w_ap)
         b_conv2 = self.conv2(b_w_ap)
