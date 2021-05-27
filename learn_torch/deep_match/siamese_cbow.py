@@ -24,8 +24,10 @@ class CBOW(nn.Module):
         self.linear2 = nn.Linear(128, num_embeddings)
 
     def forward(self, x):
+        # batch_size,seq_length
         x = self.embedding(x)
-        x = x.view(1, -1)
+        x = x.view(x.shape[0], -1, 1)
+        x = x.squeeze(-1)
         x = self.linear1(x)
         x = F.relu(x, inplace=True)
         x = self.linear2(x)

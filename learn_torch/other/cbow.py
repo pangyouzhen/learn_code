@@ -20,18 +20,24 @@ print(data)
 
 
 class CBOW(nn.Module):
-    def __init__(self, n_word, n_dim, context_size):
+    def __init__(self, n_word, embedding_dim, context_size):
         super(CBOW, self).__init__()
-        self.embedding = nn.Embedding(n_word, n_dim)
-        self.linear1 = nn.Linear(2 * context_size * n_dim, 128)
+        self.embedding = nn.Embedding(n_word, embedding_dim)
+        self.linear1 = nn.Linear(2 * context_size * embedding_dim, 128)
         self.linear2 = nn.Linear(128, n_word)
 
     def forward(self, x):
+        # seq_length
         x = self.embedding(x)
+        # seq_legth,embedding_dim
         x = x.view(1, -1)
+        #  1, seq_length * embedding_dim
         x = self.linear1(x)
+        #  1* 128
         x = F.relu(x, inplace=True)
+        #  1* 128
         x = self.linear2(x)
+        # 1 * n_word
         x = F.log_softmax(x)
         return x
 

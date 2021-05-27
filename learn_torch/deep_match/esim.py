@@ -131,4 +131,5 @@ if __name__ == '__main__':
         print(param[0], param[1].shape)
     inputs1 = torch.randint(high=200, size=(batch_size, max_length))
     inputs2 = torch.randint(high=200, size=(batch_size, max_length))
-    print(model(inputs1, inputs2))
+    res = (model(inputs1, inputs2))
+    assert res.shape == (batch_size, out_features)
