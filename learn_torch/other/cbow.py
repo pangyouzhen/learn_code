@@ -49,15 +49,15 @@ for epoch in range(100):
     running_loss = 0
     for word in data:
         context, target = word
-        context = Variable(torch.LongTensor([word_to_idx[i] for i in context]))
-        target = Variable(torch.LongTensor([word_to_idx[target]]))
+        context = torch.LongTensor([word_to_idx[i] for i in context])
+        target = torch.LongTensor([word_to_idx[target]])
         if torch.cuda.is_available():
             context = context.cuda()
             target = target.cuda()
         # forward
         out = model(context)
         loss = criterion(out, target)
-        running_loss += loss.data[0]
+        running_loss += float(loss.data)
         # backward
         optimizer.zero_grad()
         loss.backward()
