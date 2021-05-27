@@ -92,7 +92,7 @@ def evaluate(model, dataloader_dev):
 def main(label_num):
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
-    model_name = 'siamese_lstm'
+    model_name = 'siamese_cbow'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
