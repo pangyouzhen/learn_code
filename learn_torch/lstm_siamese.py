@@ -35,4 +35,5 @@ if __name__ == '__main__':
     input1 = torch.randint(max_num_value, (batch_size, seq_input1_length))
     input2 = torch.randint(max_num_value, (batch_size, seq_input2_length))
     res = lstmSiamese(input1, input2)
+    print(res)
     assert res.size() == (5, 1)
