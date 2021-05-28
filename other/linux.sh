@@ -249,6 +249,10 @@ ex ()
 #压缩命令/
 tar -zcvf abc.tgz ./abc
 
+#pigz
+tar -cvf ./abc | pigz -p 8 > output.tgz && mv output.tgz /run/meida/pang/K...
+pigz -p 8 -d output.tgz
+
 ssh root@81.71.140.148
 # linux常见
 #执行任务时 & 符号,将任务在后台运行

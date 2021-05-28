@@ -2,9 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 # todo
 class Config(object):
-    def __init__(self, num_embeddings, embedding_dim, out_features):
+    def __init__(self, num_embeddings, embedding_dim, seq_length, out_features):
         self.model_name = 'siamese_cbow'
         self.num_embeddings = num_embeddings
         self.embedding_dim = embedding_dim
@@ -14,6 +15,7 @@ class Config(object):
         self.dropout = 0.2
         self.lr = 0.001
         self.kernel = 3
+        self.seq_length = seq_length
 
 
 class CBOW(nn.Module):
