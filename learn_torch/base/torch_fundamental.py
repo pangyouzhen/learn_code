@@ -119,7 +119,7 @@ print(x_embedding.view(-1, 8).is_contiguous())
 print(x_embedding.view(-1, 8).contiguous())
 
 # conv2d
-m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=3, stride=2)
+m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=(3,), stride=(2,))
 input1 = torch.randn(20, 16, 50, 100)
 print(m(input1).size())
 
@@ -263,7 +263,7 @@ print(cnn)
 # print("finish")
 
 # (batch_size,in_channels,H_in,W_in) -> (batch_size,out_channels,H_out,W_out)
-m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=3, stride=2)
+m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=(3,), stride=(2,))
 # m2 = nn.Conv2d(16, 33, (3, 5), stride=(2, 1), padding=(4, 2))
 # m3 = nn.Conv2d(16, 33, (3, 5), stride=(2, 1), padding=(4, 2), dilation=(3, 1))
 input = torch.randn(20, 16, 50, 100)
@@ -290,19 +290,22 @@ print('crossentropyloss_output:\n', crossentropyloss_output)
 # target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
 
 
-m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)
-m2 = torch.nn.MaxPool1d(kernel_size=3, stride=2)
-inputm = torch.randn(2, 4, 5)
-print(m1(inputm).shape)
-print(m2(inputm).shape)
+# m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)
+# m2 = torch.nn.MaxPool1d(kernel_size=3, stride=2)
+# inputm = torch.randn(2, 4, 5)
+# print(m1(inputm).shape)
+# print(m2(inputm).shape)
+#
+# m1 = torch.nn.AvgPool2d(kernel_size=3, stride=2)
+# m11 = torch.nn.AvgPool2d(kernel_size=3)
+# m2 = torch.nn.AvgPool1d(kernel_size=3, stride=2)
+# inputm = torch.randn(2, 4, 5)
+# print(m1(inputm).shape)
+# print(m2(inputm).shape)
+# print(m11(inputm).shape)
 
-m1 = torch.nn.AvgPool2d(kernel_size=3, stride=2)
-m11 = torch.nn.AvgPool2d(kernel_size=3)
-m2 = torch.nn.AvgPool1d(kernel_size=3, stride=2)
-inputm = torch.randn(2, 4, 5)
-print(m1(inputm).shape)
-print(m2(inputm).shape)
-print(m11(inputm).shape)
+a = torch.randn(2, 4, 5)
+print(F.max_pool1d(a))
 
 target = torch.randn(12, 5)
 out = torch.randn(12, 5)
@@ -314,7 +317,7 @@ print(loss2)
 # print(crition(target, out) == loss)
 
 
-m = nn.Conv1d(in_channels=16, out_channels=33, kernel_size=3)
+m = nn.Conv1d(in_channels=16, out_channels=33, kernel_size=(3,))
 # input： N,in_channels,L_in
 # 默认情况下： Conv1d：N,out_channels,L_in - kernel_size + 1
 # 公式：https://pytorch.org/docs/stable/generated/torch.nn.Conv1d.html?highlight=conv1d#torch.nn.Conv1d

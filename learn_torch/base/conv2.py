@@ -63,3 +63,4 @@ if __name__ == '__main__':
         print(param[0], param[1].shape)
     inputs1 = torch.randint(high=10, size=(batch_size, seq_length))
     print(model(inputs1))
+    assert model(inputs1).shape == (batch_size, out_features)
