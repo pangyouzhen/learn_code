@@ -398,6 +398,7 @@ a = torch.FloatTensor([[[1, 2, 4, 1],
                         [6, 3, 2, 4],
                         [2, 4, 6, 1]]])
 print(a.size() == (1, 3, 4))
+# batch_size,seq_length,embedding
 assert a[0].size() == (3, 4)
 a_mean = torch.mean(a, dim=-1)
 assert a_mean.size() == (1, 3)

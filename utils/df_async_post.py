@@ -5,6 +5,7 @@ import asyncio
 import aiohttp
 import json
 from loguru import logger
+import numpy as np
 
 logger.add("./a.log")
 
@@ -95,6 +96,7 @@ class DfAsyncPost:
 
 
 if __name__ == '__main__':
-    pass
-# python 3.7+
-# asyncio.run(main(df))
+    rand_num = np.random.randint(500000, size=(500000, 3))
+    df = pd.DataFrame(rand_num)
+    df.columns = ["user1", "user2", "user3"]
+    df_async = DfAsyncPost(url="http://127.0.0.1:8082/reader", payload=json.dumps({}), headers=None)
