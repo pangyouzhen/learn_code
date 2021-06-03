@@ -8,13 +8,14 @@ import torch.nn.functional as F
 from sklearn import metrics
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+import time
 
 vocab_size = 5000
 batch_size = 128
 max_length = 32
 embed_dim = 300
 label_num = 2
-epoch = 10
+epoch = 20
 train_path = '../../full_data/ants/train.json'
 dev_path = '../../full_data/ants/train.json'
 vocab_path = '/data/project/nlp_summary/data/THUCNews/data/vocab.txt'
@@ -92,7 +93,7 @@ def evaluate(model, dataloader_dev):
 def main(label_num):
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
-    model_name = 'siamese_cnn'
+    model_name = 'siamese_lstm'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

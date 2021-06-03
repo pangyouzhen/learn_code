@@ -39,7 +39,7 @@ class Model(nn.Module):
             nn.BatchNorm1d(config.out_features),
             nn.Dropout(config.dropout),
             nn.Linear(config.out_features, config.out_features),
-            nn.Softmax(dim=-1)
+            # nn.Softmax(dim=-1)
         )
 
     def forward(self, a: torch.Tensor, b: torch.Tensor):

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 # todo
 class Config(object):
-    def __init__(self, num_embeddings, embedding_dim, seq_length, out_features):
+    def __init__(self, num_embeddings, embedding_dim, out_features):
         self.model_name = 'siamese_cbow'
         self.num_embeddings = num_embeddings
         self.embedding_dim = embedding_dim
@@ -15,14 +15,13 @@ class Config(object):
         self.dropout = 0.2
         self.lr = 0.001
         self.kernel = 3
-        self.seq_length = seq_length
 
 
 class CBOW(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, seq_length):
+    def __init__(self, num_embeddings, embedding_dim):
         super(CBOW, self).__init__()
         self.embedding = nn.Embedding(num_embeddings=num_embeddings, embedding_dim=embedding_dim)
-        self.linear1 = nn.Linear(seq_length * embedding_dim, 128)
+        self.linear1 = nn.Linear(32 * embedding_dim, 128)
         self.linear2 = nn.Linear(128, num_embeddings)
 
     def forward(self, x):
@@ -46,7 +45,7 @@ class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
         self.dropout = 0.5
-        self.cbow = CBOW(config.num_embeddings, config.embedding_dim, config.seq_length)
+        self.cbow = CBOW(config.num_embeddings, config.embedding_dim)
         self.linear = nn.Linear(config.num_embeddings, config.out_features)
 
     def forward(self, s1, s2):
