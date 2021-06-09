@@ -6,27 +6,41 @@ import torch.nn.functional as F
 class RE2(nn.Module):
     def __init__(self, embedding_dim, dropout, num_embeddings, l):
         super(RE2, self).__init__()
-        self.embeding = nn.Embedding(num_embeddings, embedding_dim)
-        self.embedding_dim = embedding_dim
+        self.embedding = nn.Embedding(num_embeddings, embedding_dim)
+        self.encode1 = nn.LSTM(input_size=embedding_dim, hidden_size=128, batch_first=True, num_layers=2,
+                               bidirectional=True)
+        self.encode2 = nn.LSTM(input_size=embedding_dim, hidden_size=128, batch_first=True, num_layers=2,
+                               bidirectional=True)
+        self.encode = nn.LSTM(input_size=embedding_dim, hidden_size=128, batch_first=True, num_layers=2,
+                              bidirectional=True)
         self.dropout = dropout
-        self.l = l
 
-    def forward(self, x):
+    def forward(self, x, y):
+        pass
+
+    def encode1(self, x):
         #  batch_size,seq_length
         x = self.embedding(x)
         #  batch_size, seq_length,embeding_dim
+        encode1 = self.encode1(x)
+        #  batch_size,seq_length,hidden_size * 2
+        return encode1
+
+    def encode2(self):
+        pass
+
+    def encode(self, x, y):
+        # encoder
+        res_x, res_y = x, y
+        x, y = self.encode(x), self.encode(y)
+        # 残差连接
+        x += res_x
+        y += res_y
+        # 对齐层
 
 
-class Block(nn.Module):
-    def __init__(self, embedding_dim, hidden_size, c, d):
-        super(Block, self).__init__()
-        self.embedding_dim = embedding_dim
-        self.hidden_size = hidden_size
-        self.c = c
-        self.d = d
-        #  TODO 这里的 是要结合前面的，所以只定义embedding_dim 相当于只能定义第一层
-        self.encode = nn.LSTM(input_size=self.embedding_dim, hidden_size=self.hidden_size)
+        # Fusion Layer（融合层）
 
-    def forward(self, x):
-        # batch_size,seq_length,embedding
+    def alignment(self, x, y):
+        # x,y: batch_size, seq_length, embedding_dim
         pass
