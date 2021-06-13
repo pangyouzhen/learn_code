@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # df = pd.read_csv("../full_data/train.csv")
@@ -18,17 +19,18 @@ left = pd.DataFrame(
 
 right = pd.DataFrame(
     {
-        "a": [1, 2, 3],
-        "dt": ["2021/6/11", "2021/07/12", "2021/03/02"],
-        "b": [4, 1, np.NAN],
-        "c": ["a", "b", "c"]
+        "a": [1, 2, 2, 2],
+        "dt": ["2021/6/11", "2021/07/12", "2021/03/02", "2021/09/11"],
+        "b": [4, 1, np.NAN, np.NAN],
+        "c": ["a", "b", "c", "e"],
+        "y": [0, 1, 1, 0]
     }
 )
 print(left.dtypes)
 dt = datetime(year=2021, month=7, day=1)
 left["dt"] = pd.to_datetime(left["dt"])
 df1 = left[left["dt"] < dt]
-#  选择行和列 以后都可以用loc,还有一种选择的方法是iloc
+# 选择行和列 以后都可以用loc,还有一种选择的方法是iloc
 # 直接使用[[]] 选择列这些比较乱
 df2 = left.loc[left["dt"] < dt, :]
 df3 = left.loc[left["dt"] < dt, ["a", "b"]]
@@ -52,3 +54,21 @@ for i in left.columns:
 # merge 包含了join 的所有操作
 
 df = pd.merge(left, right, left_on="a", right_on="a", how="inner")
+print("----------------------数据的描述性统计-------------------")
+
+sk = right.skew().to_frame("偏度")
+# print(left.describe())
+null_num = right.isnull().sum().to_frame("空值统计")
+ku = right.kurt().to_frame("峰度")
+df_type = right.dtypes.to_frame("数据类型")
+nuniq = right.nunique().to_frame("数据值的个数")
+df = pd.DataFrame(
+    {"x": [1, 2, 2, 0, 2],
+     "y": [0, 1, 0, 1, 0]}
+)
+df.groupby(["x", "y"]).size().unstack().plot(kind='bar', stacked=True)
+plt.show()
+plt.close()
+# print(left.kurt())
+df = pd.concat([sk, null_num, ku, df_type, nuniq], axis=1)
+print(df)
