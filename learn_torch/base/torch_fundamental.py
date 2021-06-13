@@ -150,6 +150,7 @@ print(type(torch.max(a, dim=1)))
 print(torch.max(a, dim=1).indices)
 
 ## pytorch 两种矩阵相乘的方式
+# 一种是mul,一种是matmul
 
 # torch.mul() 矩阵点乘 == a*b，也就是element wise 对应位相乘
 # torch.matmul() 矩阵相乘，对应 python 中 x @ y  \otimes
@@ -166,6 +167,10 @@ tensor1 = torch.randn(10, 3, 4)
 tensor2 = torch.randn(10, 4, 5)
 assert bool((torch.matmul(tensor1, tensor2) == (tensor1 @ tensor2)).all()) == True
 print(torch.matmul(tensor1, tensor2).size())
+
+tensor1 = torch.randn(10, 3, 2)
+tensor2 = torch.randn(4, 5, 7)
+assert (torch.kron(tensor1, tensor2)).shape == (40, 15, 14)
 
 # bmm 适用于3维，matmul 普遍适用，mm只适用二维
 m = torch.randn(10, 3, 4)
@@ -542,3 +547,18 @@ print(a.shape)
 
 out = F.conv2d(a, filter_matrix, stride=1)
 print(out.shape)
+
+# attention
+# batch_size,seq_length,embeding
+a = torch.randn(30, 13, 20)
+b = torch.randn(30, 5, 20)
+attn = torch.matmul(a, b.transpose(2, 1))
+#  batch_size,seq_length_a,seq_length_b
+attn_a = F.softmax(attn, dim=1)
+#  batch_size,seq_length_a,seq_length_b
+attn_b = F.softmax(attn, dim=2)
+#  batch_size,seq_length_a,seq_length_b
+feature_b = torch.matmul(attn_a.transpose(1, 2), a)
+# batch_size, seq_length_b, embedding
+feature_a = torch.matmul(attn_b, b)
+# batch_size, seq_length_a, embedding
