@@ -287,6 +287,7 @@ x_input = torch.randn(3, 3)  # 随机生成输入
 y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 
 # 直接使用pytorch中的loss_func=nn.CrossEntropyLoss()看与经过NLLLoss的计算是不是一样
+#  todo  torch 交叉熵中log softmax 那么模型的最后一层是不是不需要再进行softmax
 crossentropyloss = nn.CrossEntropyLoss()
 crossentropyloss_output = crossentropyloss(x_input, y_target)
 print('crossentropyloss_output:\n', crossentropyloss_output)
@@ -561,4 +562,20 @@ attn_b = F.softmax(attn, dim=2)
 feature_b = torch.matmul(attn_a.transpose(1, 2), a)
 # batch_size, seq_length_b, embedding
 feature_a = torch.matmul(attn_b, b)
+
+
 # batch_size, seq_length_a, embedding
+
+
+def attn(a, b):
+    #  batch_size, seq_length, embedding
+    attn = torch.matmul(a, b.transpose(2, 1))
+    #  batch_size,seq_length_a,seq_length_b
+    attn_a = F.softmax(attn, dim=1)
+    #  batch_size,seq_length_a,seq_length_b
+    attn_b = F.softmax(attn, dim=2)
+    #  batch_size,seq_length_a,seq_length_b
+    feature_b = torch.matmul(attn_a.transpose(1, 2), a)
+    # batch_size, seq_length_b, embedding
+    feature_a = torch.matmul(attn_b, b)
+    return feature_a, feature_b

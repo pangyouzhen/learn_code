@@ -3,6 +3,10 @@ import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+import pymysql
+
+
+#  使用mysql   https://segmentfault.com/a/1190000014210743
 
 # df = pd.read_csv("../full_data/train.csv")
 # print(df[:5])

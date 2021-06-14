@@ -38,9 +38,21 @@ class RE2(nn.Module):
         y += res_y
         # 对齐层
 
-
         # Fusion Layer（融合层）
 
     def alignment(self, x, y):
         # x,y: batch_size, seq_length, embedding_dim
         pass
+
+    def attn(self, a, b):
+        #  batch_size, seq_length, embedding
+        attn = torch.matmul(a, b.transpose(2, 1))
+        #  batch_size,seq_length_a,seq_length_b
+        attn_a = F.softmax(attn, dim=1)
+        #  batch_size,seq_length_a,seq_length_b
+        attn_b = F.softmax(attn, dim=2)
+        #  batch_size,seq_length_a,seq_length_b
+        feature_b = torch.matmul(attn_a.transpose(1, 2), a)
+        # batch_size, seq_length_b, embedding
+        feature_a = torch.matmul(attn_b, b)
+        return feature_a, feature_b

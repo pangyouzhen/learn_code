@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#  TODO warmup 的作用是什么
 warmup_steps = 2500
 
 init_lr = 0.1

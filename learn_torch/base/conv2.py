@@ -43,6 +43,7 @@ class Model(nn.Module):
         conv1 = self.conv_and_pool(input_embedding, self.conv1)
         conv2 = self.conv_and_pool(input_embedding, self.conv2)
         conv3 = self.conv_and_pool(input_embedding, self.conv3)
+        #  batch_size,embedding
         out = torch.cat((conv1, conv2, conv3), dim=1)
         out = self.dropout(out)
         out = self.fc(out)
