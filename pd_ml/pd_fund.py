@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import pymysql
 
-
 #  使用mysql   https://segmentfault.com/a/1190000014210743
 
 # df = pd.read_csv("../full_data/train.csv")
@@ -20,6 +19,11 @@ left = pd.DataFrame(
         "c": ["a", "b", "c"]
     }
 )
+
+dtype_dict = {
+    "dt": np.datetime64,
+    "a": int,
+}
 
 right = pd.DataFrame(
     {
@@ -40,7 +44,12 @@ df2 = left.loc[left["dt"] < dt, :]
 df3 = left.loc[left["dt"] < dt, ["a", "b"]]
 df4 = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 # pandas 自动推断并转换类型
-left = left.convert_dtypes()
+print("--------------类型推断-----------------------------")
+# left = left.convert_dtypes()
+for i in left.select_dtypes(exclude=np.number).columns:
+    print(i)
+print("-----------------------------------------")
+# 这些默认生成的都是series
 print(left.dtypes)
 print(type(left.dtypes))
 # 转换成类别的形式
@@ -66,13 +75,33 @@ null_num = right.isnull().sum().to_frame("空值统计")
 ku = right.kurt().to_frame("峰度")
 df_type = right.dtypes.to_frame("数据类型")
 nuniq = right.nunique().to_frame("数据值的个数")
-df = pd.DataFrame(
-    {"x": [1, 2, 2, 0, 2],
-     "y": [0, 1, 0, 1, 0]}
-)
-df.groupby(["x", "y"]).size().unstack().plot(kind='bar', stacked=True)
-plt.show()
-plt.close()
+# 堆积柱状图
+# df = pd.DataFrame(
+#     {"x": [1, 2, 2, 0, 2],
+#      "y": [0, 1, 0, 1, 0]}
+# )
+# df.groupby(["x", "y"]).size().unstack().plot(kind='bar', stacked=True)
+# plt.show()
+# plt.close()
 # print(left.kurt())
 df = pd.concat([sk, null_num, ku, df_type, nuniq], axis=1)
 print(df)
+
+#  特征选择  woe 和 iv
+import numpy as np
+import pandas as pd
+
+np.random.seed(100)
+
+df = pd.DataFrame({'grade': np.random.choice(list('ABCD'), size=(20)),
+                   'pass': np.random.choice([0, 1], size=(20))
+                   })
+
+feature, target = 'grade', 'pass'
+df_woe_iv = (pd.crosstab(df[feature], df[target],
+                         normalize='columns')
+             .assign(woe=lambda dfx: np.log(dfx[1] / dfx[0]))
+             .assign(iv=lambda dfx: np.sum(dfx['woe'] *
+                                           (dfx[1] - dfx[0]))))
+
+print(df_woe_iv)
