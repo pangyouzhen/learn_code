@@ -525,3 +525,8 @@ def conv_and_pool(x, conv):
     x = F.relu(conv(x)).squeeze(-1)
     x = F.max_pool1d(x, x.size(-1)).squeeze(-1)
     return x
+
+
+
+m = nn.AdaptiveMaxPool2d((5,7))
+input = torch.randn(1, 64, 8, 9)

@@ -8,7 +8,6 @@ import torch.nn.functional as F
 from sklearn import metrics
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-import time
 
 vocab_size = 5000
 batch_size = 128
@@ -20,7 +19,7 @@ train_path = '../../full_data/ants/train.json'
 dev_path = '../../full_data/ants/train.json'
 vocab_path = '/data/project/nlp_summary/data/THUCNews/data/vocab.txt'
 
-output_path = 'output'
+output_path = './output'
 
 
 def get_data(path):
@@ -93,7 +92,7 @@ def evaluate(model, dataloader_dev):
 def main(label_num):
     debug = False
     # 相对路径 + modelName(TextCNN、TextLSTM)
-    model_name = 'siamese_lstm'
+    model_name = 'siamese_cnn'
     module = import_module(model_name)
     config = module.Config(vocab_size, embed_dim, label_num)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -115,7 +114,7 @@ def main(label_num):
 
         optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
         model.train()
-        best_acc = 0.9
+        dev_acc = 0
         for i in range(epoch):
             index = 0
             for sentence1, sentence2, labels in tqdm(dataloader):
@@ -132,10 +131,8 @@ def main(label_num):
                     train_acc = metrics.accuracy_score(true, predic)
                     dev_acc = evaluate(model, dataloader_dev)
                     print(f'epoch:{i} batch:{index} loss:{loss} train_acc:{train_acc} dev_acc:{dev_acc}')
-                    if dev_acc > best_acc:
-                        torch.save(model, f'{output_path}/{model_name}/model.pt')
                     model.train()
-
+        torch.save(model, f'{output_path}/{model_name}_{dev_acc}_{epoch}.pt')
         print('train finish')
 
 
