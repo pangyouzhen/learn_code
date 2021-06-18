@@ -20,7 +20,7 @@ train_path = '../../full_data/ants/train.json'
 dev_path = '../../full_data/ants/train.json'
 vocab_path = '/data/project/nlp_summary/data/THUCNews/data/vocab.txt'
 
-output_path = 'output/'
+output_path = 'output'
 
 
 def get_data(path):
@@ -115,7 +115,7 @@ def main(label_num):
 
         optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
         model.train()
-        best_acc = 0
+        best_acc = 0.9
         for i in range(epoch):
             index = 0
             for sentence1, sentence2, labels in tqdm(dataloader):
@@ -132,8 +132,8 @@ def main(label_num):
                     train_acc = metrics.accuracy_score(true, predic)
                     dev_acc = evaluate(model, dataloader_dev)
                     print(f'epoch:{i} batch:{index} loss:{loss} train_acc:{train_acc} dev_acc:{dev_acc}')
-                    # if dev_acc > best_acc:
-                    #     torch.save(model, f'{output_path}/{model_name}/model.pt')
+                    if dev_acc > best_acc:
+                        torch.save(model, f'{output_path}/{model_name}/model.pt')
                     model.train()
 
         print('train finish')

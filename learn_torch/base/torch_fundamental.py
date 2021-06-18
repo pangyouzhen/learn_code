@@ -497,78 +497,9 @@ a = torch.tensor([[3, 7, 2], [2, 8, 3]])
 print(a)
 print(torch.take(a, torch.tensor([0, 1, 5])))
 
-import torch
-import torch.nn as nn
-
-# max_sent_len=35, batch_size=50, embedding_size=300
-conv1 = nn.Conv1d(in_channels=300, out_channels=100, kernel_size=(3,))
-input = torch.randn(50, 35, 300)
-# batch_size x max_sent_len x embedding_size -> batch_size x embedding_size x max_sent_len
-input = input.permute(0, 2, 1)
-print("input:", input.size())
-output = conv1(input)
-print("output:", output.size())
-
-# 李宏毅的深度学习例子
-import torch
-import numpy as np
-import torch.nn as nn
-import torch.nn.functional as F
-
-a = np.array(
-    [[1, 0, 0, 0, 0, 1],
-     [0, 1, 0, 0, 1, 0],
-     [0, 0, 1, 1, 0, 0],
-     [1, 0, 0, 0, 1, 0],
-     [0, 1, 0, 0, 1, 0],
-     [0, 0, 1, 0, 1, 0]]
-)
-
-a = torch.from_numpy(a)
-# conv = nn.Conv2d(in_channels=3, out_channels=4, kernel_size=(1, 2))
-# print(conv(a))
-
-filter_matrix = torch.Tensor([
-    [[1, -1, -1],
-     [-1, 1, -1],
-     [-1, -1, 1]],
-    [[-1, 1, -1],
-     [-1, 1, -1],
-     [-1, 1, -1]]
-])
-
-filter_matrix = filter_matrix.unsqueeze(1)
-# The shape of the filter kernel should be [number_of_filters, input_channels, height, width].
-print(filter_matrix.shape)
-print(a.shape)
-a = a.unsqueeze(0)
-a = a.unsqueeze(1)
-a = a.float()
-print(a.shape)
-
-out = F.conv2d(a, filter_matrix, stride=1)
-print(out.shape)
-
-# attention
-# batch_size,seq_length,embeding
-a = torch.randn(30, 13, 20)
-b = torch.randn(30, 5, 20)
-attn = torch.matmul(a, b.transpose(2, 1))
-#  batch_size,seq_length_a,seq_length_b
-attn_a = F.softmax(attn, dim=1)
-#  batch_size,seq_length_a,seq_length_b
-attn_b = F.softmax(attn, dim=2)
-#  batch_size,seq_length_a,seq_length_b
-feature_b = torch.matmul(attn_a.transpose(1, 2), a)
-# batch_size, seq_length_b, embedding
-feature_a = torch.matmul(attn_b, b)
-
-
-# batch_size, seq_length_a, embedding
-
-
 def attn(a, b):
     #  batch_size, seq_length, embedding
+    # 交互矩阵计算
     attn = torch.matmul(a, b.transpose(2, 1))
     #  batch_size,seq_length_a,seq_length_b
     attn_a = F.softmax(attn, dim=1)
@@ -579,3 +510,18 @@ def attn(a, b):
     # batch_size, seq_length_b, embedding
     feature_a = torch.matmul(attn_b, b)
     return feature_a, feature_b
+
+
+def conv_and_pool(x, conv):
+    # x: batch_size,1,seq_length,embedding_dim
+    # conv1: 1, embedding_dim,(kernel,embedding_dim)
+
+    # conv(x): batch_size, embedding_dim, seq_length - kernel_size + 1, 1
+    # F.relu(conv(x)): batch_size, embedding_dim, seq_length - kernel_size + 1, 1
+    # F.relu(conv(x)).squeeze(-1): batch_size, embedding_dim, seq_length - kernel_size + 1
+    # F.max_pool1d(x, x.size(-1)): batch_size, embedding_dim, 1
+
+    # result: batch_size, embedding_dim
+    x = F.relu(conv(x)).squeeze(-1)
+    x = F.max_pool1d(x, x.size(-1)).squeeze(-1)
+    return x
