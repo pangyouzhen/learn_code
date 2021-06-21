@@ -15,6 +15,7 @@ class Config(object):
         self.lr = 0.001
 
 
+# todo esim 增加mask
 class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()

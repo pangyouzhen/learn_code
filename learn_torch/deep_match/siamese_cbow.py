@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# todo
+# todo siamese 效果这么差
 class Config(object):
     def __init__(self, num_embeddings, embedding_dim, out_features):
         self.model_name = 'siamese_cbow'

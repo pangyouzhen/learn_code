@@ -77,7 +77,7 @@ class Model(torch.nn.Module):
         # x1 = x1 / x1_norm
         # x2 = x2 / x2_norm
         # use cosine similarity since dim is too big for dot-product
-        # 这里和原始的模型不太一样 这里直接交互矩阵
+        # todo 这里和原始的模型不太一样 这里直接交互矩阵
         simi_img = torch.matmul(x1, x2.transpose(1, 2)) / np.sqrt(embedding_dim)
         if pad1 != 0 or pad2 != 0:
             simi_img = F.pad(simi_img, (0, pad2, 0, pad1))

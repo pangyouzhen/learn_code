@@ -47,7 +47,6 @@ class Model(nn.Module):
         res = [[], []]
         q1_encode = self.embed(q1)
         q2_encode = self.embed(q2)
-        # eg: s1 => res[0]
         # (batch_size, seq_len, dim) => (batch_size, dim)
         # if num_layer == 0
         res[0].append(F.avg_pool1d(q1_encode.transpose(1, 2), kernel_size=q1_encode.size(1)).squeeze(-1))

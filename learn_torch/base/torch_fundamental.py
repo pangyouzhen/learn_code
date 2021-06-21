@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from learn_torch.other.PositionalEncoding import PositionalEncoding
 
 np.random.seed(0)
@@ -534,3 +535,19 @@ input = torch.randn(1, 64, 8, 9)
 m = nn.ZeroPad2d((1, 1, 2, 2))
 input = torch.randn(1, 1, 3, 3)
 print(m(input).shape)
+
+import torch
+
+batch_size = 9
+a = torch.randn(size=(batch_size, 1, 6, 5))
+cnn2 = nn.Conv2d(in_channels=1, out_channels=1,
+                 kernel_size=(2, 5))
+cnn3 = nn.Conv2d(in_channels=1, out_channels=1,
+                 kernel_size=(3, 5))
+cnn4 = nn.Conv2d(in_channels=1, out_channels=1,
+                 kernel_size=(3, 5))
+# print(cnn(a).shape)
+print(cnn2(a).shape)
+x = cnn2(a)
+x = x.squeeze(1)
+x = x.squeeze(-1)
