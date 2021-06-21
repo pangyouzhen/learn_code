@@ -497,6 +497,7 @@ a = torch.tensor([[3, 7, 2], [2, 8, 3]])
 print(a)
 print(torch.take(a, torch.tensor([0, 1, 5])))
 
+
 def attn(a, b):
     #  batch_size, seq_length, embedding
     # 交互矩阵计算
@@ -527,6 +528,9 @@ def conv_and_pool(x, conv):
     return x
 
 
-
-m = nn.AdaptiveMaxPool2d((5,7))
+m = nn.AdaptiveMaxPool2d((5, 7))
 input = torch.randn(1, 64, 8, 9)
+# m = nn.ZeroPad2d((left, right, top , bottom))
+m = nn.ZeroPad2d((1, 1, 2, 2))
+input = torch.randn(1, 1, 3, 3)
+print(m(input).shape)
