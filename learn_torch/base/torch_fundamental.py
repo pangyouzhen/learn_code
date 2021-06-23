@@ -516,14 +516,14 @@ def attn(a, b):
 
 def conv_and_pool(x, conv):
     # x: batch_size,1,seq_length,embedding_dim
-    # conv1: 1, embedding_dim,(kernel,embedding_dim)
+    # conv: 1, output_channel,(kernel,embedding_dim)
 
-    # conv(x): batch_size, embedding_dim, seq_length - kernel_size + 1, 1
-    # F.relu(conv(x)): batch_size, embedding_dim, seq_length - kernel_size + 1, 1
-    # F.relu(conv(x)).squeeze(-1): batch_size, embedding_dim, seq_length - kernel_size + 1
-    # F.max_pool1d(x, x.size(-1)): batch_size, embedding_dim, 1
+    # conv(x): batch_size, output_channel, seq_length - kernel_size + 1, 1
+    # F.relu(conv(x)): batch_size, output_channel, seq_length - kernel_size + 1, 1
+    # F.relu(conv(x)).squeeze(-1): batch_size, output_channel, seq_length - kernel_size + 1
+    # F.max_pool1d(x, x.size(-1)): batch_size, output_channel, 1
 
-    # result: batch_size, embedding_dim
+    # result: batch_size, output_channel
     x = F.relu(conv(x)).squeeze(-1)
     x = F.max_pool1d(x, x.size(-1)).squeeze(-1)
     return x
@@ -547,7 +547,4 @@ cnn3 = nn.Conv2d(in_channels=1, out_channels=1,
 cnn4 = nn.Conv2d(in_channels=1, out_channels=1,
                  kernel_size=(3, 5))
 # print(cnn(a).shape)
-print(cnn2(a).shape)
-x = cnn2(a)
-x = x.squeeze(1)
-x = x.squeeze(-1)
+
