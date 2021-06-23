@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# todo fixed error
 class Config(object):
     def __init__(self, num_embeddings, embedding_dim, out_features):
         self.model_name = 'esim_cnn'
@@ -20,12 +21,11 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.dropout = 0.5
         self.embedding = nn.Embedding(num_embeddings=config.num_embeddings, embedding_dim=config.embedding_dim)
-        self.lstm = nn.LSTM(input_size=config.embedding_dim, hidden_size=config.hidden_size, num_layers=2,
-                            bidirectional=True,
-                            batch_first=True)
-        self.lstm2 = nn.LSTM(input_size=8 * config.hidden_size, hidden_size=config.hidden_size, num_layers=2,
-                             bidirectional=True,
-                             batch_first=True)
+        self.cnn = nn.Conv2d(in_channels=1, out_channels=config.embedding_dim, kernel_size=(2, config.embedding_dim))
+        # self.lstm2 = nn.LSTM(input_size=8 * config.hidden_size, hidden_size=config.hidden_size, num_layers=2,
+        #                      bidirectional=True,
+        #                      batch_first=True)
+        self.cnn2 = nn.Conv2d(in_channels=1, out_channels=config.embedding_dim, kernel_size=(5, embedding_dim))
         # self.linear1 = nn.Linear(in_features=20 * 2, out_features=40)
         # self.linear2 = nn.Linear(in_features=20 * 2, out_features=2)
         self.fc = nn.Sequential(
@@ -52,37 +52,40 @@ class Model(nn.Module):
 
     def input_encoding(self, a: torch.Tensor, b: torch.Tensor):
         # input: batch_size,seq_num
-        a_embedding = self.embedding(a)
-        b_embedding = self.embedding(b)
+        a_embedding = self.embedding(a).unsqueeze(1)
+        b_embedding = self.embedding(b).unsqueeze(1)
         # output: batch_size,seq_num,embedding_dim
         # 这里两个用的是同一个lstm, 而且是双向的lstm
-        a_bar, (a0, a1) = self.lstm(a_embedding)
-        b_bar, (b0, b1) = self.lstm(b_embedding)
-        # output:batch_size, seq_num,  2 * hidden_size
+        a_bar = self.conv_and_pool(a_embedding, self.cnn).unsqueeze(-1)
+        b_bar = self.conv_and_pool(b_embedding, self.cnn).unsqueeze(-1)
+        # result: batch_size, 2 * hidden_size, 1
         return a_bar, b_bar
 
     def inference_modeling(self, a_bar: torch.Tensor, b_bar: torch.Tensor):
         e_ij = torch.matmul(a_bar, b_bar.permute(0, 2, 1))
-        # output： batch_size,seq_num_a,seq_num_b
+        # output： batch_size,2 * hidden_size, 2 * hidden_size
         attention_a = F.softmax(e_ij)
         attention_b = F.softmax(e_ij.permute(0, 2, 1))
         a_hat = torch.matmul(attention_a, b_bar)
         b_hat = torch.matmul(attention_b, a_bar)
-        # output: batch_size, seq_num, 2 * hidden_size
+        # output: batch_size, 2 * hidden_size, 2 * hidden_size
         return a_hat, b_hat
 
     def inference_composition(self, a_hat: torch.Tensor, b_hat: torch.Tensor, a_bar: torch.Tensor, b_bar: torch.Tensor):
         a_diff = a_bar - a_hat
         a_mul = torch.mul(a_bar, a_hat)
         m_a = torch.cat((a_bar, a_hat, a_diff, a_mul), dim=-1)
-        # output: batch_size, seq_num_a, 2 * hidden_size * 4
+        # output: batch_size, 2 * hidden_size, 2 * hidden_size * 4
         b_diff = b_bar - b_hat
         b_mul = torch.mul(b_bar, b_hat)
         m_b = torch.cat((b_bar, b_hat, b_diff, b_mul), dim=-1)
-        # output: batch_size, seq_num_b, 2 * hidden_size * 4
-        v_a, _ = self.lstm2(m_a)
-        v_b, _ = self.lstm2(m_b)
-        # output: batch_size, seq_num_b, 2 * hidden_size
+        # output: batch_size, 2 * hidden_size, 2 * hidden_size * 4
+        m_a = m_a.unsqueeze(1)
+        m_b = m_b.unsqueeze(1)
+        print(f"m_a.shape is {m_a.shape}")
+        v_a, _ = self.conv_and_pool(m_a, self.cnn2).unsqueeze(-1)
+        v_b, _ = self.conv_and_pool(m_b, self.cnn2).unsqueeze(-1)
+        # output: batch_size, 2 * hidden_size
         # v_a_mean = learn_torch.mean(v_a, dim=1)
         # v_b_mean = learn_torch.mean(v_b, dim=1)
         #
@@ -115,6 +118,11 @@ class Model(nn.Module):
         # output: batch_size * (4 * hidden_size)
         return torch.cat([p1, p2], 1)
 
+    def conv_and_pool(self, x, conv):
+        x = F.relu(conv(x)).squeeze(-1)
+        x = F.max_pool1d(x, x.size(-1)).squeeze(-1)
+        return x
+
 
 if __name__ == '__main__':
     num_embeddings = 5000
@@ -125,10 +133,10 @@ if __name__ == '__main__':
     epoch = 5
     config = Config(num_embeddings, embedding_dim, out_features)
     model = Model(config)
-    print(model)
-    print("---------------------")
-    for param in model.named_parameters():
-        print(param[0], param[1].shape)
+    # print(model)
+    # print("---------------------")
+    # for param in model.named_parameters():
+    #     print(param[0], param[1].shape)
     inputs1 = torch.randint(high=200, size=(batch_size, max_length))
     inputs2 = torch.randint(high=200, size=(batch_size, max_length))
     res = (model(inputs1, inputs2))
