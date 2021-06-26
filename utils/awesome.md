@@ -1,6 +1,7 @@
 # 爬虫和自动化工具
 
-1. requests,beautifulsoup
+1. requests
+1. beautifulsoup
 1. selenium
 1. playwright
 1. puppeteer (终极武器)
@@ -24,12 +25,15 @@
 1. milvus
 1. annoy
 1. Elastic search
+1. fasttext
+1. faiss
 
 # 工程化/java工具
 
 1. spring cloud(java)
 1. [java-hutool](https://www.hutool.cn/)
 1. fastjson
+1. arthas
 
 # 浏览器插件
 
@@ -63,4 +67,8 @@
 
 1. akshare
 1. ta-lib
-1. 
+1.
+
+# 日志
+
+1. loguru
