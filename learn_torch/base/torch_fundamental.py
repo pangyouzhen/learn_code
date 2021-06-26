@@ -548,3 +548,44 @@ cnn4 = nn.Conv2d(in_channels=1, out_channels=1,
                  kernel_size=(3, 5))
 # print(cnn(a).shape)
 
+# embedding=2, seq_length=18
+a = torch.randn(size=(1, 5, 3))
+# b = nn.Conv1d(in_channels=2, out_channels=2, kernel_size=(3,), padding=1)
+
+b = F.conv1d(input=a, weight=())
+# print(b(a).shape)
+
+m = nn.Conv1d(16, 33, 3, padding=1)
+# 输入应该时 batch_size, embedding, seq_len, 增加padding之后，维度仍为50个单词，只是维度变化了
+input = torch.randn(20, 16, 50)
+# 输出应该是 batch_size, 特征向量， seq_len
+output = m(input)
+
+
+def conv1d_pool(x, conv):
+    # 这样对应textcnn上的图
+    # x : batch_size, seq_len,embedding_dim
+    # conv1d: embedding_dim, out_channel,kernel, padding=1
+    x = x.transpose(2, 1)
+    # x : batch_size, embedding_dim,seq_len
+    x = F.relu(conv(x))
+    #  batch_size, out_channel, seq_len -kernel +1
+    x = x.transpose(2, 1)
+    #  batch_size, seq_len -kernel+1, out_channel
+    x = F.max_pool1d(x, x.size(-1)).unsqueeze(-1)
+    #  batch_size, seq_len - kernel+1
+    return x
+
+
+#  img 下的 textcnn 实现, 有点问题，maxpool之后应该就只剩一维度的了
+a = torch.randn(size=(1, 7, 5))
+# batch_size, seq_len, embedding
+conv1 = nn.Conv1d(in_channels=5, out_channels=12, kernel_size=(4,))
+conv2 = nn.Conv1d(in_channels=5, out_channels=14, kernel_size=(4,))
+conv3 = nn.Conv1d(in_channels=5, out_channels=16, kernel_size=(3,))
+conv4 = nn.Conv1d(in_channels=5, out_channels=18, kernel_size=(3,))
+conv5 = nn.Conv1d(in_channels=5, out_channels=20, kernel_size=(2,))
+conv6 = nn.Conv1d(in_channels=5, out_channels=22, kernel_size=(2,))
+conv_list = [conv1, conv2, conv3, conv4, conv5, conv6]
+for i in conv_list:
+    print(conv1d_pool(a, i).shape)
