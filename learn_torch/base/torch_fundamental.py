@@ -580,12 +580,13 @@ def conv1d_pool(x, conv):
 #  img 下的 textcnn 实现, 有点问题，maxpool之后应该就只剩一维度的了
 a = torch.randn(size=(1, 7, 5))
 # batch_size, seq_len, embedding
-conv1 = nn.Conv1d(in_channels=5, out_channels=12, kernel_size=(4,))
-conv2 = nn.Conv1d(in_channels=5, out_channels=14, kernel_size=(4,))
-conv3 = nn.Conv1d(in_channels=5, out_channels=16, kernel_size=(3,))
-conv4 = nn.Conv1d(in_channels=5, out_channels=18, kernel_size=(3,))
-conv5 = nn.Conv1d(in_channels=5, out_channels=20, kernel_size=(2,))
-conv6 = nn.Conv1d(in_channels=5, out_channels=22, kernel_size=(2,))
-conv_list = [conv1, conv2, conv3, conv4, conv5, conv6]
-for i in conv_list:
-    print(conv1d_pool(a, i).shape)
+conv1 = nn.Conv1d(in_channels=5, out_channels=1, kernel_size=(4,))
+# conv2 = nn.Conv1d(in_channels=5, out_channels=14, kernel_size=(4,))
+# conv3 = nn.Conv1d(in_channels=5, out_channels=16, kernel_size=(3,))
+# conv4 = nn.Conv1d(in_channels=5, out_channels=18, kernel_size=(3,))
+# conv5 = nn.Conv1d(in_channels=5, out_channels=20, kernel_size=(2,))
+# conv6 = nn.Conv1d(in_channels=5, out_channels=22, kernel_size=(2,))
+# conv_list = [conv1]
+# for i in conv_list:
+#     print(conv1d_pool(a, i).shape)
+print(conv1d_pool(a,conv1))

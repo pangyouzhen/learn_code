@@ -55,7 +55,6 @@ class Model(nn.Module):
         a_embedding = self.embedding(a).unsqueeze(1)
         b_embedding = self.embedding(b).unsqueeze(1)
         # output: batch_size,seq_num,embedding_dim
-        # 这里两个用的是同一个lstm, 而且是双向的lstm
         a_bar = self.conv_and_pool(a_embedding, self.cnn).unsqueeze(-1)
         b_bar = self.conv_and_pool(b_embedding, self.cnn).unsqueeze(-1)
         # result: batch_size, 2 * hidden_size, 1

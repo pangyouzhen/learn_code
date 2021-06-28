@@ -38,4 +38,4 @@ class PositionalEncoding(nn.Module):
 if __name__ == '__main__':
     a = torch.randint(100, size=(5, 4, 2))
     pe = PositionalEncoding(2)
-    print(pe(a))
+    print(pe(a).shape)
