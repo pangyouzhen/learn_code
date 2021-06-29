@@ -84,6 +84,7 @@ args = parser.parse_args()
 def f(*kw):
     print(kw)
 
+
 f(["a", "b", "c"])
 f(("今天",))
 f("今天天气很好啊")
@@ -91,3 +92,9 @@ f(*["A", "B", "C"])
 f(*"明天咋样")
 f(*("明早上",))
 f(*("哈哈哈哈"))
+
+import re
+
+phone_number = "\"phone\": \"15555555555\""
+res2 = re.sub("\"phone\": \"(\d{1})\d{8}(\d{2})\"", '\g<1>********\g<2>', phone_number)
+print(res2)
