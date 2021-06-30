@@ -56,6 +56,7 @@
 1. pyecharts
 1. matplot
 1. sklearn
+1. boruta 特征选择
 1.
 
 # 后台接口和数据库
