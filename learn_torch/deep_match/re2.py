@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
+# todo
 class RE2(nn.Module):
     def __init__(self, embedding_dim, dropout, num_embeddings, l):
         super(RE2, self).__init__()
