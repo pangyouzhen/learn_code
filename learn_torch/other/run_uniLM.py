@@ -7,7 +7,7 @@
 # from bojone_snippets import DataGenerator, AutoRegressiveDecoder, sequence_padding
 # from bojone_tokenizers import load_vocab, Tokenizer
 # from configuration.config import *
-# from model_unilm import BojoneModel
+# from uniLM import BojoneModel
 # from optimizer import create_optimizer_and_scheduler
 # from evaluation.evaluation_sogouQA import is_exact_match_answer, load_qid_answer_expand, \
 #     cacu_character_level_f

@@ -115,8 +115,8 @@ class BojoneModelWithPooler(BertPreTrainedModel):
 
 
 if __name__ == '__main__':
-    bert_wwm_pt_path = "/data/tmp/downloads/bert_models/cased_L-12_H-768_A-12"
-    config = bert_wwm_pt_path + "/ bert_config.json"
-    tmp_state_dict = bert_wwm_pt_path + "vocab.txt"
+    bert_wwm_pt_path = "/data/project/learn_code/data/chinese-bert-wwm-ext"
+    config = bert_wwm_pt_path + "/config.json"
+    tmp_state_dict = torch.load(bert_wwm_pt_path + "/pytorch_model.bin", map_location="cpu")
     bjModel = BojoneModel.from_pretrained(pretrained_model_name_or_path=bert_wwm_pt_path, config=config,
-                                          state_dict=tmp_state_dict, local_files_only=True)
+                                          state_dict=tmp_state_dict, local_files_only=False)

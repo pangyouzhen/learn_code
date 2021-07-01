@@ -98,3 +98,15 @@ import re
 phone_number = "\"phone\": \"15555555555\""
 res2 = re.sub("\"phone\": \"(\d{1})\d{8}(\d{2})\"", '\g<1>********\g<2>', phone_number)
 print(res2)
+
+# 时间日期
+import arrow
+
+print(arrow.now())
+# 转化成字符串
+print(arrow.now().format())
+print(arrow.now().format("YYYY-MM-DD HH:mm:ss"))
+# 昨天
+print(arrow.now().shift(days=-1).format())
+# 转化为时间戳
+print(arrow.now().timestamp())

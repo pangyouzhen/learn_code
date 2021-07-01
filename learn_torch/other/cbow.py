@@ -45,7 +45,7 @@ class CBOW(nn.Module):
 model = CBOW(len(word_to_idx), 100, CONTEXT_SIZE)
 if torch.cuda.is_available():
     model = model.cuda()
-
+# todo 这里不应该用交叉熵, 最后一层用了log_softmax
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=1e-3)
 
