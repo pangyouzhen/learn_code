@@ -4,13 +4,14 @@
 1. beautifulsoup
 1. selenium
 1. playwright
-1. puppeteer (终极武器)
+1. puppeteer
 1. pyautogui
 1. scrapy
 1. scrapy-redis
 1. aiohttp
 1. httpx
 1. muggle_ocr 通用型验证码
+1. chrome console
 
 # 文档
 
@@ -27,6 +28,8 @@
 1. Elastic search
 1. fasttext
 1. faiss
+1. transformers
+1. allennlp
 
 # 工程化/java工具
 

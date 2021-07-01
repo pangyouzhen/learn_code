@@ -4,6 +4,7 @@ import torch.nn as nn
 from transformers.models.bert import modeling_bert
 from transformers.models.bert.modeling_bert import BertEncoder, BertPreTrainedModel, BertEmbeddings, \
     BertPredictionHeadTransform, BertPooler
+from transformers.models.bert import BertModel, BertTokenizer
 
 
 class BertPreTrainingHeads(nn.Module):
@@ -118,5 +119,6 @@ if __name__ == '__main__':
     bert_wwm_pt_path = "/data/project/learn_code/data/chinese-bert-wwm-ext"
     config = bert_wwm_pt_path + "/config.json"
     tmp_state_dict = torch.load(bert_wwm_pt_path + "/pytorch_model.bin", map_location="cpu")
+    tokenizer = BertTokenizer.from_pretrained(bert_wwm_pt_path)
     bjModel = BojoneModel.from_pretrained(pretrained_model_name_or_path=bert_wwm_pt_path, config=config,
                                           state_dict=tmp_state_dict, local_files_only=False)
