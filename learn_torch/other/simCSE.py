@@ -25,3 +25,8 @@ cosine_sim_0_2 = 1 - cosine(embeddings[0], embeddings[2])
 
 print("Cosine similarity between \"%s\" and \"%s\" is: %.3f" % (texts[0], texts[1], cosine_sim_0_1))
 print("Cosine similarity between \"%s\" and \"%s\" is: %.3f" % (texts[0], texts[2], cosine_sim_0_2))
+
+# simcse 的核心有两个
+# 1. loss function: 拉近相似的样本,推开不相似的样本
+# 1. 使用dropout做数据增强
+
