@@ -11,7 +11,8 @@
 1. aiohttp
 1. httpx
 1. muggle_ocr 通用型验证码
-1. chrome console
+1. chrome console （自动刷新网页等等）
+1. parsel
 
 # 文档
 
