@@ -176,8 +176,8 @@ cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
-
-rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git
+# 复制文件 时排除某些文件或者文件夹
+rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git --exclude .idea
 
 #|       命令      | 标准输出 | 错误输出 | 应用场景 |
 #|:---------------:|:--------:|:--------:|----------|
