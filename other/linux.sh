@@ -176,7 +176,15 @@ cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
+
+rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git
+
+#|       命令      | 标准输出 | 错误输出 | 应用场景 |
+#|:---------------:|:--------:|:--------:|----------|
+#| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
+#| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
 #因为scp的输出不是标准输出 直接>是无效的
+
 sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
 
 kill -9 pid

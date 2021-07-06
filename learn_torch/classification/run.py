@@ -108,6 +108,7 @@ def main(label_num):
             for datas, labels in tqdm(dataloader):
                 model.zero_grad()
                 output = model(datas)
+                # output (batch_size,label_num_probit)
                 loss = F.cross_entropy(output, labels)
                 loss.backward()
                 optimizer.step()
