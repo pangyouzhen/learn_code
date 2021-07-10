@@ -221,10 +221,12 @@ function lg() {
         git add .
         git commit -a -m "$1"
         git push origin "$(git branch --show-current)"
+        echo "-----push success-------"
     else
         echo "failed stash"
         git stash
         git pull origin "$(git branch --show-current)"
+        echo "----!!!nead merge!!!------"
     fi
 }
 
