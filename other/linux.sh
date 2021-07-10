@@ -213,6 +213,8 @@ tail -100f /var/log/cron
 function lg() {
 #  lazygit
     git pull origin "$(git branch --show-current)"
+    # 针对老版本git 没有 -show-current
+#    git pull origin "$(git branch | grep '*' | awk '{print $2}')"
     if [ $? -eq 0 ]
     then
         echo "pull succeed"
@@ -222,16 +224,8 @@ function lg() {
     else
         echo "failed stash"
         git stash
+        git pull origin "$(git branch --show-current)"
     fi
-}
-
-# 针对老版本git 没有 -show-current
-function lg() {
-#  lazygit
-    git pull origin $(git branch | grep '*' | awk '{print $2}')
-    git add .
-    git commit -a -m "$1"
-    git push origin $(git branch | grep '*' | awk '{print $2}')
 }
 
 
