@@ -83,7 +83,7 @@ nuniq = right.nunique().to_frame("数据值的个数")
 # print(left.kurt())
 df = pd.concat([sk, null_num, ku, df_type, nuniq], axis=1)
 print(df)
-
+#  数据清洗，缺失值，异常值，重复值，基本数据分析
 #  特征选择  woe 和 iv
 import numpy as np
 import pandas as pd

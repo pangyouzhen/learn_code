@@ -212,10 +212,17 @@ tail -100f /var/log/cron
 
 function lg() {
 #  lazygit
-    git pull origin $(git branch --show-current)
-    git add .
-    git commit -a -m "$1"
-    git push origin $(git branch --show-current)
+    git pull origin "$(git branch --show-current)"
+    if [ $? -eq 0 ]
+    then
+        echo "pull succeed"
+        git add .
+        git commit -a -m "$1"
+        git push origin "$(git branch --show-current)"
+    else
+        echo "failed stash"
+        git stash
+    fi
 }
 
 # 针对老版本git 没有 -show-current
