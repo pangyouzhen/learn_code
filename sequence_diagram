@@ -38,3 +38,16 @@ commnads.train.Train.add_subparser -> training.trainer.Trainer:train_model
 training.trainer.Trainer -> training.optimizers:Optimizer.from_params
 training.trainer.Trainer -> LearningRateScheduler:LearningRateScheduler.from_params
 commands.init -> esim_debug:return
+
+
+title SimCSE-main
+
+train.main->datasets.load:load_dataset
+train.main->train.main:prepare_features
+train.main->train.main:CLTrainer.data_collator
+train.main->simcse.trainers:CLTrainer
+simcse.trainers->transformers.trainer:training_step
+transformers.trainer->transformers.trainer:compute_loss
+transformers.trainer->simcse.trainers:TrainOutput()
+simcse.trainers->train.main:train_result
+train.main->simcse.trainers:CLTrainer.evaluate
