@@ -131,7 +131,7 @@ nl .xsession-errors | sed -n "1~2p"
 # 更改xcfe的 alt键  tweak
 # uml 图 + 时序图
 # pip install pylint
-#pyreverse -ASmy -o png allennlp/data/
+pyreverse -ASmy -o png allennlp/data/
 
 # pycharm struct 说明
 # c class

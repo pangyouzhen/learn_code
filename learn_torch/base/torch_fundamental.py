@@ -439,11 +439,13 @@ a = torch.randn(size=(5, 4, 6))
 self_attention = MultiheadAttention(embed_dim=6, num_heads=1)
 attn_output, _ = self_attention(a, a, a)
 print(attn_output)
-print("--------------torch index -------------")
+print("--------------torch index/slice  -------------")
 import torch
 
 a = torch.randint(10, size=(4, 3, 28, 28)).float()
 # Pytorch风格的索引
+#
+assert bool(torch.all((a[0] == a[0,...]) == (a[0] == a[0,:,:,:]))) == True
 assert a[0].size() == (3, 28, 28)
 assert a[0, 0].size() == (28, 28)
 assert a[0, 0, 0].size() == (28,)
@@ -589,4 +591,4 @@ conv1 = nn.Conv1d(in_channels=5, out_channels=1, kernel_size=(4,))
 # conv_list = [conv1]
 # for i in conv_list:
 #     print(conv1d_pool(a, i).shape)
-print(conv1d_pool(a,conv1))
+print(conv1d_pool(a, conv1))
