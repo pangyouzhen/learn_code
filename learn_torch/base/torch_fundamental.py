@@ -283,19 +283,24 @@ print(m(input).shape)
 
 # 损失函数-交叉熵
 
-# https://www.zhihu.com/question/294679135
-x_input = torch.randn(3, 3)  # 随机生成输入
-y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 
-# 直接使用pytorch中的loss_func=nn.CrossEntropyLoss()看与经过NLLLoss的计算是不是一样
-#  todo  torch 交叉熵中log softmax 那么模型的最后一层是不是不需要再进行softmax
+x_input = torch.randn(3, 3)  # 随机生成输入
+# x_input : batch_size, label_num
+y_target = torch.tensor([1, 2, 0])# 设置输出具体值 print('y_target\n',y_target)
+# y_target : label_num
+# nll loss
+import torch
+import torch.nn.functional as F
+
+target = torch.tensor([1, 0])
+input = torch.tensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], dtype=torch.float)
+F.nll_loss(input, target, reduction='none')
+# CrossEntropyLoss = logsoftmax + nllLoss
+
 crossentropyloss = nn.CrossEntropyLoss()
+#
 crossentropyloss_output = crossentropyloss(x_input, y_target)
 print('crossentropyloss_output:\n', crossentropyloss_output)
-
-# 常见错误
-# target out of bounds, NllLoss = -x[class] 的期望，x[class] 超出索引
-
 
 # m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)
 # m2 = torch.nn.MaxPool1d(kernel_size=3, stride=2)
@@ -445,7 +450,7 @@ import torch
 a = torch.randint(10, size=(4, 3, 28, 28)).float()
 # Pytorch风格的索引
 #
-assert bool(torch.all((a[0] == a[0,...]) == (a[0] == a[0,:,:,:]))) == True
+assert bool(torch.all((a[0] == a[0, ...]) == (a[0] == a[0, :, :, :]))) == True
 assert a[0].size() == (3, 28, 28)
 assert a[0, 0].size() == (28, 28)
 assert a[0, 0, 0].size() == (28,)
