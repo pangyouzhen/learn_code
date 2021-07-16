@@ -115,7 +115,7 @@ sed -n "10,20!p" .xsession-errors
 # 每隔两行进行打印
 nl .xsession-errors | sed -n "1~2p"
 
- awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
+awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 
 
 #关闭plank后面的阴影，
@@ -177,6 +177,7 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5p')
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
+<<<<<<< Updated upstream
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
 # 复制文件 时排除某些文件或者文件夹
 rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git --exclude .idea
@@ -185,6 +186,9 @@ rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude mod
 #|:---------------:|:--------:|:--------:|----------|
 #| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
+=======
+scp root@ip ./ 2>&1  >/dev/null  &
+>>>>>>> Stashed changes
 #因为scp的输出不是标准输出 直接>是无效的
 
 sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
@@ -223,12 +227,18 @@ function lg() {
         git add .
         git commit -a -m "$1"
         git push origin "$(git branch --show-current)"
+<<<<<<< Updated upstream
         echo "-----push success-------"
     else
         echo "failed stash"
         git stash
         git pull origin "$(git branch --show-current)"
         echo "----!!!nead merge!!!------"
+=======
+    else
+        echo "------failed stash------"
+        git stash
+>>>>>>> Stashed changes
     fi
 }
 
