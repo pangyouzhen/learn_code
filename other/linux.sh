@@ -185,9 +185,7 @@ rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude mod
 #|:---------------:|:--------:|:--------:|----------|
 #| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
-=======
 scp root@ip ./ 2>&1  >/dev/null  &
->>>>>>> Stashed changes
 #因为scp的输出不是标准输出 直接>是无效的
 
 sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
