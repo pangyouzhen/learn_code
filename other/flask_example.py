@@ -14,9 +14,10 @@ def reader():
     data = request.get_data()
     logger.info(data)
     username = json.loads(data)["username"]
+    age = json.loads(data)["age"]
     logger.info("username is {}".format(username))
-    time.sleep(1)
-    return json.dumps({"username": username})
+    logger.info("age is {}".format(age))
+    return json.dumps({"code": 0, "username": username, "age": age})
 
 
 if __name__ == "__main__":

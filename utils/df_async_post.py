@@ -15,7 +15,7 @@ import uuid
 
 class DfAsyncPost:
     """
-    针对dataframe的异步post请求
+    针对dataframe的异步post请求封装
     """
 
     def __init__(self, url: str, payload: str, df_response: str, sema: int = 5):
@@ -37,18 +37,15 @@ class DfAsyncPost:
         self.sema = asyncio.BoundedSemaphore(sema)
 
     @logger.catch()
-    async def process_url(self, df: pd.DataFrame, ind_query: Tuple) -> None:
+    async def process_url(self, df: pd.DataFrame, ind_query: Tuple, df_request_name: List[str]) -> None:
         """
         :type ind_query: 元组，第一个为index，第二个为需要格式化的内容，
         只传入单个内容：（0,"今天天气很好啊"）
-        传入多个需要格式化内容比如用户id和用户内容(0,"1111111$$$今天天气很好啊")
         :rtype: object
         """
-        ind = ind_query[0]
-        if not ind_query[1]:
-            return
-        query = str(ind_query[1]).split("$$$")
-        payload = self.payload % query[0]
+        ind, rows = ind_query
+        content = tuple(rows[df_request_name].tolist())
+        payload = self.payload % content
         with (await self.sema):
             async with aiohttp.ClientSession() as session:
                 resp = await session.post(self.url, json=json.loads(payload), headers=self.headers)
@@ -61,11 +58,11 @@ class DfAsyncPost:
     # a.pop("preProcess")
     # a["data"] = a["data"].strip("\"")
 
-    async def gather_data(self, df: pd.DataFrame, df_request_name: str) -> None:
+    async def gather_data(self, df: pd.DataFrame, df_request_name: List[str]) -> None:
         await asyncio.gather(
-            *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
+            *[self.process_url(df, (ind, row), df_request_name) for ind, row in df.iterrows()])
 
-    def run(self, df: pd.DataFrame, df_request_name: str) -> pd.DataFrame:
+    def run(self, df: pd.DataFrame, df_request_name: List[str]) -> pd.DataFrame:
         start_time = datetime.datetime.now()
         print(f"start_time is {start_time}")
         loop = asyncio.get_event_loop()
@@ -76,10 +73,6 @@ class DfAsyncPost:
         last_time = end_time - start_time
         print(f"last_time is {last_time}")
         return df
-
-    def get_gater_data(self, df: pd.DataFrame, df_request_name: str) -> asyncio.Future:
-        return asyncio.gather(
-            *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
 
     @classmethod
     def from_postman_curl(cls, inputs, df_response):
@@ -93,13 +86,13 @@ class DfAsyncPost:
 
 
 if __name__ == '__main__':
-    rand_num = np.random.randint(500, size=(10000, 3))
+    rand_num = np.random.randint(500, size=(100, 3))
     df = pd.DataFrame(rand_num)
     df.columns = ["user1", "user2", "user3"]
-    payload = """{\"username\": \"%s\",\"age\": \"%s\",}"""
+    payload = """{\"username\": \"%s\",\"age\": \"%s\"}"""
     df_request_name = ["user1", "user2"]
     df_async = DfAsyncPost(url="http://81.71.140.148:8082/reader", payload=payload, df_response="reponse", sema=100)
-    df_async.run(df, "user1")
+    df_async.run(df, df_request_name)
     print(df[:5])
     # curl_cmd = """curl --location --request POST 'http://127.0.0.1:8082/reader' \
     #             --header 'Content-Type: application/json'
