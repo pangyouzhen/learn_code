@@ -69,6 +69,10 @@ class BiLSTM_CRF(nn.Module):
         return lstm_features
 
     def _viterbi_decode(self, feats):
+        """
+        .. math::
+        v_t(j) = max_{i=1}^{N} v_{t-1}(i) a_{ij} b_j(o_t)
+        """
         #  TODO
         #  维特比算法的状态转移方程
         # v_t(j)=max_{i=1}^{N}v_{t-1}(i)a_{ij}b_j(o_t)

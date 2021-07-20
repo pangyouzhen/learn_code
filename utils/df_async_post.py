@@ -6,8 +6,11 @@ import aiohttp
 import json
 from loguru import logger
 import numpy as np
+import datetime
+import uuid
 
-logger.add("./a.log")
+
+# logger.add("./a.log")
 
 
 class DfAsyncPost:
@@ -24,7 +27,10 @@ class DfAsyncPost:
         :rtype:
         """
         self.url = url
-        self.payload = payload
+        if isinstance(payload, str):
+            self.payload = payload
+        elif isinstance(payload, dict):
+            self.payload: str = json.dumps(payload)
         self.df_response = df_response
         if headers:
             self.headers = headers
@@ -33,7 +39,6 @@ class DfAsyncPost:
             self.headers = {"Content-Type": "application/json"}
             self.headers_json = True
         self.sema = asyncio.BoundedSemaphore(sema)
-        self.session = aiohttp.ClientSession()
 
     @logger.catch()
     async def process_url(self, df: pd.DataFrame, ind_query: Tuple) -> None:
@@ -47,19 +52,15 @@ class DfAsyncPost:
         if not ind_query[1]:
             return
         query = str(ind_query[1]).split("$$$")
-        payload = self.payload.format(*tuple(query))
+        payload = self.payload % query[0]
         with (await self.sema):
-            try:
-                async with self.session:
-                    if self.headers_json:
-                        resp = await self.session.post(self.url, json=json.loads(payload), headers=self.headers)
-                    else:
-                        resp = await self.session.post(self.url, data=payload.encode("utf-8"), headers=self.headers)
-                    await asyncio.sleep(0.5)
-                    df.loc[ind, self.df_response] = await resp.text()
-            except Exception as e:
-                logger.error(e)
-                raise
+            async with aiohttp.ClientSession() as session:
+                if self.headers_json:
+                    resp = await session.post(self.url, json=json.loads(payload), headers=self.headers)
+                else:
+                    resp = await session.post(self.url, data=payload.encode("utf-8"), headers=self.headers)
+                await asyncio.sleep(0.5)
+                df.loc[ind, self.df_response] = await resp.text()
 
     # json.loads(payload)  就是将 str转化为字典，post 的参数中json 需要的是一个字典
     # postman 中转化出来的是 str 需要改为data = payload.encode("utf-8")
@@ -72,9 +73,15 @@ class DfAsyncPost:
             *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
 
     def run(self, df: pd.DataFrame, df_request_name: str) -> pd.DataFrame:
+        start_time = datetime.datetime.now()
+        print(f"start_time is {start_time}")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.gather_data(df, df_request_name))
         loop.close()
+        end_time = datetime.datetime.now()
+        print(f"end_time is {end_time}")
+        last_time = end_time - start_time
+        print(f"last_time is {last_time}")
         return df
 
     def get_gater_data(self, df: pd.DataFrame, df_request_name: str) -> asyncio.Future:
@@ -94,9 +101,26 @@ class DfAsyncPost:
         loop.close()
         return df
 
+    @classmethod
+    def from_postman_curl(cls, inputs, df_response):
+        """
+        inputs: POSTMAN - curl
+        """
+        try:
+            import uncurl
+        except:
+            assert "can't find uncurl"
+
 
 if __name__ == '__main__':
-    rand_num = np.random.randint(500000, size=(500000, 3))
+    rand_num = np.random.randint(500, size=(50000, 3))
     df = pd.DataFrame(rand_num)
     df.columns = ["user1", "user2", "user3"]
-    df_async = DfAsyncPost(url="http://127.0.0.1:8082/reader", payload=json.dumps({}), headers=None)
+    payload = """{\"username\": \"%s\"}"""
+    df_async = DfAsyncPost(url="http://127.0.0.1:8082/reader", payload=payload, df_response="reponse", sema=100)
+    df_async.run(df, "user1")
+    print(df[:5])
+    # curl_cmd = """curl --location --request POST 'http://127.0.0.1:8082/reader' \
+    #             --header 'Content-Type: application/json'
+    #             --data-raw '{"username":"pangyouzhen"}'"""
+    # df_async = DfAsyncPost.from_postman_curl(curl_cmd, "response")
