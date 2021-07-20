@@ -18,7 +18,7 @@ class DfAsyncPost:
     针对dataframe的异步post请求
     """
 
-    def __init__(self, url: str, payload: str, df_response: str, headers: Dict = None, sema: int = 5):
+    def __init__(self, url: str, payload: str, df_response: str, sema: int = 5):
         """
         url:  url
         payload : post请求的内容
@@ -29,15 +29,11 @@ class DfAsyncPost:
         self.url = url
         if isinstance(payload, str):
             self.payload = payload
-        elif isinstance(payload, dict):
-            self.payload: str = json.dumps(payload)
-        self.df_response = df_response
-        if headers:
-            self.headers = headers
-            self.headers_json = False
         else:
-            self.headers = {"Content-Type": "application/json"}
-            self.headers_json = True
+            assert "输入payload不是str的实例"
+        self.df_response = df_response
+        self.headers = {"Content-Type": "application/json"}
+        self.headers_json = True
         self.sema = asyncio.BoundedSemaphore(sema)
 
     @logger.catch()
@@ -55,10 +51,7 @@ class DfAsyncPost:
         payload = self.payload % query[0]
         with (await self.sema):
             async with aiohttp.ClientSession() as session:
-                if self.headers_json:
-                    resp = await session.post(self.url, json=json.loads(payload), headers=self.headers)
-                else:
-                    resp = await session.post(self.url, data=payload.encode("utf-8"), headers=self.headers)
+                resp = await session.post(self.url, json=json.loads(payload), headers=self.headers)
                 await asyncio.sleep(0.5)
                 df.loc[ind, self.df_response] = await resp.text()
 
@@ -88,19 +81,6 @@ class DfAsyncPost:
         return asyncio.gather(
             *[self.process_url(df, (ind, query)) for ind, query in enumerate(df[df_request_name])])
 
-    @staticmethod
-    def multi_run(df: pd.DataFrame, df_request_name: str, *args):
-        """
-        针对同一个df中的一列，请求多个接口的情况，每个接口response作为单独一列，常用来进行效果对比
-        :rtype:
-        """
-        loop = asyncio.get_event_loop()
-        groups: List[asyncio.Future] = [asyncio.gather(i.get_gater_data(df, df_request_name)) for i in args]
-        all_groups = asyncio.gather(*groups)
-        loop.run_until_complete(all_groups)
-        loop.close()
-        return df
-
     @classmethod
     def from_postman_curl(cls, inputs, df_response):
         """
@@ -113,11 +93,12 @@ class DfAsyncPost:
 
 
 if __name__ == '__main__':
-    rand_num = np.random.randint(500, size=(50000, 3))
+    rand_num = np.random.randint(500, size=(10000, 3))
     df = pd.DataFrame(rand_num)
     df.columns = ["user1", "user2", "user3"]
-    payload = """{\"username\": \"%s\"}"""
-    df_async = DfAsyncPost(url="http://127.0.0.1:8082/reader", payload=payload, df_response="reponse", sema=100)
+    payload = """{\"username\": \"%s\",\"age\": \"%s\",}"""
+    df_request_name = ["user1", "user2"]
+    df_async = DfAsyncPost(url="http://81.71.140.148:8082/reader", payload=payload, df_response="reponse", sema=100)
     df_async.run(df, "user1")
     print(df[:5])
     # curl_cmd = """curl --location --request POST 'http://127.0.0.1:8082/reader' \

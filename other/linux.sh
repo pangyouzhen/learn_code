@@ -177,7 +177,6 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5p')
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
-<<<<<<< Updated upstream
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
 # 复制文件 时排除某些文件或者文件夹
 rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git --exclude .idea
@@ -227,22 +226,18 @@ function lg() {
         git add .
         git commit -a -m "$1"
         git push origin "$(git branch --show-current)"
-<<<<<<< Updated upstream
         echo "-----push success-------"
     else
         echo "failed stash"
         git stash
         git pull origin "$(git branch --show-current)"
         echo "----!!!nead merge!!!------"
-=======
-    else
-        echo "------failed stash------"
-        git stash
->>>>>>> Stashed changes
     fi
 }
 
-
+lsof -i:port
+pwdx pid
+cat /proc/pid
 
 # manjaro bash 解压方法
 ex ()
