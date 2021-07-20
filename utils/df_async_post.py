@@ -83,6 +83,9 @@ class DfAsyncPost:
             import uncurl
         except:
             assert "can't find uncurl"
+        context = uncurl.parse_context(inputs)
+
+        url = context.url
 
 
 if __name__ == '__main__':
