@@ -64,8 +64,6 @@ class AsyncDf:
     async def _process_url(self, ind_query: Tuple) -> None:
         """
         :type ind_query: 元组，第一个为index，第二个为需要格式化的内容，
-        只传入单个内容：（0,"今天天气很好啊"）
-        :rtype: object
         """
         ind, rows = ind_query
         content = tuple(rows[self.df_request_name].tolist())
@@ -88,6 +86,7 @@ class AsyncDf:
         return self.df
 
     def __call__(self):
+        # 是否pre_process, post_process
         return self.run()
 
     @classmethod
@@ -101,6 +100,12 @@ class AsyncDf:
         context = uncurl.parse_context(curl_cmd)
         context_kwargs = context._asdict()
         return AsyncDf(df=df, df_response=df_response, df_request_name=df_request_name, sema=sema, **context_kwargs)
+
+    def pre_process(self):
+        return self.df
+
+    def post_process(self):
+        return self.df
 
 
 if __name__ == '__main__':
