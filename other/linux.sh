@@ -11,7 +11,7 @@ docker run -it -d ubuntu:latest --name ubuntu
 docker exec -it ubuntu bash
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 # 一些操作
-docker commit -m d2eb5b9b61f5 nsg_annoy:v1.0
+docker commit d2eb5b9b61f5 nsg_annoy:v1.0
 docker save ubuntu:latest > /tmp/annoy_nsg.tar
 tar -zcvf nsg-annoy.tgz nsg_annoy.tar
 
@@ -23,6 +23,8 @@ docker run --name mysql -e MYSQL_ROOT_PASSWORD=SeaBiscuit##^ -p 3306:3306 -v /us
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
 docker run -it -p:4444:4444 retreatguru/headless-chromedriver
+# !!!!老版本的docker 运行nvidia
+docker run --runtime=nvidia -it -v <服务器本地路径>:<docker容器路径> 镜像ID bash
 
 
 docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 -v /home/$USER/milvus/db:/var/lib/milvus/db -v /home/$USER/milvus/conf:/var/lib/milvus/conf -v /home/$USER/milvus/logs:/var/lib/milvus/logs -v /home/$USER/milvus/wal:/var/lib/milvus/wal milvusdb/milvus:0.10.5-gpu-d010621-4eda95
