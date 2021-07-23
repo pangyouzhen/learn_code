@@ -21,7 +21,7 @@ class Config(object):
         self.dropout = 0.2
         self.lr = 0.001
 
-
+# todo
 class Model(nn.Module):
     def __init__(self, num_embeddings, embedding_dim, hidden_size, b):
         super(Model, self).__init__()
