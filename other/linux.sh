@@ -30,10 +30,8 @@ docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
 #解决办法
-function docker_start() {
-    systemctl restart docker
-    chmod 666 /var/run/docker.sock
-}
+sudo systemctl restart docker
+sudo chmod 666 /var/run/docker.sock
 #2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
 #docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
 #解决办法
@@ -41,7 +39,6 @@ yay -S nvidia-container-runtime
 
 
 sed -i '/^\[mysqld\]/a default-character-set=utf8mb4' /tmp/my.cnf.bak
-
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
 #git
@@ -61,12 +58,12 @@ git branch -a | grep -v master > file.log
 git branch -r | grep -v master | xargs git branch -r -D
 # docker 打包镜像
 # docker load 镜像
-#git 撤销命令
+# git 撤销命令
 
-#git checkout . 撤销所有修改
+# git checkout . 撤销所有修改
 # git restore --staged .
-#git reset HEAD . 用在add之后
-#git reset --soft HEAD^ 用在commit之后
+# git reset HEAD . 用在add之后
+# git reset --soft HEAD^ 用在commit之后
 
 # systemctl & systemd
 sudo systemctl restart lightdm
@@ -134,14 +131,6 @@ awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 pyreverse --help
 pyreverse -ASmn -o png allennlp/data/
 
-
-# pycharm struct 说明
-# c class
-# v 类变量
-# p 方法变属性
-# m 方法
-# f 属性
-
 #时间同步服务
 sudo systemctl restart systemd-timesyncd.service
 # 将当前时间写入硬件时间
@@ -179,7 +168,7 @@ cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
 scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
 # 复制文件 时排除某些文件或者文件夹
-rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .gitrsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude model --exclude __pycache__ --exclude .git --exclude .idea
+rsync -av --progress ./SimCSE-main /run/media/pang/KINGSTON/ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea
 
 #|       命令      | 标准输出 | 错误输出 | 应用场景 |
 #|:---------------:|:--------:|:--------:|----------|
@@ -187,7 +176,6 @@ rsync -av --progress ./SIMCSE_unsup-main /run/media/pang/KINGSTON/ --exclude mod
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
 scp root@ip ./ 2>&1  >/dev/null  &
 #因为scp的输出不是标准输出 直接>是无效的
-
 sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
 
 kill -9 pid
@@ -211,8 +199,6 @@ crontab -e
 tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
 
-
-
 function lg() {
 #  lazygit
     git pull origin "$(git branch --show-current)"
@@ -225,16 +211,10 @@ function lg() {
         git commit -a -m "$1"
         git push origin "$(git branch --show-current)"
         echo "-----push success-------"
-    else
-        echo "failed stash"
-        git stash
-        git pull origin "$(git branch --show-current)"
-        echo "----!!!nead merge!!!------"
     fi
 }
 
-lsof -i:port
-pwdx pid
+lsof -i:8082 | awk '{print $2}' | grep -v PID | xargs pwdx
 cat /proc/pid
 
 # manjaro bash 解压方法
@@ -275,8 +255,6 @@ ssh root@81.71.140.148
 #执行任务时 & 符号,将任务在后台运行
 #如果忘记了&可以ctrl+z 然后bg
 
-
-reredirect -m /tmp/docker.log 3204
 # 多个jdk 时
 #sudo pacman -S jdk8-openjdk
 # ls /usr/lib/jvm/
@@ -293,3 +271,11 @@ docker build -t stock:v0.1 .
 netstat -nltp | grep 8080
 
 $ docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
+
+# 设置 http 代理
+export http=http://127.0.0.1:7890
+export https=http://127.0.0.1:7890
+
+# 或, 设置 socket 代理(clash)
+export http_proxy=socks5://127.0.0.1:7891
+export https_proxy=socks5://127.0.0.1:7891
