@@ -130,6 +130,7 @@ awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 # pip install pylint
 pyreverse --help
 pyreverse -ASmn -o png allennlp/data/
+pyreverse -o png allennlp/data/  --ignore=a.py,b.py
 
 #时间同步服务
 sudo systemctl restart systemd-timesyncd.service
@@ -163,6 +164,8 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 # ！$ 上一个命令的参数
 # 获取文件的目录
 # locate transformer_.py | head -n 1 | xargs dirname
+# 搜索以dot结尾的文件
+locate dot | grep -P .*?dot$
 cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5p')
 
 jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
@@ -279,3 +282,11 @@ export https=http://127.0.0.1:7890
 # 或, 设置 socket 代理(clash)
 export http_proxy=socks5://127.0.0.1:7891
 export https_proxy=socks5://127.0.0.1:7891
+
+
+
+#    下载相关源码：推荐去 GitHub 上下载，也可以用 Chrome 插件看
+#    查看 README.md 和相关说明文档
+#    参考 Tutorials 将代码跑起来
+#    利用 Pyreverse 包含在 Pypylint 生成项目框架图
+#    找到需要参考的代码，修改

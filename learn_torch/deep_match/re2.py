@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.nn import ModuleList, ModuleDict, Conv1d, Linear
 from typing import Collection
 
+
 # todo
 class Config(object):
     def __init__(self, num_embeddings, embedding_dim, out_features):
@@ -230,6 +231,23 @@ class NewConv1d(nn.Module):
         return torch.cat([encoder(x) for encoder in self.model], dim=-1)
 
 
+def process_data(batch, device=torch.device("cpu")):
+    text1 = torch.LongTensor(batch['text1']).to(device)
+    text2 = torch.LongTensor(batch['text2']).to(device)
+    mask1 = torch.ne(text1, 0).unsqueeze(2)
+    mask2 = torch.ne(text2, 0).unsqueeze(2)
+    inputs = {
+        'text1': text1,
+        'text2': text2,
+        'mask1': mask1,
+        'mask2': mask2,
+    }
+    if 'target' in batch:
+        target = torch.LongTensor(batch['target']).to(device)
+        return inputs, target
+    return inputs, None
+
+
 if __name__ == '__main__':
     num_embeddings = 5000
     batch_size = 128
@@ -243,7 +261,10 @@ if __name__ == '__main__':
     print("---------------------")
     for param in model.named_parameters():
         print(param[0], param[1].shape)
-    inputs1 = torch.randint(high=200, size=(batch_size, max_length))
-    inputs2 = torch.randint(high=200, size=(batch_size, max_length))
-    res = (model(inputs1, inputs2))
+    inputs1 = torch.randint(high=50, size=(batch_size, max_length))
+    inputs2 = torch.randint(high=50, size=(batch_size, max_length))
+    target = torch.randint(high=2, size=(batch_size,))
+    batch = {"text1": inputs1, "text2": inputs2, "target": target}
+    inputs, target = process_data(batch)
+    res = model(inputs)
     assert res.shape == (batch_size, out_features)

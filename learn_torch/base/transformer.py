@@ -1,1 +1,0 @@
-from torch.nn.modules.transformer import TransformerEncoder
