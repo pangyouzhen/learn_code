@@ -292,3 +292,9 @@ export https_proxy=socks5://127.0.0.1:7891
 #    参考 Tutorials 将代码跑起来
 #    利用 Pyreverse 包含在 Pypylint 生成项目框架图
 #    找到需要参考的代码，修改
+
+
+sudo dmesg  | grep error
+# 进入安全模式
+# 修复磁盘
+e2fsck -y /dev/sda1
