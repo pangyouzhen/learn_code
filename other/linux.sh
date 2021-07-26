@@ -293,7 +293,7 @@ export https_proxy=socks5://127.0.0.1:7891
 #    利用 Pyreverse 包含在 Pypylint 生成项目框架图
 #    找到需要参考的代码，修改
 
-
+# 问题修复 - 使用 ventoy的 live cd模式
 sudo dmesg  | grep error
 # 进入安全模式
 # 修复磁盘

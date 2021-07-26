@@ -1,6 +1,9 @@
-FROM ubuntu
+FROM ubuntu:latest
+COPY ./pip.conf /tmp/
 RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list \
     && apt-get update \
+    && mkdir ~/.pip \
+    && cp /tmp/pip.conf ~/.pip/pip.conf
     && DEBIAN_FRONTEND=noninteractive apt-get install -y python3 npm python3-pip git \
     && echo "python3 install success" \
     && npm i puppeteer -g \
@@ -9,7 +12,4 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list
     && mkdir /data/stock \
     && cd /data/stock \
     && pip3 install Pillow \
-    && pip3 install torch \
-    && pip3 install torchvision \
-    && pip3 install loguru
-#    && git clone
+    && git clone
