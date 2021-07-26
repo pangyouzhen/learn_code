@@ -13,3 +13,4 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list
     && cd /data/stock \
     && pip3 install Pillow \
     && git clone
+# docker build  -t simcse:0.3 /data/project/learn_code/docker
