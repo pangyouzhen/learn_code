@@ -304,3 +304,5 @@ e2fsck -y /dev/sda1
 # 预先下载 tensorflow:1.15.5-gpu(默认是3.6) docker +  Miniconda3-py37(可选) + pip.conf + 对应cuda版本的torch(重要)
 
 #
+
+dot -Tpng classes.dot -o classes.png

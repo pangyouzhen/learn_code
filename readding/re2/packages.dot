@@ -1,0 +1,50 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="src", shape="box"];
+"1" [label="src.evaluator", shape="box"];
+"2" [label="src.interface", shape="box"];
+"3" [label="src.model", shape="box"];
+"4" [label="src.modules", shape="box"];
+"5" [label="src.modules.alignment", shape="box"];
+"6" [label="src.modules.connection", shape="box"];
+"7" [label="src.modules.embedding", shape="box"];
+"8" [label="src.modules.encoder", shape="box"];
+"9" [label="src.modules.fusion", shape="box"];
+"10" [label="src.modules.pooling", shape="box"];
+"11" [label="src.modules.prediction", shape="box"];
+"12" [label="src.network", shape="box"];
+"13" [label="src.trainer", shape="box"];
+"14" [label="src.utils", shape="box"];
+"15" [label="src.utils.loader", shape="box"];
+"16" [label="src.utils.logger", shape="box"];
+"17" [label="src.utils.metrics", shape="box"];
+"18" [label="src.utils.params", shape="box"];
+"19" [label="src.utils.registry", shape="box"];
+"20" [label="src.utils.vocab", shape="box"];
+"1" -> "2" [arrowhead="open", arrowtail="none"];
+"1" -> "3" [arrowhead="open", arrowtail="none"];
+"1" -> "15" [arrowhead="open", arrowtail="none"];
+"2" -> "15" [arrowhead="open", arrowtail="none"];
+"2" -> "20" [arrowhead="open", arrowtail="none"];
+"3" -> "12" [arrowhead="open", arrowtail="none"];
+"3" -> "17" [arrowhead="open", arrowtail="none"];
+"5" -> "19" [arrowhead="open", arrowtail="none"];
+"6" -> "19" [arrowhead="open", arrowtail="none"];
+"9" -> "19" [arrowhead="open", arrowtail="none"];
+"11" -> "19" [arrowhead="open", arrowtail="none"];
+"12" -> "4" [arrowhead="open", arrowtail="none"];
+"12" -> "5" [arrowhead="open", arrowtail="none"];
+"12" -> "6" [arrowhead="open", arrowtail="none"];
+"12" -> "7" [arrowhead="open", arrowtail="none"];
+"12" -> "8" [arrowhead="open", arrowtail="none"];
+"12" -> "9" [arrowhead="open", arrowtail="none"];
+"12" -> "10" [arrowhead="open", arrowtail="none"];
+"12" -> "11" [arrowhead="open", arrowtail="none"];
+"13" -> "2" [arrowhead="open", arrowtail="none"];
+"13" -> "3" [arrowhead="open", arrowtail="none"];
+"13" -> "15" [arrowhead="open", arrowtail="none"];
+"13" -> "16" [arrowhead="open", arrowtail="none"];
+"13" -> "18" [arrowhead="open", arrowtail="none"];
+"17" -> "19" [arrowhead="open", arrowtail="none"];
+}
