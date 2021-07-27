@@ -285,16 +285,22 @@ export https=http://127.0.0.1:7890
 export http_proxy=socks5://127.0.0.1:7891
 export https_proxy=socks5://127.0.0.1:7891
 
-
-
-#    下载相关源码：推荐去 GitHub 上下载，也可以用 Chrome 插件看
-#    查看 README.md 和相关说明文档
-#    参考 Tutorials 将代码跑起来
-#    利用 Pyreverse 包含在 Pypylint 生成项目框架图
-#    找到需要参考的代码，修改
+# 代码阅读
+#  下载相关源码：推荐去 GitHub 上下载，也可以用 Chrome 插件看
+#  查看 README.md 和相关说明文档
+#  参考 Tutorials 将代码跑起来/找到程序入口
+#  利用 Pyreverse 包含在 Pypylint 生成项目框架图 uml图和packages图
+#  找到程序入口, 画出时序图
+#  找到需要参考的代码，修改
+#  机器学习和深度学习重点关注两个点: 数据+模型.数据是怎么处理的,模型的输入和输出是什么
 
 # 问题修复 - 使用 ventoy的 live cd模式
 sudo dmesg  | grep error
 # 进入安全模式
 # 修复磁盘
 e2fsck -y /dev/sda1
+
+# 构建docker gpu环境
+# 预先下载 tensorflow:1.15.5-gpu(默认是3.6) docker +  Miniconda3-py37(可选) + pip.conf + 对应cuda版本的torch(重要)
+
+#

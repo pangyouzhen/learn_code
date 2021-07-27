@@ -1,0 +1,11 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="{BertForCL|bert\llm_head\lmodel_args\l|forward(input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, labels, output_attentions, output_hidden_states, return_dict, sent_emb, mlm_input_ids, mlm_labels)\l}", shape="record"];
+"1" [label="{CLTrainer|control\ldeepspeed\llr_scheduler : NoneType\lmodel\lmodel_wrapped\loptimizer : NoneType\lstate\l|evaluate(eval_dataset: Optional[Dataset], ignore_keys: Optional[List[str]], metric_key_prefix: str, eval_senteval_transfer: bool): Dict[str, float]\ltrain(model_path: Optional[str], trial: Union['optuna.Trial', Dict[str, Any]])\l}", shape="record"];
+"2" [label="{MLPLayer|activation\ldense\l|forward(features)\l}", shape="record"];
+"3" [label="{Pooler|pooler_type\l|forward(attention_mask, outputs)\l}", shape="record"];
+"4" [label="{RobertaForCL|lm_head\lmodel_args\lroberta\l|forward(input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, labels, output_attentions, output_hidden_states, return_dict, sent_emb, mlm_input_ids, mlm_labels)\l}", shape="record"];
+"5" [label="{SimCSE|device : Optional[str]\lindex : dict, NoneType\lis_faiss_index : bool\lmodel\lnum_cells : int\lnum_cells_in_search : int\lpooler : str, NoneType\ltokenizer\l|build_index(sentences_or_file_path: Union[str, List[str]], use_faiss: bool, faiss_fast: bool, device: str, batch_size: int)\lencode(sentence: Union[str, List[str]], device: str, return_numpy: bool, normalize_to_unit: bool, keepdim: bool, batch_size: int, max_length: int): Union[ndarray, Tensor]\lsearch(queries: Union[str, List[str]], device: str, threshold: float, top_k: int): Union[List[Tuple[str, float]], List[List[Tuple[str, float]]]]\lsimilarity(queries: Union[str, List[str]], keys: Union[str, List[str], ndarray], device: str): Union[float, ndarray]\l}", shape="record"];
+"6" [label="{Similarity|cos\ltemp\l|forward(x, y)\l}", shape="record"];
+}

@@ -1,0 +1,9 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="simcse", shape="box"];
+"1" [label="simcse.models", shape="box"];
+"2" [label="simcse.tool", shape="box"];
+"3" [label="simcse.trainers", shape="box"];
+"0" -> "2" [arrowhead="open", arrowtail="none"];
+}
