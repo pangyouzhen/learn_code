@@ -24,7 +24,7 @@ docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
 docker run -it -p:4444:4444 retreatguru/headless-chromedriver
 # !!!!老版本的docker 运行nvidia
-docker run --runtime=nvidia -it -v <服务器本地路径>:<docker容器路径> 镜像ID bash
+docker run --runtime=nvidia -it -v /data:/data  -d tensorflow/tensorflow:1-1.15-gpu
 
 
 docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 -v /home/$USER/milvus/db:/var/lib/milvus/db -v /home/$USER/milvus/conf:/var/lib/milvus/conf -v /home/$USER/milvus/logs:/var/lib/milvus/logs -v /home/$USER/milvus/wal:/var/lib/milvus/wal milvusdb/milvus:0.10.5-gpu-d010621-4eda95
@@ -32,8 +32,7 @@ docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
 #解决办法
-sudo systemctl restart docker
-sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker && chmod 666 /var/run/docker.sock
 #2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
 #docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
 #解决办法
@@ -275,7 +274,7 @@ sudo npm i jsdom -g
 docker build -t stock:v0.1 .
 netstat -nltp | grep 8080
 
-$ docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
+docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
 
 # 设置 http 代理
 export http=http://127.0.0.1:7890
@@ -303,6 +302,4 @@ e2fsck -y /dev/sda1
 # 构建docker gpu环境
 # 预先下载 tensorflow:1.15.5-gpu(默认是3.6) docker +  Miniconda3-py37(可选) + pip.conf + 对应cuda版本的torch(重要)
 
-#
-
-dot -Tpng classes.dot -o classes.png
+dot -Tpng classes.dot -o classes.png && viewnior classes.png

@@ -58,7 +58,7 @@ subgraph cluster_blocks {
 "3" -> "18" [style=dotted, label="update"];
 "7" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="blocks", style="solid"];
 "21" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="blocks", style="solid"];
-"2" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="connection", style="solid"];
+"2" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="residualConnection", style="solid"];
 "10" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="blocks", style="solid"];
 "0" -> "28" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="prediction", style="solid"];
 "4" -> "7" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="encoders", style="solid"];
