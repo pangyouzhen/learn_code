@@ -1,0 +1,13 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="{Transformer|d_model : int\ldecoder : NoneType\lencoder : NoneType\lnhead : int\l|forward(src: Tensor, tgt: Tensor, src_mask: Optional[Tensor], tgt_mask: Optional[Tensor], memory_mask: Optional[Tensor], src_key_padding_mask: Optional[Tensor], tgt_key_padding_mask: Optional[Tensor], memory_key_padding_mask: Optional[Tensor]): Tensor\lgenerate_square_subsequent_mask(sz: int): Tensor\l}", shape="record"];
+"1" [label="{TransformerDecoder|layers\lnorm : NoneType\lnum_layers\l|forward(tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor], memory_mask: Optional[Tensor], tgt_key_padding_mask: Optional[Tensor], memory_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
+"2" [label="{TransformerDecoderLayer|activation\ldropout\ldropout1\ldropout2\ldropout3\llinear1\llinear2\lmultihead_attn\lnorm1\lnorm2\lnorm3\lself_attn\l|forward(tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor], memory_mask: Optional[Tensor], tgt_key_padding_mask: Optional[Tensor], memory_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
+"3" [label="{TransformerEncoder|layers\lnorm : NoneType\lnum_layers\l|forward(src: Tensor, mask: Optional[Tensor], src_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
+"4" [label="{TransformerEncoderLayer|activation\ldropout\ldropout1\ldropout2\llinear1\llinear2\lnorm1\lnorm2\lself_attn\l|forward(src: Tensor, src_mask: Optional[Tensor], src_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
+"1" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="decoder", style="solid"];
+"3" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="encoder", style="solid"];
+"2" -> "1" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="layers", style="solid"];
+"4" -> "3" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="layers", style="solid"];
+}

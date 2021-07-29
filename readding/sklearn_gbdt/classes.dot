@@ -1,0 +1,40 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="{BaseGradientBoosting|alpha : float\lcriterion\lestimators_ : ndarray\lfeature_importances_\linit\linit_\llearning_rate\lloss\lloss_\lmax_depth\lmax_features\lmax_features_\lmax_leaf_nodes : NoneType\lmin_impurity_decrease\lmin_impurity_split\lmin_samples_leaf\lmin_samples_split\lmin_weight_fraction_leaf\ln_classes_ : int\ln_estimators\ln_estimators_ : int\ln_features\ln_features_\ln_iter_no_change : NoneType\loob_improvement_ : ndarray\lpresort : str\lrandom_state\lsubsample\ltol : float\ltrain_score_ : ndarray\lvalidation_fraction : float\lverbose : int\lwarm_start : bool\l|apply(X)\lfit(X, y, sample_weight, monitor)\l}", shape="record"];
+"1" [label="{BinomialDeviance|\l|init_estimator()\lnegative_gradient(y, pred)\l}", shape="record"];
+"2" [label="{ClassificationLossFunction|\l|}", shape="record"];
+"3" [label="{ExponentialLoss|\l|init_estimator()\lnegative_gradient(y, pred)\l}", shape="record"];
+"4" [label="{GradientBoostingClassifier|classes_\ln_classes_\l|decision_function(X)\lpredict(X)\lpredict_log_proba(X)\lpredict_proba(X)\lstaged_decision_function(X)\lstaged_predict(X)\lstaged_predict_proba(X)\l}", shape="record"];
+"5" [label="{GradientBoostingRegressor|\l|apply(X)\lpredict(X)\lstaged_predict(X)\l}", shape="record"];
+"6" [label="{HuberLossFunction|alpha : float\lgamma : NoneType\l|init_estimator()\lnegative_gradient(y, pred, sample_weight)\l}", shape="record"];
+"7" [label="{LeastAbsoluteError|\l|init_estimator()\lnegative_gradient(y, pred)\l}", shape="record"];
+"8" [label="{LeastSquaresError|\l|init_estimator()\lnegative_gradient(y, pred)\lupdate_terminal_regions(tree, X, y, residual, y_pred, sample_weight, sample_mask, learning_rate, k)\l}", shape="record"];
+"9" [label="{LogOddsEstimator|prior\lscale : float\l|fit(X, y, sample_weight)\lpredict(X)\l}", shape="record"];
+"10" [label="{LossFunction|K\lis_multi_class : bool\l|init_estimator()\lnegative_gradient(y, y_pred)\lupdate_terminal_regions(tree, X, y, residual, y_pred, sample_weight, sample_mask, learning_rate, k)\l}", shape="record"];
+"11" [label="{MeanEstimator|mean\l|fit(X, y, sample_weight)\lpredict(X)\l}", shape="record"];
+"12" [label="{MultinomialDeviance|is_multi_class : bool\l|init_estimator()\lnegative_gradient(y, pred, k)\l}", shape="record"];
+"13" [label="{PriorProbabilityEstimator|priors : ndarray\l|fit(X, y, sample_weight)\lpredict(X)\l}", shape="record"];
+"14" [label="{QuantileEstimator|alpha : float\lquantile\l|fit(X, y, sample_weight)\lpredict(X)\l}", shape="record"];
+"15" [label="{QuantileLossFunction|alpha : float\lpercentile : float\l|init_estimator()\lnegative_gradient(y, pred)\l}", shape="record"];
+"16" [label="{RegressionLossFunction|\l|}", shape="record"];
+"17" [label="{ScaledLogOddsEstimator|scale : float\l|}", shape="record"];
+"18" [label="{VerboseReporter|begin_at_stage : int\lstart_time\lverbose\lverbose_fmt : str\lverbose_mod : int\l|init(est, begin_at_stage)\lupdate(j, est)\l}", shape="record"];
+"19" [label="{ZeroEstimator|n_classes : int\l|fit(X, y, sample_weight)\lpredict(X)\l}", shape="record"];
+"1" -> "2" [arrowhead="empty", arrowtail="none"];
+"3" -> "2" [arrowhead="empty", arrowtail="none"];
+"4" -> "0" [arrowhead="empty", arrowtail="none"];
+"5" -> "0" [arrowhead="empty", arrowtail="none"];
+"6" -> "16" [arrowhead="empty", arrowtail="none"];
+"7" -> "16" [arrowhead="empty", arrowtail="none"];
+"8" -> "16" [arrowhead="empty", arrowtail="none"];
+"12" -> "2" [arrowhead="empty", arrowtail="none"];
+"15" -> "16" [arrowhead="empty", arrowtail="none"];
+"17" -> "9" [arrowhead="empty", arrowtail="none"];
+"1" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="loss_", style="solid"];
+"1" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="loss_", style="solid"];
+"9" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="init_", style="solid"];
+"12" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="loss_", style="solid"];
+"12" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="loss_", style="solid"];
+"13" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="init_", style="solid"];
+}
