@@ -286,7 +286,7 @@ print(m(input).shape)
 
 x_input = torch.randn(3, 3)  # 随机生成输入
 # x_input : batch_size, label_num
-y_target = torch.tensor([1, 2, 0])# 设置输出具体值 print('y_target\n',y_target)
+y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 # y_target : label_num
 # nll loss
 import torch
@@ -597,3 +597,8 @@ conv1 = nn.Conv1d(in_channels=5, out_channels=1, kernel_size=(4,))
 # for i in conv_list:
 #     print(conv1d_pool(a, i).shape)
 print(conv1d_pool(a, conv1))
+
+a = torch.randn((10, 5))
+print(a)
+print(torch.topk(a, k=2, dim=1))
+assert torch.topk(a, k=2, dim=1).indices.shape == (10, 2)
