@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 torch.manual_seed(0)
 # batch_size,seq_length,embedding
@@ -13,17 +14,24 @@ a = a.float()
 #         [[56., 68., 94., 33.],
 #          [26., 19., 91., 54.]]])
 
-a_mean = torch.mean(a, dim=-1)
-a_var = torch.var(a, dim=-1, unbiased=False)
-a_mean_expand = a_mean.unsqueeze(dim=-1).expand(3, 2, 4)
-a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(3, 2, 4) + 1e-5)
-res = (a - a_mean_expand) / (a_var_expand)
-lm = nn.LayerNorm(4)
-print(lm(a).data)
-print(res.data)
-print(torch.mean(res.data, dim=-1))
+ln = nn.LayerNorm(4)
+t = ln(a)
+print(torch.mean(t, dim=-1))
+print(torch.var(t, dim=-1, unbiased=False))
 
 ln = nn.LayerNorm([2, 4])
-print(ln(a))
-# todo 这里不明白是怎么计算出来的
-print(torch.mean(ln(a), dim=-1))
+t = ln(a)
+# shape= 3 * 1
+print(torch.mean(t, dim=[-2, -1]))
+# shape = 3 * 1
+print(torch.var(t, dim=[-2, -1], unbiased=False))
+
+bn = nn.BatchNorm1d(2)
+t = bn(a)
+print(torch.mean(t, dim=[0, 2]))
+print(torch.var(t, dim=[0, 2], unbiased=False))
+
+a = torch.Tensor([3, 4])
+# torch 中这里是不能直接输入一个向量的
+a = a.unsqueeze(0).float()
+print(F.cosine_similarity(a, a))
