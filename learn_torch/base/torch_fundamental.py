@@ -7,6 +7,9 @@ import torch.nn.functional as F
 
 from learn_torch.other.PositionalEncoding import PositionalEncoding
 
+torch.cuda.get_device_name()
+print(torch.version.cuda)
+
 np.random.seed(0)
 torch.manual_seed(0)
 
@@ -30,6 +33,7 @@ num_embeddings = 10
 # target = np.random.randint(num_class, size=batch_size)
 # target = torch.from_numpy(target).long()
 target = torch.randint(num_class, size=(batch_size,))
+ndarray = target.cpu().numpy()
 print(target)
 # embedding
 x = np.random.randint(10, size=(batch_size, seq_length))
@@ -159,15 +163,16 @@ print(torch.max(a, dim=1).indices)
 # element wise --- Hadamard product.  \odot
 m = torch.Tensor([[1, 2, 3], [4, 5, 6]])
 n = torch.Tensor([[4, 5, 6], [1, 7, 3]])
-assert bool((torch.mul(m, n) == m * n).all()) == True
-print(torch.mul(m, n).size())
+assert torch.equal(torch.mul(m, n), m * n) == True
+assert (m * n).shape == (2, 3)
 
 # tensor product 也是矩阵相乘: \otimes
 # 同时也和 torch.bmm 相等
 tensor1 = torch.randn(10, 3, 4)
 tensor2 = torch.randn(10, 4, 5)
-assert bool((torch.matmul(tensor1, tensor2) == (tensor1 @ tensor2)).all()) == True
-print(torch.matmul(tensor1, tensor2).size())
+matmul_result = torch.matmul(tensor1, tensor2)
+assert torch.equal(matmul_result, tensor1 @ tensor2) == True
+assert matmul_result.shape == (5)
 
 tensor1 = torch.randn(10, 3, 2)
 tensor2 = torch.randn(4, 5, 7)
@@ -193,10 +198,6 @@ a = torch.tensor([4, 5, 6, 7])
 masked = torch.tensor([1, 1, 0, 0]).bool()
 b = a.masked_fill(mask=masked, value=torch.tensor(0))
 print(b)
-
-#  pytorch 模型的训练步骤
-# 1. 数据 2. 模型 3. 损失函数 4. 优化和拟合
-
 
 #  判断数据是float 还是long
 import numpy as np
@@ -252,21 +253,6 @@ class CNN(nn.Module):
 
 cnn = CNN()
 print(cnn)
-# 这一段代码有问题
-# trainloader = learn_torch.utils.data.dataloader
-# criterion = nn.CrossEntropyLoss()
-# optimizer = optim.SGD(cnn.parameters(), lr=0.01)
-# for epoch in range(2):
-#     running_loss = 0.0
-#     for i, data in enumerate(trainloader, 0):
-#         inputs, labels = data
-#         optimizer.zero_grad()
-#         outputs = cnn(inputs)
-#         loss = criterion(outputs, labels)
-#         loss.backward()
-#         optimizer.step()
-#         running_loss += loss.item()
-# print("finish")
 
 # (batch_size,in_channels,H_in,W_in) -> (batch_size,out_channels,H_out,W_out)
 m = nn.Conv2d(in_channels=16, out_channels=33, kernel_size=(3,), stride=(2,))
@@ -285,7 +271,7 @@ print(m(input).shape)
 
 
 x_input = torch.randn(3, 3)  # 随机生成输入
-# x_input : batch_size, label_num
+# x_input : batch_size, label_num, 相当于算出每一类的概率
 y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 # y_target : label_num
 # nll loss
@@ -365,14 +351,6 @@ indicies = torch.LongTensor([0, 2])
 print(torch.index_select(x_embedding, 0, indicies))
 print(torch.index_select(x_embedding, 1, indicies))
 
-# pytorch 归一化层：BatchNorm、LayerNorm、InstanceNorm、GroupNorm
-# Norm 最归一化，所以输入输出的维度是不变化的
-# BatchNorm：batch方向做归一化
-# LayerNorm：channel方向做归一化
-# InstanceNorm： 一个channel内做归一化
-# GroupNorm：将channel方向分group，
-# SwitchableNorm是将BN、LN、IN结合
-
 ## torch 随机数
 # torch.Tensor是默认的tensor类型（torch.FlaotTensor）的简称
 
@@ -406,35 +384,6 @@ assert torch.mean(a, dim=-1).size() == (3, 2, 6)
 # layerNorm 计算过程
 #  layerNorm 针对最里层做的归一化变换
 print("--------------layernorm--------------")
-a = torch.FloatTensor([[[1, 2, 4, 1],
-                        [6, 3, 2, 4],
-                        [2, 4, 6, 1]]])
-print(a.size() == (1, 3, 4))
-# batch_size,seq_length,embedding
-assert a[0].size() == (3, 4)
-a_mean = torch.mean(a, dim=-1)
-assert a_mean.size() == (1, 3)
-a_var = torch.var(a, dim=-1, unbiased=False)
-assert a_var.size() == (1, 3)
-a_mean_expand = a_mean.unsqueeze(dim=-1).expand(1, 3, 4)
-a_var_expand = torch.sqrt(a_var.unsqueeze(dim=-1).expand(1, 3, 4) + 1e-5)
-res = (a - a_mean_expand) / (a_var_expand)
-lm = nn.LayerNorm(4)
-print(lm(a).data)
-print(res.data)
-print("--------------batchnorm--------------")
-# TODO error
-a_mean_bm = torch.mean(a, dim=0)
-a_var_bm = torch.var(a, dim=0, unbiased=False)
-a_mean_expand_bm = a_mean_bm.unsqueeze(dim=0).expand(1, 3, 4)
-a_var_expand_bm = torch.sqrt(a_var_bm.unsqueeze(dim=0).expand(1, 3, 4) + 1e-5)
-# TODO 为什么这里的维度是3, 输入默认第一个参数是batch_size
-bm = nn.BatchNorm1d(3)
-res2 = (a - a_mean_bm) / (a_var_expand_bm)
-print(a_mean_expand_bm)
-print(a_var_expand_bm)
-print(bm(a).data)
-print(res2.data)
 
 print("------------------self_attention----------------")
 from torch.nn.modules.transformer import MultiheadAttention
@@ -602,3 +551,6 @@ a = torch.randn((10, 5))
 print(a)
 print(torch.topk(a, k=2, dim=1))
 assert torch.topk(a, k=2, dim=1).indices.shape == (10, 2)
+
+# pytorch 常用的代码片段
+# https://zhuanlan.zhihu.com/p/104019160
