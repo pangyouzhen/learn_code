@@ -31,7 +31,20 @@ t = bn(a)
 print(torch.mean(t, dim=[0, 2]))
 print(torch.var(t, dim=[0, 2], unbiased=False))
 
-a = torch.Tensor([3, 4])
+# a = torch.Tensor([3, 4])
 # torch 中这里是不能直接输入一个向量的
-a = a.unsqueeze(0).float()
-print(F.cosine_similarity(a, a))
+# a = a.unsqueeze(0).float()
+a = torch.randn(3, 4)
+b = torch.randn(3, 4)
+s = F.cosine_similarity(a, b)
+assert s.shape == (3,)
+
+a = torch.randn(3, 4, 5)
+b = torch.randn(3, 4, 5)
+s = F.cosine_similarity(a, b, dim=-1)
+assert s.shape == (3, 4)
+
+a = torch.randn(3, 4, 5)
+b = torch.randn(3, 4, 5)
+s = F.cosine_similarity(a, b)
+assert s.shape == (3, 5)

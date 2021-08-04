@@ -6,8 +6,10 @@ rankdir=BT
 "2" [label="{TransformerDecoderLayer|activation\ldropout\ldropout1\ldropout2\ldropout3\llinear1\llinear2\lmultihead_attn\lnorm1\lnorm2\lnorm3\lself_attn\l|forward(tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor], memory_mask: Optional[Tensor], tgt_key_padding_mask: Optional[Tensor], memory_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
 "3" [label="{TransformerEncoder|layers\lnorm : NoneType\lnum_layers\l|forward(src: Tensor, mask: Optional[Tensor], src_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
 "4" [label="{TransformerEncoderLayer|activation\ldropout\ldropout1\ldropout2\llinear1\llinear2\lnorm1\lnorm2\lself_attn\l|forward(src: Tensor, src_mask: Optional[Tensor], src_key_padding_mask: Optional[Tensor]): Tensor\l}", shape="record"];
+"5" [label="{MultiheadAttention|add_zero_attn : bool\lbatch_first : bool\lbias_k\lbias_k : Parameter, NoneType\lbias_v\lbias_v : NoneType, Parameter\ldropout : float\lembed_dim\lhead_dim\lin_proj_bias : Parameter\lin_proj_weight : Parameter\lk_proj_weight : Parameter\lkdim : NoneType\lnum_heads\lout_proj : NonDynamicallyQuantizableLinear\lq_proj_weight : Parameter\lv_proj_weight : Parameter\lvdim : NoneType\l|forward(query, key, value, key_padding_mask, need_weights, attn_mask)\l}", shape="record"];
 "1" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="decoder", style="solid"];
 "3" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="encoder", style="solid"];
 "2" -> "1" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="layers", style="solid"];
 "4" -> "3" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="layers", style="solid"];
+"5" -> "4" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="self_attn", style="solid"];
 }
