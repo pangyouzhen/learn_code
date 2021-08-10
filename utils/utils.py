@@ -7,6 +7,7 @@ raw = file_.read_bytes()
 encoding = chardet.detect(raw)['encoding']
 # python 3.8 高级用法
 # print(f"{encoding=}")
+# print(f"{2+1=}")
 print(encoding)
 # 打印当前文件的名字，可以将文件名保存成这个
 print(Path(__file__).stem)

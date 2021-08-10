@@ -46,15 +46,3 @@ print(confusion_matrix_)
 print(f1_score(y_true, y_pred))
 print(recall_score(y_true, y_pred))
 print(precision_score(y_true, y_pred))
-
-# pandas 常见的其他函数
-#  Grouping（数据聚合与分组运算）
-# sex_group = df.groupby("survived")
-
-# 统计特征不同取值
-# df['embarked'].unique()
-
-# df['embarked'].value_counts()
-
-# 多个值进行抽取
-# df1 = df.loc[(df["intent1"] == 1) & (df["intent3"] == 1)]
