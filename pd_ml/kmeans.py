@@ -1,12 +1,5 @@
-import random
-
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from pathlib import Path
 import matplotlib.pyplot as plt
-from sklearn import metrics
-from numpy.random import default_rng
+import numpy as np
 
 np.random.seed(0)
 
@@ -39,3 +32,7 @@ rand_num = 4
 t = np.random.choice(samples_num, size=rand_num)
 # for i in t:
 #     print(t[i])
+
+import requests
+
+requests.get()

@@ -1,0 +1,40 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="{AuthBase|\l|}", shape="record"];
+"1" [label="{BaseAdapter|\l|close()\lsend(request, stream, timeout, verify, cert, proxies)\l}", shape="record"];
+"2" [label="{CaseInsensitiveDict|\l|copy()\llower_items()\l}", shape="record"];
+"9" [label="{HTTPAdapter|config : dict\lmax_retries : NoneType, Retry, int\lpoolmanager : PoolManager\lproxy_manager : dict\l|add_headers(request)\lbuild_response(req, resp)\lcert_verify(conn, url, verify, cert)\lclose()\lget_connection(url, proxies)\linit_poolmanager(connections, maxsize, block)\lproxy_headers(proxy)\lproxy_manager_for(proxy)\lrequest_url(request, proxies)\lsend(request, stream, timeout, verify, cert, proxies)\l}", shape="record"];
+"10" [label="{HTTPBasicAuth|password\lusername\l|}", shape="record"];
+"11" [label="{HTTPDigestAuth|password\lusername\l|build_digest_header(method, url)\lhandle_401(r)\lhandle_redirect(r)\linit_per_thread_state()\l}", shape="record"];
+"13" [label="{HTTPProxyAuth|\l|}", shape="record"];
+"18" [label="{LookupDict|name : NoneType\l|get(key, default)\l}", shape="record"];
+"20" [label="{MockRequest|host\lorigin_req_host\ltype\lunverifiable\l|add_header(key, val)\ladd_unredirected_header(name, value)\lget_full_url()\lget_header(name, default)\lget_host()\lget_new_headers()\lget_origin_req_host()\lget_type()\lhas_header(name)\lis_unverifiable()\l}", shape="record"];
+"21" [label="{MockResponse|\l|getheaders(name)\linfo()\l}", shape="record"];
+"22" [label="{PreparedRequest|body : str, NoneType\lheaders : NoneType\lhooks\lmethod : NoneType\lurl : NoneType, str\l|copy()\lprepare(method, url, headers, files, data, params, auth, cookies, hooks, json)\lprepare_auth(auth, url)\lprepare_body(data, files, json)\lprepare_content_length(body)\lprepare_cookies(cookies)\lprepare_headers(headers)\lprepare_hooks(hooks)\lprepare_method(method)\lprepare_url(url, params)\l}", shape="record"];
+"25" [label="{Request|auth : NoneType\lcookies : NoneType\ldata : NoneType, list\lfiles : NoneType, list\lheaders : NoneType, dict\lhooks\ljson : NoneType\lmethod : NoneType\lparams : NoneType, dict\lurl : NoneType\l|prepare()\l}", shape="record"];
+"26" [label="{RequestEncodingMixin|path_url\l|}", shape="record"];
+"28" [label="{RequestHooksMixin|\l|deregister_hook(event, hook)\lregister_hook(event, hook)\l}", shape="record"];
+"29" [label="{RequestsCookieJar|\l|copy()\lget(name, default, domain, path)\lget_dict(domain, path)\lget_policy()\litems()\literitems()\literkeys()\litervalues()\lkeys()\llist_domains()\llist_paths()\lmultiple_domains()\lset(name, value)\lset_cookie(cookie)\lupdate(other)\lvalues()\l}", shape="record"];
+"32" [label="{Response|apparent_encoding\lconnection\lcontent\lcookies : NoneType\lelapsed : timedelta\lencoding : NoneType, str\lheaders\lhistory : list\lis_permanent_redirect\lis_redirect\llinks\lnext\lok\lraw : NoneType\lreason : NoneType\lrequest : NoneType\lstatus_code : NoneType\ltext\lurl : NoneType\l|close()\liter_content(chunk_size, decode_unicode)\liter_lines(chunk_size, decode_unicode, delimiter)\ljson()\lraise_for_status()\l}", shape="record"];
+"35" [label="{Session|adapters : OrderedDict\lauth : NoneType\lcert : NoneType\lcookies : NoneType\lheaders\lhooks\lmax_redirects : int\lparams : dict\lproxies : dict\lstream : bool\ltrust_env : bool\lverify : bool\l|close()\ldelete(url)\lget(url)\lget_adapter(url)\lhead(url)\lmerge_environment_settings(url, proxies, stream, verify, cert)\lmount(prefix, adapter)\loptions(url)\lpatch(url, data)\lpost(url, data, json)\lprepare_request(request)\lput(url, data)\lrequest(method, url, params, data, headers, cookies, files, auth, timeout, allow_redirects, proxies, hooks, stream, verify, cert, json)\lsend(request)\l}", shape="record"];
+"36" [label="{SessionRedirectMixin|\l|get_redirect_target(resp)\lrebuild_auth(prepared_request, response)\lrebuild_method(prepared_request, response)\lrebuild_proxies(prepared_request, proxies)\lresolve_redirects(resp, req, stream, timeout, verify, cert, proxies, yield_requests)\lshould_strip_auth(old_url, new_url)\l}", shape="record"];
+"9" -> "1" [arrowhead="empty", arrowtail="none"];
+"10" -> "0" [arrowhead="empty", arrowtail="none"];
+"11" -> "0" [arrowhead="empty", arrowtail="none"];
+"13" -> "10" [arrowhead="empty", arrowtail="none"];
+"22" -> "26" [arrowhead="empty", arrowtail="none"];
+"22" -> "28" [arrowhead="empty", arrowtail="none"];
+"25" -> "28" [arrowhead="empty", arrowtail="none"];
+"35" -> "36" [arrowhead="empty", arrowtail="none"];
+"2" -> "22" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="headers", style="solid"];
+"2" -> "22" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="headers", style="solid"];
+"2" -> "32" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="headers", style="solid"];
+"2" -> "32" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="headers", style="solid"];
+"2" -> "35" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="headers", style="solid"];
+"9" -> "32" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="connection", style="solid"];
+"29" -> "22" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_cookies", style="solid"];
+"29" -> "22" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_cookies", style="solid"];
+"29" -> "32" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="cookies", style="solid"];
+"29" -> "35" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="cookies", style="solid"];
+}
