@@ -114,7 +114,7 @@ x_embedding = torch.randn(1, 4, 5)
 print(x_embedding.size())
 print(x_embedding.unsqueeze(2).size())
 print(x_embedding.unsqueeze(1).size())
-#  squeeze 挤压，就是删减维度
+#  squeeze 挤压，就是删减维度,是如果对应维度=1则进行删减，否则进行保留
 #  unsqueeze - squeeze的反义词，增加维度
 
 # view
@@ -282,7 +282,7 @@ target = torch.tensor([1, 0])
 input = torch.tensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], dtype=torch.float)
 F.nll_loss(input, target, reduction='none')
 # CrossEntropyLoss = logsoftmax + nllLoss
-
+# 交叉熵本身自带softmax,所以模型最后一层不要用softmax
 crossentropyloss = nn.CrossEntropyLoss()
 #
 crossentropyloss_output = crossentropyloss(x_input, y_target)
