@@ -23,7 +23,7 @@
 
     for (let i = containerDom.length - 1; i >= 0; i--) {
         let titleDom = containerDom[i].getElementsByClassName("t");
-        if (titleDom == null || titleDom.length == 0) continue;
+        if (titleDom == null || titleDom.length === 0) continue;
 
         let titleText = titleDom[0].innerText;
         console.log(titleText)
@@ -35,20 +35,20 @@
 
 
         let descDom = containerDom[i].getElementsByClassName("c-abstract");
-        if (descDom == null || descDom.length == 0) continue;
+        if (descDom == null || descDom.length === 0) continue;
 
         let descText = descDom[0].innerText;
-        if (descText.indexOf(containStr) != -1) {
+        if (descText.indexOf(containStr) !== -1) {
             containerDom[i].remove();
             continue;
         }
 
         let urlText = containerDom[i].getElementsByClassName("c-showurl");
-        if (urlText == null || urlText.length == 0) continue;
+        if (urlText == null || urlText.length === 0) continue;
         let urlInnerText = urlText[0].innerText;
         if (urlInnerText.includes(titleEndsWith)) {
             containerDom[i].remove();
-            continue;
+
         }
     }
 })();

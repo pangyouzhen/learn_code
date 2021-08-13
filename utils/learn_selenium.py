@@ -10,7 +10,3 @@ username.send_keys("pangyouzhen")
 username.find_element_by_class_name("")
 time.sleep(5)
 driver.close()
-
-import requests
-
-requests.get
