@@ -1,3 +1,6 @@
+
+工具只是手段而不是目的
+
 # 爬虫和自动化工具
 
 1. requests
@@ -82,3 +85,6 @@
 1. pylint(pyreverse) 模块class uml图
 1. ventoy
 1. word,excel的文档协作和历史版本
+1. typora时序图，流程图
+1. onenote 的笔记同步功能
+1. graphviz(使用代码画图的好处是便于修改和版本控制)
