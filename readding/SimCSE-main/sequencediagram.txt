@@ -1,8 +1,6 @@
-title SimCSE-main
-
 train.main->datasets.load:load_dataset
 train.main->train.main:prepare_features
-train.main->train.main:tokenizer(BertTokenizerFast_instance)
+train.main->train.main:tokenizer(BertTokenizerFast)
 train.main->train.main:CLTrainer.data_collator
 train.main->simcse.trainers:CLTrainer
 simcse.trainers->transformers.trainer:training_step
