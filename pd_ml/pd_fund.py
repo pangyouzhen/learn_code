@@ -16,13 +16,17 @@ left = pd.DataFrame(
         "c": ["a", "b", "c"]
     }
 )
-
+ind: pd.DatetimeIndex = pd.DatetimeIndex(['2021-09-09', '2021-09-11', '2021-09-10'])
+left.index = ind
+# 一般而言索引是不能重复的,
+# 索引的重复值 判断
+assert len(set(left.index.duplicated())) == 1
 dtype_dict = {
     "dt": np.datetime64,
     "a": int,
 }
 
-right = pd.DataFrame(
+right: pd.DataFrame = pd.DataFrame(
     {
         "a": [1, 2, 2, 2],
         "dt": ["2021/6/11", "2021/07/12", "2021/03/02", "2021/09/11"],
@@ -37,9 +41,11 @@ left["dt"] = pd.to_datetime(left["dt"])
 df1 = left[left["dt"] < dt]
 # 选择行和列 以后都可以用loc,还有一种选择的方法是iloc
 # 直接使用[[]] 选择列这些比较乱
-df2 = left.loc[left["dt"] < dt, :]
-df3 = left.loc[left["dt"] < dt, ["a", "b"]]
-df4 = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
+df2: pd.DataFrame = left.loc[left["dt"] < dt, :]
+df3: pd.DataFrame = left.loc[left["dt"] < dt, ["a", "b"]]
+df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
+df5: pd.Series = left.loc[left["dt"] < dt, "y"]
+df3 = df3[~df3.index.duplicated(keep='first')]
 # pandas 自动推断并转换类型
 print("--------------类型推断-----------------------------")
 # left = left.convert_dtypes()
@@ -102,3 +108,10 @@ df_woe_iv = (pd.crosstab(df[feature], df[target],
                                            (dfx[1] - dfx[0]))))
 
 print(df_woe_iv)
+
+# pandas 常见错误
+# ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+# 造成该问题的原因一般是没设置索引,loc通过条件查询,查询出来的是 series序列
+# left.loc[left["a"]==1,"c"],可以将这个值打印出来
+# left.loc['a',c] 就不会出现这个问题
+
