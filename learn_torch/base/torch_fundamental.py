@@ -554,3 +554,40 @@ assert torch.topk(a, k=2, dim=1).indices.shape == (10, 2)
 
 # pytorch 常用的代码片段
 # https://zhuanlan.zhihu.com/p/104019160
+
+
+import torch
+
+a = torch.Tensor([[3, 4], [5, 6]])
+a.requires_grad = True
+# tensor([[3., 4.],
+#         [5., 6.]], requires_grad=True)
+b = a * a
+# tensor([[ 9., 16.],
+#         [25., 36.]], grad_fn=<MulBackward0>)
+c = b.sum()
+# tensor(86., grad_fn=<SumBackward0>)
+c.backward()
+print(a.grad)
+# tensor([[ 6.,  8.],
+#         [10., 12.]])
+
+
+a = torch.Tensor([[3, 4], [5, 6]])
+d = torch.Tensor([[1, 2], [3, 4]])
+a.requires_grad = True
+d.requires_grad = True
+# tensor([[3., 4.],
+#         [5., 6.]], requires_grad=True)
+b = a * d
+# tensor([[ 9., 16.],
+#         [25., 36.]], grad_fn=<MulBackward0>)
+c = b.sum()
+# tensor(86., grad_fn=<SumBackward0>)
+c.backward()
+print(a.grad)
+# tensor([[1,  2],
+#         [3, 4]])
+print(d.grad)
+# tensor([[3,  4],
+#         [5, 6]])
