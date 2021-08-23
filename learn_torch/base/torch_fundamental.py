@@ -399,12 +399,15 @@ import torch
 a = torch.randint(10, size=(4, 3, 28, 28)).float()
 # Pytorch风格的索引
 #
-assert bool(torch.all((a[0] == a[0, ...]) == (a[0] == a[0, :, :, :]))) == True
+assert torch.equal(a[0], a[0, ...]) is True
+assert torch.equal(a[0], a[0, :, :, :]) is True
+assert torch.equal(a[0], a[0, :]) is True
+# 注意这里a[:,0] 只是列举了两个维度
+assert torch.equal(a[:, 0, :, :], a[:, 0]) is True
+assert torch.equal(a[:, 0], a[:, 0, ...]) is True
 assert a[0].size() == (3, 28, 28)
 assert a[0, 0].size() == (28, 28)
 assert a[0, 0, 0].size() == (28,)
-print(a[0, 0, 0, 0])
-print(a[0, 0, 0, 0].size())
 # python风格的索引
 assert torch.mean(a, dim=-1).size() == (4, 3, 28)
 assert a[:2].size() == (2, 3, 28, 28)
