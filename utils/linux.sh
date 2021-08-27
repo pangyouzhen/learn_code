@@ -277,12 +277,13 @@ netstat -nltp | grep 8080
 docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
 
 # 设置 http 代理
-export http=http://127.0.0.1:7890
-export https=http://127.0.0.1:7890
+export http=http://127.0.0.1:1089
+export https=http://127.0.0.1:1089
 
 # 或, 设置 socket 代理(clash)
-export http_proxy=socks5://127.0.0.1:7891
-export https_proxy=socks5://127.0.0.1:7891
+export http_proxy=socks5://127.0.0.1:1089
+export https_proxy=socks5://127.0.0.1:1089
+export all_proxy="https://127.0.0.1:1089"
 
 # 代码阅读
 #  下载相关源码：推荐去 GitHub 上下载，也可以用 Chrome 插件看
