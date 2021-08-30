@@ -208,6 +208,7 @@ print(x_embedding.type())
 
 # softmax
 x_embedding = torch.rand(2, 5).int().float()
+assert torch.equal(F.softmax(x_embedding), F.softmax(x_embedding, dim=-1)) is True
 print(F.softmax(x_embedding))
 print(F.softmax(x_embedding, dim=0))
 print(F.softmax(x_embedding, dim=1).sum())
@@ -278,17 +279,22 @@ y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y
 import torch
 import torch.nn.functional as F
 
+
+def NLLLoss2(input, targets):
+    out = torch.diag(input[:, targets])
+    return -torch.mean(out)
+
+
 target = torch.tensor([1, 0])
 input = torch.tensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], dtype=torch.float)
-F.nll_loss(input, target, reduction='none')
-# CrossEntropyLoss = logsoftmax + nllLoss
-# 交叉熵本身自带softmax,所以模型最后一层不要用softmax
+assert torch.equal(F.nll_loss(input, target), NLLLoss2(input, target)) is True
 crossentropyloss = nn.CrossEntropyLoss()
 #
 crossentropyloss_output = crossentropyloss(x_input, y_target)
-print('crossentropyloss_output:\n', crossentropyloss_output)
+assert torch.equal(torch.log(F.softmax(x_input)), F.log_softmax(x_input)) is True
+assert torch.equal(F.nll_loss(F.log_softmax(x_input), y_target), crossentropyloss_output) is True
 
-# m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)
+# m1 = torch.nn.MaxPool2d(kernel_size=3, stride=2)c
 # m2 = torch.nn.MaxPool1d(kernel_size=3, stride=2)
 # inputm = torch.randn(2, 4, 5)
 # print(m1(inputm).shape)
