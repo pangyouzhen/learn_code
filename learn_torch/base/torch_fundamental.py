@@ -276,18 +276,15 @@ x_input = torch.randn(3, 3)  # 随机生成输入
 y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 # y_target : label_num
 # nll loss
-import torch
-import torch.nn.functional as F
 
-
-def NLLLoss2(input, targets):
+def nll_loss2(input, targets):
     out = torch.diag(input[:, targets])
     return -torch.mean(out)
 
 
 target = torch.tensor([1, 0])
 input = torch.tensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], dtype=torch.float)
-assert torch.equal(F.nll_loss(input, target), NLLLoss2(input, target)) is True
+assert torch.equal(F.nll_loss(input, target), nll_loss2(input, target)) is True
 crossentropyloss = nn.CrossEntropyLoss()
 #
 crossentropyloss_output = crossentropyloss(x_input, y_target)
