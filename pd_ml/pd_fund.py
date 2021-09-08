@@ -38,13 +38,14 @@ right: pd.DataFrame = pd.DataFrame(
 print(left.dtypes)
 dt = datetime(year=2021, month=7, day=1)
 left["dt"] = pd.to_datetime(left["dt"])
+right["dt"] = pd.to_datetime(right["dt"])
 df1 = left[left["dt"] < dt]
 # 选择行和列 以后都可以用loc,还有一种选择的方法是iloc
 # 直接使用[[]] 选择列这些比较乱
 df2: pd.DataFrame = left.loc[left["dt"] < dt, :]
 df3: pd.DataFrame = left.loc[left["dt"] < dt, ["a", "b"]]
 df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
-df5: pd.Series = left.loc[left["dt"] < dt, "y"]
+df5: pd.Series = right.loc[right["dt"] < dt, "y"]
 df3 = df3[~df3.index.duplicated(keep='first')]
 # pandas 自动推断并转换类型
 print("--------------类型推断-----------------------------")
@@ -115,3 +116,5 @@ print(df_woe_iv)
 # left.loc[left["a"]==1,"c"],可以将这个值打印出来
 # left.loc['a',c] 就不会出现这个问题
 
+for i in df.iterrows():
+    pass

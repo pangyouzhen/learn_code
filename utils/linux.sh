@@ -307,3 +307,6 @@ dot -Tpng classes.dot -o classes.png && viewnior classes.png
 
 # 全局搜索替换
 sed -i "s/aaa/AAA/g" `grep -rl "aaa" ./ `
+
+# git 从另一个分支取文件和文件夹
+git checkout branch_name -- dirname

@@ -30,5 +30,5 @@ print("Cosine similarity between \"%s\" and \"%s\" is: %.3f" % (texts[0], texts[
 # 1. loss function: 拉近相似的样本,推开不相似的样本
 # 1. 使用dropout做数据增强
 # embedding 生成的效果分析
-#
+
 
