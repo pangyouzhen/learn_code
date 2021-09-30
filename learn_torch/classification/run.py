@@ -7,13 +7,15 @@ import torch.nn.functional as F
 from sklearn import metrics
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
+writer = SummaryWriter()
 vocab_size = 5000
 batch_size = 128
 max_length = 32
 embed_dim = 300
 label_num = 10
-epoch = 5
+epochs = 50
 train_path = '/data/project/nlp_summary/data/THUCNews/data/train.txt'
 dev_path = '/data/project/nlp_summary/data/THUCNews/data/dev.txt'
 vocab_path = '/data/project/nlp_summary/data/THUCNews/data/vocab.txt'
@@ -103,8 +105,10 @@ def main(label_num):
         optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
         model.train()
         best_acc = 0
-        for i in range(epoch):
+        for epoch in range(epochs):
             index = 0
+            acc_loss = 0
+            train_acc_val = 0
             for datas, labels in tqdm(dataloader):
                 model.zero_grad()
                 output = model(datas)
@@ -113,17 +117,23 @@ def main(label_num):
                 loss.backward()
                 optimizer.step()
                 index += 1
-                if index % 50 == 0:
-                    # 每多少轮输出在训练集和验证集上的效果
-                    true = labels.data.cpu()
-                    predic = torch.max(output.data, 1)[1].cpu()
-                    train_acc = metrics.accuracy_score(true, predic)
-                    dev_acc = evaluate(model, dataloader_dev)
-                    print(f'epoch:{i} batch:{index} loss:{loss} train_acc:{train_acc} dev_acc:{dev_acc}')
-                    # if dev_acc > best_acc:
-                    #     torch.save(model, f'{output_path}/{model_name}/model.pt')
-                    model.train()
-
+                acc_loss += loss
+                # if index % 50 == 0:
+                #     每多少轮输出在训练集和验证集上的效果
+                true = labels.data.cpu()
+                predic = torch.max(output.data, 1)[1].cpu()
+                train_acc = metrics.accuracy_score(true, predic)
+                # dev_acc = evaluate(model, dataloader_dev)
+                # print(f'epoch:{i} batch:{index} loss:{loss} train_acc:{train_acc} dev_acc:{dev_acc}')
+                # if dev_acc > best_acc:
+                #     torch.save(model, f'{output_path}/{model_name}/model.pt')
+                model.train()
+            writer.add_scalar("Loss/train", acc_loss, epoch)
+            # tb.add_scalar('Accuracy', total_correct / len(train_set), epoch)
+            print(f"acc_loss is {acc_loss}")
+        torch.save(model, f'{output_path}/{model_name}/model.pt')
+        dev_acc = evaluate(model, dataloader_dev)
+        print(dev_acc)
         print('train finish')
 
 

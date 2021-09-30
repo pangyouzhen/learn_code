@@ -35,6 +35,7 @@ right: pd.DataFrame = pd.DataFrame(
         "y": [0, 1, 1, 0]
     }
 )
+left = left.convert_dtypes()
 print(left.dtypes)
 dt = datetime(year=2021, month=7, day=1)
 left["dt"] = pd.to_datetime(left["dt"])

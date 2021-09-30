@@ -4,6 +4,7 @@ import torch
 from torch import Tensor
 from transformers.modeling_outputs import BaseModelOutputWithPoolingAndCrossAttentions
 from transformers.models.bert import BertModel, BertTokenizer
+from transformers import BatchEncoding
 
 model_name = '/data/project/learn_code/data/chinese-bert-wwm-ext/'
 # 读取模型对应的tokenizer
@@ -16,6 +17,7 @@ input_text = "今天天气很好啊,你好吗"
 # todo input_text2 怎样一起输入
 input_text2 = "文本"
 # 通过tokenizer把文本变成 token_id
+batch_encoding: BatchEncoding = tokenizer(input_text)
 input_ids: List[int] = tokenizer.encode(input_text, add_special_tokens=True)
 print(len(input_ids))
 print(input_ids)
