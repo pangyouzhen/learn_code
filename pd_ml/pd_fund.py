@@ -1,12 +1,19 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 # import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-# df = pd.read_csv("../full_data/train.csv")
-# print(df[:5])
-#
+# 数据分析还是建议使用jupyter
+# 数据的一般流程
+path = Path("../learn_torch/.data/train.csv")
+df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
+df = df.convert_dtypes()
+# 数据review
+print(df[:5])
+# 数据index 检查,index的意义为加快查询速度
+assert df.index.has_duplicates is False
 # 根据时间选取行
 left = pd.DataFrame(
     {
@@ -18,13 +25,6 @@ left = pd.DataFrame(
 )
 ind: pd.DatetimeIndex = pd.DatetimeIndex(['2021-09-09', '2021-09-11', '2021-09-10'])
 left.index = ind
-# 一般而言索引是不能重复的,
-# 索引的重复值 判断
-assert len(set(left.index.duplicated())) == 1
-dtype_dict = {
-    "dt": np.datetime64,
-    "a": int,
-}
 
 right: pd.DataFrame = pd.DataFrame(
     {
@@ -49,8 +49,6 @@ df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
 df3 = df3[~df3.index.duplicated(keep='first')]
 # pandas 自动推断并转换类型
-print("--------------类型推断-----------------------------")
-# left = left.convert_dtypes()
 for i in left.select_dtypes(exclude=np.number).columns:
     print(i)
 print("-----------------------------------------")
@@ -119,3 +117,17 @@ print(df_woe_iv)
 
 for i in df.iterrows():
     pass
+
+# 这是一个面板数据，适用于multiIndex,参考股票的数据
+df_all = pd.DataFrame(
+    {
+        "stock_code": ["1", "1", "3"],
+        "date": ["2021/6/11", "2021/07/12", "2021/6/11"],
+        "value": [4, 1, np.NAN],
+        "other": ["a", "b", "c"]
+    }
+)
+df_all = df_all.convert_dtypes()
+print(df_all.dtypes)
+# 设置双重索引
+df_all = df_all.set_index(["date", "stock_code"])
