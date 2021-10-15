@@ -73,7 +73,7 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,  # load the best model when finished training (default metric is loss)
     # but you can specify `metric_for_best_model` argument to change to accuracy or other metric
     logging_steps=200,  # log & save weights each logging_steps
-    evaluation_strategy=IntervalStrategy.STEPS,  # evaluate each `logging_steps`
+    evaluation_strategy=IntervalStrategy.EPOCH,  # evaluate each `logging_steps`
     # no_cuda=True,
 )
 

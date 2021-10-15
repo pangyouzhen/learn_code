@@ -271,9 +271,7 @@ print(m(input).shape)
 # 损失函数-交叉熵
 
 
-x_input = torch.randn(3, 3)  # 随机生成输入
-# x_input : batch_size, label_num, 相当于算出每一类的概率
-y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
+
 # y_target : label_num
 # nll loss
 
@@ -287,6 +285,9 @@ input = torch.tensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], dtype=torch.float)
 assert torch.equal(F.nll_loss(input, target), nll_loss2(input, target)) is True
 crossentropyloss = nn.CrossEntropyLoss()
 #
+x_input = torch.randn(3, 3)  # 随机生成输入
+# x_input : batch_size, label_num, 相当于算出每一类的概率
+y_target = torch.tensor([1, 2, 0])  # 设置输出具体值 print('y_target\n',y_target)
 crossentropyloss_output = crossentropyloss(x_input, y_target)
 assert torch.equal(torch.log(F.softmax(x_input)), F.log_softmax(x_input)) is True
 assert torch.equal(F.nll_loss(F.log_softmax(x_input), y_target), crossentropyloss_output) is True

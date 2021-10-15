@@ -18,6 +18,7 @@ input_text = "今天天气很好啊,你好吗"
 input_text2 = "文本"
 # 通过tokenizer把文本变成 token_id
 batch_encoding: BatchEncoding = tokenizer(input_text)
+print(batch_encoding)
 input_ids: List[int] = tokenizer.encode(input_text, add_special_tokens=True)
 print(len(input_ids))
 print(input_ids)
