@@ -1,5 +1,4 @@
-title requests
-
+```sequence
 User->api:get
 api->api:request
 api->Session: request
@@ -15,3 +14,4 @@ HTTPAdapter->HTTPAdapter:build_response
 HTTPAdapter-->Session:return
 Session-->api:return
 api->User:return
+```

@@ -11,6 +11,7 @@ path = Path("../learn_torch/.data/train.csv")
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
 df = df.convert_dtypes()
 # 数据review
+#  注意pandas和numpy的索引选择等不一致
 print(df[:5])
 # 数据index 检查,index的意义为加快查询速度
 assert df.index.has_duplicates is False
@@ -47,7 +48,7 @@ df2: pd.DataFrame = left.loc[left["dt"] < dt, :]
 df3: pd.DataFrame = left.loc[left["dt"] < dt, ["a", "b"]]
 df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
-df3 = df3[~df3.index.duplicated(keep='first')]
+df3: pd.DataFrame = df3[~df3.index.duplicated(keep='first')]
 # pandas 自动推断并转换类型
 for i in left.select_dtypes(exclude=np.number).columns:
     print(i)

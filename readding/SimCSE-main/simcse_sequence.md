@@ -1,3 +1,4 @@
+```sequence
 train.main->datasets.load:load_dataset
 train.main->train.main:prepare_features
 train.main->train.main:tokenizer(BertTokenizerFast)
@@ -16,3 +17,4 @@ SimCSE.models.BertForCL->SimCSE.models.BertForCL:loss_fct
 transformers.trainer->simcse.trainers:TrainOutput()
 simcse.trainers->train.main:train_result
 train.main->simcse.trainers:CLTrainer.evaluate
+```
