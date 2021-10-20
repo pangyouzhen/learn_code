@@ -41,6 +41,7 @@
 1. [java-hutool](https://www.hutool.cn/)
 1. fastjson
 1. arthas
+1. jstack
 
 # 浏览器插件
 
@@ -53,6 +54,7 @@
 1. lombok
 1. database navigator
 1. leetcode
+1. EasyCode(idea插件)
 
 # 数据分析
 
