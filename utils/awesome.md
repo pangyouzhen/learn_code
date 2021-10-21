@@ -9,6 +9,7 @@
 1. playwright
 1. puppeteer
 1. pyautogui
+1. keyboard
 1. scrapy
 1. scrapy-redis
 1. aiohttp
@@ -66,7 +67,6 @@
 1. matplot
 1. sklearn
 1. boruta 特征选择
-1. 
 
 # 后台接口和数据库
 

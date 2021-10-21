@@ -32,7 +32,8 @@ docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
 #解决办法
-sudo systemctl restart docker && chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+chmod 666 /var/run/docker.sock
 #2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
 #docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
 #解决办法
@@ -286,6 +287,7 @@ export https_proxy=socks5://127.0.0.1:1089
 export all_proxy="https://127.0.0.1:1089"
 
 # 代码阅读
+# 带着问题去读！！！!
 #  下载相关源码：推荐去 GitHub 上下载，也可以用 Chrome 插件看
 #  查看 README.md 和相关说明文档
 #  参考 Tutorials 将代码跑起来/找到程序入口
