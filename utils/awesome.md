@@ -8,15 +8,16 @@
 1. selenium
 1. playwright
 1. puppeteer
-1. pyautogui
-1. keyboard
+1. pyautogui 可配合全局快捷键一起使用：在pyautogui没有生效的情况下可用keyboard
 1. scrapy
 1. scrapy-redis
 1. aiohttp
 1. httpx
 1. muggle_ocr 通用型验证码
+1. dddd_ocr 
 1. chrome console （自动刷新网页等等）
 1. parsel
+1. easyocr 截图等文字识别
 
 # 文档
 
@@ -64,7 +65,7 @@
 1. scipy
 1. seaborn
 1. pyecharts
-1. matplot
+1. matplotlib
 1. sklearn
 1. boruta 特征选择
 
@@ -77,7 +78,6 @@
 
 1. akshare
 1. ta-lib
-1.
 
 # 日志/实用工具
 

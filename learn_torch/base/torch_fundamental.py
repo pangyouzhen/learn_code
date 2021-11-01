@@ -48,15 +48,17 @@ assert x_embedding.size() == (batch_size, seq_length, embedding_dim)
 ####################################################################################
 # lstm
 # https://zhuanlan.zhihu.com/p/79064602
+# https://www.zhihu.com/question/41949741/answer/318771336
 # input: (batch_size,seq_len, embeding_dim)
 lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_size, num_layers=2, batch_first=True, dropout=0.2)
-x_lstm, _ = lstm(x_embedding)
+# batch为n的hidden state-> h_n, batch为n 的 cell state-> c_n
+outputs, (h_n, c_n) = lstm(x_embedding)
 #  (batch_size,seq_len, hidden_size)
-assert x_lstm.size() == (batch_size, seq_length, hidden_size)
-assert x_lstm[:, -1, :].size() == (batch_size, hidden_size)
-x_lstm = x_lstm[:, -1, :]
+assert outputs.size() == (batch_size, seq_length, hidden_size)
+assert outputs[:, -1, :].size() == (batch_size, hidden_size)
+outputs = outputs[:, -1, :]
 ln = nn.Linear(in_features=hidden_size, out_features=num_class)
-x_ln = ln(x_lstm)
+x_ln = ln(outputs)
 x_softmax = torch.softmax(x_ln, dim=-1)
 x_argmax = torch.argmax(x_softmax, dim=-1)
 # transformer
@@ -263,13 +265,14 @@ input = torch.randn(20, 16, 50, 100)
 # H_out = (50 + 2 * 0 - 0 *(3-1) -1) / 2+ 1
 # W_out =
 print(m(input).shape)
+
+
 # learn_torch.Size([20, 33, 24, 49])
 
 # print(m2(input).shape)
 # print(m3(input).shape)
 
 # 损失函数-交叉熵
-
 
 
 # y_target : label_num
@@ -395,7 +398,7 @@ from torch.nn.modules.transformer import MultiheadAttention
 # a = torch.randint(100, size=(5, 4, 6)).float()
 a = torch.randn(size=(5, 4, 6))
 self_attention = MultiheadAttention(embed_dim=6, num_heads=1)
-attn_output, _ = self_attention(a, a, a)
+attn_output, c_n = self_attention(a, a, a)
 print(attn_output)
 print("--------------torch index/slice  -------------")
 import torch
@@ -587,10 +590,10 @@ d.requires_grad = True
 # tensor([[3., 4.],
 #         [5., 6.]], requires_grad=True)
 b = a * d
-# tensor([[ 9., 16.],
-#         [25., 36.]], grad_fn=<MulBackward0>)
+# tensor([[ 3., 8.],
+#         [15., 24.]], grad_fn=<MulBackward0>)
 c = b.sum()
-# tensor(86., grad_fn=<SumBackward0>)
+# tensor(50., grad_fn=<SumBackward0>)
 c.backward()
 print(a.grad)
 # tensor([[1,  2],
@@ -598,3 +601,11 @@ print(a.grad)
 print(d.grad)
 # tensor([[3,  4],
 #         [5, 6]])
+
+
+from torch.nn.utils.rnn import pack_sequence
+
+a = torch.tensor([1, 2, 3])
+b = torch.tensor([4, 5])
+c = torch.tensor([6])
+pack_sequence([a, b, c])
