@@ -32,7 +32,3 @@ rand_num = 4
 t = np.random.choice(samples_num, size=rand_num)
 # for i in t:
 #     print(t[i])
-
-import requests
-
-requests.get()
