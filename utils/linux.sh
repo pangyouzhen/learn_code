@@ -204,14 +204,15 @@ crontab -e
 tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
 
-function lg() {
+lg() {
 #  lazygit
     git pull origin "$(git branch --show-current)"
     # 针对老版本git 没有 -show-current
-#    git pull origin "$(git branch | grep '*' | awk '{print $2}')"
+    #git pull origin "$(git branch | grep '*' | awk '{print $2}')"
+    # $? 是显示最后命令的退出状态
     if [ $? -eq 0 ]
     then
-        echo "pull succeed"
+        echo "-----pull success------- "
         git add .
         git commit -a -m "$1"
         git push origin "$(git branch --show-current)"
