@@ -18,6 +18,8 @@
 1. chrome console （自动刷新网页等等）
 1. parsel
 1. easyocr 截图等文字识别
+1. postman
+1. chrome/firefox 复制 + postman import + postman 生成python代码
 
 # 文档
 
