@@ -7,9 +7,13 @@ from sklearn.model_selection import train_test_split
 
 # 数据分析还是建议使用jupyter
 # 数据的一般流程
+# 设置pandas 的版本
+print(pd.__version__)
 path = Path("../learn_torch/.data/train.csv")
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
 df = df.convert_dtypes()
+#  pandas针对大数据进行处理 https://pandas.pydata.org/docs/user_guide/scale.html
+#  一般而讲float32保留8位小数，所以对于普通场景都可以将float64转化为float32降低内存
 # 数据review
 #  注意pandas和numpy的索引选择等不一致
 print(df[:5])
