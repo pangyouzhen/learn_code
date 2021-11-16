@@ -11,8 +11,9 @@
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // ==/UserScript==
+// 自动登录尝试脚本
 (function () {
-
+    // postman 生成的无法进行跨域请求
     function getSessionId() {
         var data = JSON.stringify({
             "type": "telegram",

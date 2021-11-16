@@ -1,5 +1,6 @@
-from annoy import AnnoyIndex
 import random
+
+from annoy import AnnoyIndex
 
 f = 40
 t = AnnoyIndex(f, "angular")

@@ -1,9 +1,10 @@
-import numpy as np
-import pandas as pd
 from datetime import datetime
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
 # import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 
 # 数据分析还是建议使用jupyter
 # 数据的一般流程

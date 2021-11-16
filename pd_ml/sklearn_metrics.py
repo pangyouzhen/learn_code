@@ -1,14 +1,13 @@
-import pandas as pd
 import re
 
+import pandas as pd
+from sklearn.metrics import confusion_matrix
 # 机器学习，深度学习的效果评估指标, sklearn的效果评估都在 metrics中\
 # 常见的评估指标
 # 准确率，召回率，f1，混淆矩阵, 在sklearn中输入都是 先输入正确值，再输入预测值 y_true, y_pred
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
 df = pd.read_excel("./data/test.xlsx", encoding="utf-8")
 # 对列名进行重命名

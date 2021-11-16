@@ -1,5 +1,4 @@
 import json
-import time
 
 from flask import Flask, request
 from loguru import logger
