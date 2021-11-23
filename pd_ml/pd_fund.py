@@ -1,15 +1,25 @@
 from datetime import datetime
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-# import matplotlib.pyplot as plt
+from loguru import logger
+from pandas.core.groupby import DataFrameGroupBy
 
 # 数据分析还是建议使用jupyter
+# 普通的数据分析和具体上系统是不一样的
 # 数据的一般流程
-# 设置pandas 的版本
-print(pd.__version__)
+
+# logger 的一些设置
+
+# 使用前最好assert pandas的版本，防止版本不同导致函数接口不同
+# 对于上一个新的系统而言，对行数和列数，列名称检查都是必要的
+try:
+    assert float(pd.__version__[:3]) >= 1.0
+except Exception as e:
+    logger.error(f"pd的版本为{pd.__version__},不符合版本")
+    raise e
 path = Path("../learn_torch/.data/train.csv")
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
 df = df.convert_dtypes()
@@ -61,7 +71,7 @@ print("-----------------------------------------")
 # 这些默认生成的都是series
 print(left.dtypes)
 print(type(left.dtypes))
-# 转换成类别的形式
+# accessors
 left['c'] = left["c"].astype("category").cat.codes
 print(left)
 # print(df1 == df2)
@@ -85,20 +95,21 @@ ku = right.kurt().to_frame("峰度")
 df_type = right.dtypes.to_frame("数据类型")
 nuniq = right.nunique().to_frame("数据值的个数")
 # 堆积柱状图
-# df = pd.DataFrame(
-#     {"x": [1, 2, 2, 0, 2],
-#      "y": [0, 1, 0, 1, 0]}
-# )
-# df.groupby(["x", "y"]).size().unstack().plot(kind='bar', stacked=True)
-# plt.show()
-# plt.close()
-# print(left.kurt())
+df = pd.DataFrame(
+    {"x": [1, 2, 2, 0, 2],
+     "y": [0, 1, 0, 1, 0]}
+)
+a: DataFrameGroupBy = df.groupby(["x", "y"])
+for i, v in a:
+    pass
+df.groupby(["x", "y"]).size().unstack().plot(kind='bar', stacked=True)
+plt.show()
+plt.close()
+print(left.kurt())
 df = pd.concat([sk, null_num, ku, df_type, nuniq], axis=1)
 print(df)
 #  数据清洗，缺失值，异常值，重复值，基本数据分析
 #  特征选择  woe 和 iv
-import numpy as np
-import pandas as pd
 
 np.random.seed(100)
 

@@ -92,3 +92,8 @@
 1. typora时序图，流程图
 1. onenote 的笔记同步功能
 1. graphviz(使用代码画图的好处是便于修改和版本控制)
+
+# python 项目管理
+1. 使用cookiecutter做项目结构管理
+1. 使用black进行项目管理
+1. 
