@@ -12,20 +12,19 @@ docker exec -it ubuntu bash
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 # 一些操作
 docker commit d2eb5b9b61f5 nsg_annoy:v1.0
-docker save ubuntu:latest > /tmp/annoy_nsg.tar
+docker save ubuntu:latest >/tmp/annoy_nsg.tar
 tar -zcvf nsg-annoy.tgz nsg_annoy.tar
 
 # 移除退出的docker
 docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
-docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=SeaBiscuit##^ -p 3306:3306 -v /usr/mysql/conf:/etc/mysql/conf.d  -v /usr/mysql/data:/var/lib/mysql  -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=SeaBiscuit##^ -p 3306:3306 -v /usr/mysql/conf:/etc/mysql/conf.d -v /usr/mysql/data:/var/lib/mysql -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
 docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/ricklamers/gridstudio:release
 docker run -it -p:4444:4444 retreatguru/headless-chromedriver
 # !!!!老版本的docker 运行nvidia
-docker run --runtime=nvidia -it -v /data:/data  -d tensorflow/tensorflow:1-1.15-gpu
-
+docker run --runtime=nvidia -it -v /data:/data -d tensorflow/tensorflow:1-1.15-gpu
 
 docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 -v /home/$USER/milvus/db:/var/lib/milvus/db -v /home/$USER/milvus/conf:/var/lib/milvus/conf -v /home/$USER/milvus/logs:/var/lib/milvus/logs -v /home/$USER/milvus/wal:/var/lib/milvus/wal milvusdb/milvus:0.10.5-gpu-d010621-4eda95
 #docker19后新功能
@@ -39,10 +38,9 @@ chmod 666 /var/run/docker.sock
 #解决办法
 yay -S nvidia-container-runtime
 
-
 sed -i '/^\[mysqld\]/a default-character-set=utf8mb4' /tmp/my.cnf.bak
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
-echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' > /etc/pacman.d/mirrorlist
+echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' >/etc/pacman.d/mirrorlist
 #git
 # git 生成ssh
 ls ~/.ssh
@@ -55,7 +53,7 @@ ssh-copy-id -i id_rsa.pub root@ip
 #git 删除不用分支
 git branch -a | grep -v master | xargs git branch -D
 #remove all  remotes
-git branch -a | grep -v master > file.log
+git branch -a | grep -v master >file.log
 #使用文件编辑器编辑 移除所有本地的远程分支
 git branch -r | grep -v master | xargs git branch -r -D
 # docker 打包镜像
@@ -116,7 +114,6 @@ nl .xsession-errors | sed -n "1~2p"
 
 awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 
-
 #关闭plank后面的阴影，
 # Window Manager Tweaks - Compositor - Show shadows under dock windows
 # 恢复默认xcfe panel
@@ -132,7 +129,7 @@ awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 # pip install pylint
 pyreverse --help
 pyreverse -ASmn -o png allennlp/data/
-pyreverse -o png allennlp/data/  --ignore=a.py,b.py
+pyreverse -o png allennlp/data/ --ignore=a.py,b.py
 
 #时间同步服务
 sudo systemctl restart systemd-timesyncd.service
@@ -153,8 +150,8 @@ ln -s 源文件 软链接
 # 使用命令时 最好先用man 等linux 常用的来看，后面再去百度，一定改掉这个习惯
 # 将上一个的输出变成下一个的输入 $ 符号  wc -l $(ls)
 # 递增序列
-cat -n file.txt > newfile.txt
-nl -n ln  garch.py > /tmp/garcH_test.py
+cat -n file.txt >newfile.txt
+nl -n ln garch.py >/tmp/garcH_test.py
 
 # 获取输出结果的第一个
 #utility 2>&1 | head -n 1
@@ -170,8 +167,8 @@ nl -n ln  garch.py > /tmp/garcH_test.py
 locate dot | grep -P .*?dot$
 cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5p')
 
-jupyter lab  --allow-root --ip="0.0.0.0" --no-browser > ~/jupyter.log 2>&1 &
-scp root@ip ./ && echo success > /tmp/scp.log 2>&1 &
+jupyter lab --allow-root --ip="0.0.0.0" --no-browser >~/jupyter.log 2>&1 &
+scp root@ip ./ && echo success >/tmp/scp.log 2>&1 &
 # 复制文件 时排除某些文件或者文件夹
 rsync -av --progress ./SimCSE-main /run/media/pang/KINGSTON/ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea
 
@@ -179,9 +176,9 @@ rsync -av --progress ./SimCSE-main /run/media/pang/KINGSTON/ --exclude venv --ex
 #|:---------------:|:--------:|:--------:|----------|
 #| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
-scp root@ip ./ 2>&1  >/dev/null  &
+scp root@ip ./ 2>&1 >/dev/null &
 #因为scp的输出不是标准输出 直接>是无效的
-sfdp -x -Goverlap=scale -Tpng packages.dot > packages.png
+sfdp -x -Goverlap=scale -Tpng packages.dot >packages.png
 
 kill -9 pid
 #彻底杀死一个进程
@@ -189,7 +186,6 @@ kill -STOP pid
 #暂停一个进程
 kill -CONT pid
 #重启一个进程
-
 
 #找出本文件夹下文件大于2000M的文件并删除
 find ./ -type f -size +2000M -exec rm {} \;
@@ -204,11 +200,8 @@ crontab -e
 tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
 
-
 lsof -i:8082 | awk '{print $2}' | grep -v PID | xargs pwdx
 cat /proc/pid
-
-
 
 # bottle_display
 #http://127.0.0.1:8003/visualize.html#mode=edit
@@ -217,7 +210,7 @@ cat /proc/pid
 tar -zcvf abc.tgz ./abc
 
 #pigz
-tar -cvf ./abc | pigz -p 8 > output.tgz && mv output.tgz /run/meida/pang/K...
+tar -cvf ./abc | pigz -p 8 >output.tgz && mv output.tgz /run/meida/pang/K...
 pigz -p 8 -d output.tgz
 
 ssh root@81.71.140.148
@@ -230,9 +223,7 @@ ssh root@81.71.140.148
 # ls /usr/lib/jvm/
 #从上面的结果中选择一个  sudo archlinux-java set java-12-jdk
 
-
 sudo npm i jsdom -g
-
 
 #linux 杀掉自动重启的进程
 #https://www.cnblogs.com/Rui6/p/13983713.html
@@ -262,7 +253,7 @@ export all_proxy="https://127.0.0.1:1089"
 #  机器学习和深度学习重点关注两个点: 数据+模型.数据是怎么处理的,模型的输入和输出是什么
 
 # 问题修复 - 使用 ventoy的 live cd模式
-sudo dmesg  | grep error
+sudo dmesg | grep error
 # 进入安全模式
 # 修复磁盘
 e2fsck -y /dev/sda1
@@ -273,7 +264,7 @@ e2fsck -y /dev/sda1
 dot -Tpng classes.dot -o classes.png && viewnior classes.png
 
 # 全局搜索替换
-sed -i "s/aaa/AAA/g" `grep -rl "aaa" ./ `
+sed -i "s/aaa/AAA/g" $(grep -rl "aaa" ./)
 
 # git 从另一个分支取文件和文件夹
 git checkout branch_name -- dirname

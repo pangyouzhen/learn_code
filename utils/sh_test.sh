@@ -2,7 +2,7 @@
 
 work_dir='/tmp/dir_test'
 # 注意这里是没有空格的
-if [[ ! -d ${work_dir} ]];then
+if [[ ! -d ${work_dir} ]]; then
   mkdir ${work_dir}
 else
   echo "file existed"
