@@ -5,4 +5,5 @@
       "args": ["--login", "-i"]
     }
   },
+  "python.formatting.provider": "black",
 }

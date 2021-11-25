@@ -1,3 +1,8 @@
+if [[ $(uname) == "MINGW"* ]]; then
+  alias python="winpty python"
+#  echo "git bash alias success"
+fi
+
 lg() {
 #  lazygit
     git pull origin "$(git branch --show-current)"
