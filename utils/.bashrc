@@ -1,3 +1,7 @@
+# https://github.com/rupa/z 启用z.sh 服务
+. ~/z.sh
+
+
 if [[ $(uname) == "MINGW"* ]]; then
   alias python="winpty python"
 #  echo "git bash alias success"
