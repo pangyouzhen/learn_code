@@ -94,6 +94,7 @@
 1. graphviz(使用代码画图的好处是便于修改和版本控制)
 
 # python 项目管理
-1. 使用cookiecutter做项目结构管理
+1. 微信公众号文章(https://mp.weixin.qq.com/s/qOCMBqrmpdrLgTJPdlTjjA)参考
 1. 使用black进行项目管理
-1. 
+1. 使用java bean的思想来直接替代python json和字典，具体Person(**json.loads(jsonstring)),生成需要vs paste json插件
+1. 使用bean的好处是json的层级结构后期，维护，python字典不容易维护

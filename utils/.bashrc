@@ -12,6 +12,8 @@ if [[ $(uname) == "MINGW"* ]]; then
   echo "conda success"
 fi
 
+alias docker="sudo docker"
+
 lg() {
   #  lazygit
   git pull origin "$(git branch --show-current)"
