@@ -4,7 +4,12 @@
 
 if [[ $(uname) == "MINGW"* ]]; then
   alias python="winpty python"
-#  echo "git bash alias success"
+#  echo "git bash alias --python-- success"
+fi
+
+if [[ $(uname) == "MINGW"* ]]; then
+  . /d/software/miniconda/etc/profile.d/conda.sh
+  echo "conda success"
 fi
 
 lg() {
