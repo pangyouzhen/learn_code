@@ -50,6 +50,7 @@
 # 浏览器插件
 
 1. infolite
+1. [proxy switchomega 自动代理设置](https://www.itfanr.cc/2019/09/04/autoproxy-by-shadowsocks-and-switchyomega/)
 
 # idea/pycharm 插件
 
@@ -92,6 +93,7 @@
 1. typora时序图，流程图
 1. onenote 的笔记同步功能
 1. graphviz(使用代码画图的好处是便于修改和版本控制)
+1. click 命令行工具
 
 # python 项目管理
 1. 微信公众号文章(https://mp.weixin.qq.com/s/qOCMBqrmpdrLgTJPdlTjjA)参考
