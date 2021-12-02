@@ -7,6 +7,7 @@ xmodmap -pke
 #docker 相关
 
 #ubuntu
+
 docker run -it -d ubuntu:latest --name ubuntu
 docker exec -it ubuntu bash
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
@@ -14,7 +15,8 @@ sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 docker commit d2eb5b9b61f5 nsg_annoy:v1.0
 docker save ubuntu:latest >/tmp/annoy_nsg.tar
 tar -zcvf nsg-annoy.tgz nsg_annoy.tar
-
+#  这里之所以用 tgz进行压缩，是因为tar只是归档，体积太大影响传输
+docker load -i /home/ubuntu/docker/ubuntu.tar
 # 移除退出的docker
 docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
 docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
@@ -25,8 +27,11 @@ docker run --name=gridstudio --rm=false -p 8080:8080 -p 4430:4430 docker.io/rick
 docker run -it -p:4444:4444 retreatguru/headless-chromedriver
 # !!!!老版本的docker 运行nvidia
 docker run --runtime=nvidia -it -v /data:/data -d tensorflow/tensorflow:1-1.15-gpu
-
+# -v /data:/data 为了挂载数据
 docker run -d --name milvus_gpu_0.10.5 --gpus all -p 19530:19530 -p 19121:19121 -v /home/$USER/milvus/db:/var/lib/milvus/db -v /home/$USER/milvus/conf:/var/lib/milvus/conf -v /home/$USER/milvus/logs:/var/lib/milvus/logs -v /home/$USER/milvus/wal:/var/lib/milvus/wal milvusdb/milvus:0.10.5-gpu-d010621-4eda95
+docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
+docker build -t stock:v0.1 .
+
 #docker19后新功能
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
@@ -56,8 +61,6 @@ git branch -a | grep -v master | xargs git branch -D
 git branch -a | grep -v master >file.log
 #使用文件编辑器编辑 移除所有本地的远程分支
 git branch -r | grep -v master | xargs git branch -r -D
-# docker 打包镜像
-# docker load 镜像
 # git 撤销命令
 
 # git checkout . 撤销所有修改
@@ -177,6 +180,8 @@ rsync -av --progress ./SimCSE-main /run/media/pang/KINGSTON/ --exclude venv --ex
 #| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
 scp root@ip ./ 2>&1 >/dev/null &
+# 不要使用scp，使用rsync，rsync -P 是可以断点续传的
+rsync -P --rsh='ssh -p 2200' root@81.71.140.148:/data/image2latex_test/image-to-latex/artifacts/model.pt ./
 #因为scp的输出不是标准输出 直接>是无效的
 sfdp -x -Goverlap=scale -Tpng packages.dot >packages.png
 
@@ -228,10 +233,7 @@ sudo npm i jsdom -g
 #linux 杀掉自动重启的进程
 #https://www.cnblogs.com/Rui6/p/13983713.html
 
-docker build -t stock:v0.1 .
 netstat -nltp | grep 8080
-
-docker run -it --network=host -v /path/to/your-project:/tmp/your-project node:8.9 /bin/bash -c 'cd /tmp/your-project && npm install nodejieba --save'
 
 # 设置 http 代理
 export http=http://127.0.0.1:1089

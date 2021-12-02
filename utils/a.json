@@ -1,0 +1,17 @@
+{
+    "name": "John",
+    "age": 30,
+    "car": null,
+    "children": [
+        {
+            "name": "Sally",
+            "age": 5,
+            "toy": "wood"
+        },
+        {
+            "name": "Mark",
+            "age": 15,
+            "toy": "iron"
+        }
+    ]
+}
