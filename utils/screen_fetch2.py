@@ -27,7 +27,7 @@ def ctrl_tab():
 # _ = [ceil((i / 49)) for i in all_]
 # print(_)
 file_type = 0
-all_ = [3]
+all_ = [1]
 for i in range(len(all_)):
     path = Path(f"./temp/{i}")
     path.mkdir(exist_ok=True)

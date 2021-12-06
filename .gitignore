@@ -24,3 +24,4 @@ data
 pd_ml/ld/*
 *temp
 *tmp
+venv

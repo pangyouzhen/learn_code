@@ -37,13 +37,13 @@ class PreProcess:
         if check_columns:
             if set(df.columns) != set(column_name):
                 logger.error("assert的名称和输入的不同，请检查")
-        if df.shape[0] >= 10 ** 7:
+        if df.shape[0] > 10 ** 7:
             logger.error(f"df的维度是{df.shape}数据的行数过大，请分块输入")
         if df.shape[1] == 0:
             logger.error("输入的空列，请检查")
         if df.index.duplicated is True:
             logger.error("输入的index有重复值")
-        logger.info("输入的df的维度的时{df.shape}")
+        logger.info(f"输入的df的维度的时{df.shape}")
 
     @staticmethod
     def convert_dtypes_na(df: pd.DataFrame) -> pd.DataFrame:
@@ -63,6 +63,20 @@ class PreProcess:
         self.df = self.convert_dtypes_na(df)
         return self.df
 
+
+# 大文件分块读取，最好先用linux  wc -l 检查多少行，
+reader = pd.read_csv('data/servicelogs', iterator=True)
+loop = True
+chunkSize = 1000000
+chunks = []
+while loop:
+    try:
+        chunk = reader.get_chunk(chunkSize)
+        chunks.append(chunk)
+    except StopIteration:
+        loop = False
+    print("Iteration is stopped.")
+df = pd.concat(chunks, ignore_index=True)
 
 path = Path("../learn_torch/.data/train.csv")
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])

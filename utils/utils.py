@@ -114,3 +114,11 @@ print(svmem.total)
 cpu_num: int = psutil.cpu_count()
 print(cpu_num)
 print(psutil.cpu_count(logical=False))
+
+
+import yaml
+
+with open("./a.yaml", "rb") as f:
+    t = yaml.safe_load(f)
+
+print(t)
