@@ -30,13 +30,21 @@ def check_pd_version():
 class PreProcess:
     # 进行dataframe的预处理，包括列名称的检查，df的类型转换
     @staticmethod
-    def check_df(df: pd.DataFrame,
+    def check_df(df: pd.DataFrame, strict_check_columns:bool = False,
                  check_columns: bool = False,
                  column_name: Optional[List[str]] = None,
                  ) -> None:
-        if check_columns:
+        # 检查列名是否OK
+        if strict_check_columns:
+            if df.columns != column_name:
+                logger.error("assert的名称和输入的不同，请检查")
+        if not strict_check_columns and check_columns:
             if set(df.columns) != set(column_name):
                 logger.error("assert的名称和输入的不同，请检查")
+        # 检查是是否为空dataframe
+        if df.empty:
+            logger.error("输入df的为空")
+            return 
         if df.shape[0] > 10 ** 7:
             logger.error(f"df的维度是{df.shape}数据的行数过大，请分块输入")
         if df.shape[1] == 0:

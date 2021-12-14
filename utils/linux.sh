@@ -212,6 +212,7 @@ cat /proc/pid
 #http://127.0.0.1:8003/visualize.html#mode=edit
 
 #压缩命令/
+# 文件传输一定注意要用，可以极大的减少时间
 tar -zcvf abc.tgz ./abc
 
 #pigz
