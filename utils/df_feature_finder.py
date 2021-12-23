@@ -57,14 +57,12 @@ class DataFrameFinder:
         logger.info(f"对{single_col}列进行计算")
         group_df: DataFrameGroupBy = self.df.groupby([self.label, single_col])
         unstack_df: pd.DataFrame = group_df.size().unstack()
-        idx_df: pd.Series = unstack_df.idxmax(axis=1)
-        idx_df: pd.DataFrame = idx_df.rename(f"最大值所在的{single_col}列").to_frame()
-        m_df: pd.Series = unstack_df.max(axis=1)
-        m_df: pd.DataFrame = m_df.rename("最大值").to_frame()
-        max_df = pd.concat([idx_df, m_df], axis=1)
-        # 占类别总数的百分比
-        max_df["占比"] = max_df["最大值"] / (self.df.shape[0])
-        logger.info('\n' + max_df.to_string().replace('\n', '\n\t'))
+        un_df: pd.Series = unstack_df.fillna(0).apply(sum, axis=1)
+        un_df: pd.DataFrame = un_df.rename('total_sum').to_frame()
+        new_df = unstack_df.agg(['idxmax', 'max'], axis=1)
+        final_df = pd.concat([un_df, new_df], axis=1)
+        final_df["percent"] = final_df["max"] / final_df["total_sum"]
+        logger.info('\n' + final_df.to_string().replace('\n', '\n\t'))
         unstack_df.plot(kind="bar", stacked=True)
         plt.show()
 
