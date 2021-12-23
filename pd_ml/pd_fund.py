@@ -130,6 +130,7 @@ df2: pd.DataFrame = left.loc[left["dt"] < dt, :]
 df3: pd.DataFrame = left.loc[left["dt"] < dt, ["a", "b"]]
 df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
+df5: pd.DataFrame = right.loc[right["c"].isin(["a","b"].squeeze()),:]
 df3: pd.DataFrame = df3[~df3.index.duplicated(keep="first")]
 # pandas 自动推断并转换类型
 for i in df.select_dtypes(include=np.number).columns:
