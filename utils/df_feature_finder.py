@@ -2,7 +2,6 @@ from pathlib import Path
 
 import arrow
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from loguru import logger
 from pandas.core.groupby import DataFrameGroupBy
@@ -42,7 +41,7 @@ class DataFrameFinder:
         label_value_counts: pd.Series = self.df[self.label].value_counts()
         logger.info(f"label的类别数有{label_value_counts.shape[0]}")
         if label_value_counts.shape[0] > 20 or (label_value_counts.shape[0] / self.df.shape[0] > 0.8):
-            logger.info(f"类别数过多,请检查------")
+            logger.info(f"----------类别数过多,请检查------")
 
     @run_time
     def run(self):
@@ -60,6 +59,7 @@ class DataFrameFinder:
         un_df: pd.Series = unstack_df.fillna(0).apply(sum, axis=1)
         un_df: pd.DataFrame = un_df.rename('total_sum').to_frame()
         new_df = unstack_df.agg(['idxmax', 'max'], axis=1)
+        # 某类别总共有total_sum数，其中idxmax的标签值最多，有max个，占比percent
         final_df = pd.concat([un_df, new_df], axis=1)
         final_df["percent"] = final_df["max"] / final_df["total_sum"]
         logger.info('\n' + final_df.to_string().replace('\n', '\n\t'))
@@ -74,8 +74,8 @@ if __name__ == '__main__':
     df_all = pd.DataFrame(
         {
             "stock_code": ["1", "1", "3"],
-            "date": ["2021/6/11", "2021/07/12", "2021/6/11"],
-            "value": [4, 1, np.NAN],
+            # "date": ["2021/6/11", "2021/07/12", "2021/6/11"],
+            # "value": [4, 1, np.NAN],
             "other": ["a", "a", "c"],
         }
     )
