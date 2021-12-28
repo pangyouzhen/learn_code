@@ -25,3 +25,5 @@ pd_ml/ld/*
 *temp
 *tmp
 venv
+*exe
+z.sh

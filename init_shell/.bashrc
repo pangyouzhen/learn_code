@@ -5,14 +5,27 @@
 if [[ $(uname) == "MINGW"* ]]; then
   alias python="winpty python"
 #  echo "git bash alias --python-- success"
+  # wsl 使用/mnt/d
+  # git bash 使用/d/ /c/
+  # mobaxterm 使用 /drivers/c
+  ln -s /d/ /mnt/d/
+  ln -s /c/ /mnt/c/
+  #
+  ln -s /drivers/c /mnt/c/
+  ln -s /drivers/c /mnt/d/
 fi
 
-if [[ $(uname) == "MINGW"* ]]; then
-  . /d/software/miniconda/etc/profile.d/conda.sh
-  echo "conda success"
-fi
+#if [[ $(uname) == "MINGW"* ]]; then
+#  . /d/software/miniconda/etc/profile.d/conda.sh
+#  echo "conda success"
+#fi
 
 alias docker="sudo docker"
+alias ll="ls -alh"
+#wget 断点续传
+alias wget="wget -c"
+#递归的创建目录
+alias mkdir="mkdir -pv"
 
 lg() {
   #  lazygit

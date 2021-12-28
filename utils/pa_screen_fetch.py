@@ -20,18 +20,18 @@ class Context:
 
 class Screen:
     def run(self, pages: List[int]) -> None:
-        self.init_dcloud()
+        self.__init_dcloud()
         pages = self.convert_pages(pages)
         for i in range(len(pages)):
             path = Path(f"./temp/{i}")
             path.mkdir(exist_ok=True)
             self.switch()
-            self.save(pages, i)
+            self.__save(pages, i)
 
     def switch(self):
         assert NotImplementedError
 
-    def save(self, pages, i) -> None:
+    def __save(self, pages, i) -> None:
         for j in range(pages[i]):
             img = pyautogui.screenshot()
             img.save(f'./temp/{i}/{j}.jpg')
@@ -42,7 +42,7 @@ class Screen:
     def convert_pages(self, pages: List[int]) -> List[int]:
         return pages
 
-    def init_dcloud(self):
+    def __init_dcloud(self):
         keyboard.press_and_release('left windows + 2')
         logger.info("open success")
         time.sleep(5)
