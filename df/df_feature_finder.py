@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from loguru import logger
 from pandas.core.groupby import DataFrameGroupBy
+import numpy as np
 
 path = Path(__file__).stem
 run_date = arrow.now().format(f"YYYY_MM_DD_HH_mm")
@@ -74,8 +75,8 @@ if __name__ == '__main__':
     df_all = pd.DataFrame(
         {
             "stock_code": ["1", "1", "3"],
-            # "date": ["2021/6/11", "2021/07/12", "2021/6/11"],
-            # "value": [4, 1, np.NAN],
+            "date": ["2021/6/11", "2021/07/12", "2021/6/11"],
+            "value": [4, 1, np.NAN],
             "other": ["a", "a", "c"],
         }
     )
