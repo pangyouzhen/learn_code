@@ -34,7 +34,7 @@ class AsyncDf:
         """
         df: 请求的df, 最后保存结果的 df
         df_request_name: 请求列的列名称 对应 curl -D 中需要格式化的字符串, 需要uuid的用户需要在df中自行构建
-        df_response： 保存在df的响应列的列名称
+        df_response: 保存在df的响应列的列名称
         sema: 协程数目
         **kwargs : aiohttp.ClientSession().request中的参数
         """

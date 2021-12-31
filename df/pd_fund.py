@@ -74,6 +74,7 @@ class PreProcess:
 
 # 大文件分块读取，最好先用linux  wc -l 检查多少行，
 reader = pd.read_csv('data/servicelogs', iterator=True)
+# read_csv
 loop = True
 chunkSize = 1000000
 chunks = []
