@@ -26,7 +26,7 @@ alias ll="ls -alh"
 alias wget="wget -c"
 #递归的创建目录
 alias mkdir="mkdir -pv"
-
+alias qv2ray="/home/pang/Downloads/Qv2ray-v2.7.0-linux-x64.AppImage >/dev/null 2>&1"
 lg() {
   #  lazygit
   git pull origin "$(git branch --show-current)"
