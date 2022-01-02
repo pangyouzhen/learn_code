@@ -275,3 +275,9 @@ sed -i "s/aaa/AAA/g" $(grep -rl "aaa" ./)
 git checkout branch_name -- dirname
 
 conda create -n env_name python=3.7
+ 
+# vim 不退出编辑的情况下执行命令
+:!cmd
+# vim 不退出的的情况下暂时返回shell
+:shell
+# 重新返回编辑器 ctrl+D
