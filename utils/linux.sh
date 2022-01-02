@@ -46,6 +46,8 @@ yay -S nvidia-container-runtime
 sed -i '/^\[mysqld\]/a default-character-set=utf8mb4' /tmp/my.cnf.bak
 sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 echo 'Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch' >/etc/pacman.d/mirrorlist
+
+cd /mnt/d/project && echo "success" && rsync -avz ./stock root@81.71.140.148:/tmp  --exclude venv --exclude __pycache__ --exclude .git --exclude .idea  --exclude log --exclude img --exclude raw_data
 #git
 # git 生成ssh
 ls ~/.ssh
