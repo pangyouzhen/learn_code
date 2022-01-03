@@ -66,3 +66,9 @@ ex() {
     echo "'$1' is not a valid file"
   fi
 }
+
+ port_path(){ 
+  lsof -i:$1 | awk '{print $2}' | grep -v PID | xargs pwdx
+ }
+
+ alias vv="virtualenv venv"
