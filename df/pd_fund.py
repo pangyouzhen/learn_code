@@ -30,7 +30,7 @@ def check_pd_version():
 class PreProcess:
     # 进行dataframe的预处理，包括列名称的检查，df的类型转换
     @staticmethod
-    def check_df(df: pd.DataFrame, strict_check_columns:bool = False,
+    def check_df(df: pd.DataFrame, strict_check_columns: bool = False,
                  check_columns: bool = False,
                  column_name: Optional[List[str]] = None,
                  ) -> None:
@@ -44,7 +44,7 @@ class PreProcess:
         # 检查是是否为空dataframe
         if df.empty:
             logger.error("输入df的为空")
-            return 
+            return
         if df.shape[0] > 10 ** 7:
             logger.error(f"df的维度是{df.shape}数据的行数过大，请分块输入")
         if df.shape[1] == 0:
@@ -131,7 +131,7 @@ df2: pd.DataFrame = left.loc[left["dt"] < dt, :]
 df3: pd.DataFrame = left.loc[left["dt"] < dt, ["a", "b"]]
 df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
-df5: pd.DataFrame = right.loc[right["c"].isin(["a","b"].squeeze()),:]
+df5: pd.DataFrame = right.loc[right["c"].isin(["a", "b"].squeeze()), :]
 df3: pd.DataFrame = df3[~df3.index.duplicated(keep="first")]
 # pandas 自动推断并转换类型
 for i in df.select_dtypes(include=np.number).columns:
@@ -184,10 +184,10 @@ np.random.seed(100)
 df = pd.DataFrame(
     {
         "grade": np.random.choice(list("ABCD"), size=(20)),
-        "pass": np.random.choice([0, 1], size=(20)),
+        "pass": np.random.choice([0, 1, 3, 5, np.NAN], size=(20)),
     }
 )
-
+# cross table 不会对np.NaN进行统计
 feature, target = "grade", "pass"
 df_woe_iv = (
     pd.crosstab(df[feature], df[target], normalize="columns")
@@ -219,3 +219,24 @@ df_all = df_all.convert_dtypes()
 print(df_all.dtypes)
 # 设置双重索引
 df_all = df_all.set_index(["date", "stock_code"])
+
+df2 = pd.DataFrame(
+    {
+        "date1": ["2021/1/6", "2022/03/04", "2023/04/05"],
+        "date2": ["2021/6/11", "2021/07/12", np.NAN],
+        "value": [4, 1, np.NAN],
+    }
+)
+df2["date1"] = pd.to_datetime(df2["date1"])
+df2["date2"] = pd.to_datetime(df2["date2"])
+df2["interval"] = df2["date2"] - df2["date1"]
+df2["time_lag"] = df2["interval"].dt.ceil("D").dt.days
+
+df3 = pd.DataFrame(
+    {
+        "num1": list(range(100)),
+        "num2": list(range(100, 200))
+    }
+)
+# 针对为NaN的也是ok的，NaN不会进行判定
+df3["num_bin"] = pd.cut(df3["num1"], bins=[float("-inf"), 10, 30, 60, float("inf")])

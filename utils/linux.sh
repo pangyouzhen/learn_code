@@ -117,6 +117,7 @@ sed -n "10,20!p" .xsession-errors
 # 每隔两行进行打印
 nl .xsession-errors | sed -n "1~2p"
 
+awk -F '\t' '$25!="NULL" {print $0}' a.txt
 awk '{print $1}' ./src/data/msr_paraphrase_train.txt | sort | uniq -c | sort -n
 
 #关闭plank后面的阴影，
@@ -281,3 +282,4 @@ conda create -n env_name python=3.7
 # vim 不退出的的情况下暂时返回shell
 :shell
 # 重新返回编辑器 ctrl+D
+tail -f  /var/log/cron 

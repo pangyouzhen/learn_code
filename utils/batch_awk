@@ -1,0 +1,7 @@
+#!/bin/bash
+for i in $(seq 15); do
+  awk -F '\t' -v var="$i" '$25!="NULL" {print $11","$25","var}' ./tmp.csv >$i.log
+done
+
+
+# awk 'BEGIN {FS="\t"}; {print $2,FS,$3,FS,$4 >> "output_file_"$5} input_files*.txt'
