@@ -187,10 +187,11 @@ df = pd.DataFrame(
         "pass": np.random.choice([0, 1, 3, 5, np.NAN], size=(20)),
     }
 )
-# cross table 不会对np.NaN进行统计
+# cross table 不会对np.NaN进行统计, cross 的含义是 交叉，是十字
 feature, target = "grade", "pass"
 df_woe_iv = (
     pd.crosstab(df[feature], df[target], normalize="columns")
+        #  这里的0，1 是target中的值的分类
         .assign(woe=lambda dfx: np.log(dfx[1] / dfx[0]))
         .assign(iv=lambda dfx: np.sum(dfx["woe"] * (dfx[1] - dfx[0])))
 )
