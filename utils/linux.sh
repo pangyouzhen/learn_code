@@ -283,3 +283,6 @@ conda create -n env_name python=3.7
 :shell
 # 重新返回编辑器 ctrl+D
 tail -f  /var/log/cron 
+
+# linux 进行采样
+shuf -n 10000 file
