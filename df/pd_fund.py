@@ -88,6 +88,7 @@ while loop:
 df = pd.concat(chunks, ignore_index=True)
 
 path = Path("../learn_torch/.data/train.csv")
+# 读取大数据文件最好使用不要用csv格式，可以使用pickle等格式，csv格式读取和存储比较慢
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
 df = df.convert_dtypes()
 #  pandas针对大数据进行处理 https://pandas.pydata.org/docs/user_guide/scale.html
@@ -230,6 +231,8 @@ df2 = pd.DataFrame(
 )
 df2["date1"] = pd.to_datetime(df2["date1"])
 df2["date2"] = pd.to_datetime(df2["date2"])
+# to_datetime和保存的命令类似，以后不如直接都用 astype
+df['time'] = df['time'].astype('datetime64[ns]')
 df2["interval"] = df2["date2"] - df2["date1"]
 df2["time_lag"] = df2["interval"].dt.ceil("D").dt.days
 
@@ -241,3 +244,5 @@ df3 = pd.DataFrame(
 )
 # 针对为NaN的也是ok的，NaN不会进行判定
 df3["num_bin"] = pd.cut(df3["num1"], bins=[float("-inf"), 10, 30, 60, float("inf")])
+# pandas的四种accessor  str, dt, cat, sparse
+# pandas的数据类型

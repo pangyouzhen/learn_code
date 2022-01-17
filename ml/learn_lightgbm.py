@@ -2,6 +2,7 @@ import lightgbm as lgb
 from sklearn.datasets import load_iris
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+import pandas as pd
 
 iris = load_iris()
 data = iris.data
@@ -18,13 +19,15 @@ params = {
     "task":"train",
     "boosting_type":"gbdt",
     "objective":"regression",
+    # "objective":"multiclass",
+    # "metric":"multi_logloss",
     "metric":"rmse",
     "num_leaves":31,
     "learning_rate":0.05,
     "feature_fraction":0.9,
     "bagging_fraction":0.8,
     "bagging_freq":5,
-    "verbose":0
+    "verbose":-1,
 }
 
 gbm = lgb.train(params,lgb_train,num_boost_round=100,valid_sets=lgb_eval,early_stopping_rounds=10)
@@ -33,3 +36,7 @@ gbm.save_model("model.txt")
 gbm = lgb.Booster(model_file="model.txt")
 y_pred = gbm.predict(X_test)
 print("RMSE:",mean_squared_error(y_test,y_pred)**0.5)
+
+
+lgb.plot_importance(gbm)
+pd.DataFrame({'feature':gbm.feature_name(),'importance':gbm.feature_importance()}).sort_values(by='importance',ascending=False)
