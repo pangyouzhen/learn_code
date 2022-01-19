@@ -1,16 +1,123 @@
-FROM ubuntu:latest
-COPY ./pip.conf /tmp/
-RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list \
-    && apt-get update \
-    && mkdir ~/.pip \
-    && cp /tmp/pip.conf ~/.pip/pip.conf
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python3 npm python3-pip git \
-    && echo "python3 install success" \
-    && npm i puppeteer -g \
-    && npm i readline -g \
-    && mkdir /data \
-    && mkdir /data/stock \
-    && cd /data/stock \
-    && pip3 install Pillow \
-    && git clone
-# docker build  -t simcse:0.3 /data/project/learn_code/docker
+FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
+COPY ./LightGBM.tgz /tmp
+#################################################################################################################
+#           Global
+#################################################################################################################
+# apt-get to skip any interactive post-install configuration steps with DEBIAN_FRONTEND=noninteractive and apt-get install -y
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+ARG DEBIAN_FRONTEND=noninteractive
+
+#################################################################################################################
+#           Global Path Setting
+#################################################################################################################
+
+ENV CUDA_HOME /usr/local/cuda
+ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${CUDA_HOME}/lib64
+ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/local/lib
+
+ENV OPENCL_LIBRARIES /usr/local/cuda/lib64
+ENV OPENCL_INCLUDE_DIR /usr/local/cuda/include
+
+#################################################################################################################
+#           TINI
+#################################################################################################################
+
+# Install tini
+ENV TINI_VERSION v0.14.0
+ADD https://github.com.cnpmjs.org/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+#################################################################################################################
+#           SYSTEM
+#################################################################################################################
+# update: downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their
+# dependencies. It will do this for all repositories and PPAs.
+
+RUN sed -i 's/archive.ubuntu.com/mirrors.tencentyun.com/g' /etc/apt/sources.list && \
+apt-get update && \
+apt-get install -y --no-install-recommends \
+build-essential \
+curl \
+bzip2 \
+ca-certificates \
+libglib2.0-0 \
+libxext6 \
+libsm6 \
+libxrender1 \
+git \
+vim \
+mercurial \
+subversion \
+libboost-dev \
+libboost-system-dev \
+libboost-filesystem-dev \
+gcc \
+g++ \
+cmake 
+
+# Add OpenCL ICD files for LightGBM
+RUN mkdir -p /etc/OpenCL/vendors && \
+    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
+#################################################################################################################
+#           CONDA
+#################################################################################################################
+
+ARG CONDA_DIR=/opt/conda
+# add to path
+ENV PATH $CONDA_DIR/bin:$PATH
+
+# Install miniconda
+RUN echo "export PATH=$CONDA_DIR/bin:"'$PATH' > /etc/profile.d/conda.sh && \
+    curl -sL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p $CONDA_DIR && \
+    rm ~/miniconda.sh
+
+RUN conda config --set always_yes yes --set changeps1 no && \
+    conda create -y -q -n py3 python=3.8 mkl numpy scipy scikit-learn jupyter notebook ipython pandas matplotlib
+RUN pip install --upgrade cmake -i https://pypi.tuna.tsinghua.edu.cn/simple
+#################################################################################################################
+#           LightGBM
+#################################################################################################################
+
+RUN cd /usr/local/src && mkdir lightgbm && cd lightgbm && \
+    tar -xvf /tmp/LightGBM.tgz -C /usr/local/src/lightgbm/ && \
+    cd LightGBM && mkdir build && cd build && \
+    cmake -DUSE_GPU=1 -DOpenCL_LIBRARY=/usr/local/cuda/lib64/libOpenCL.so -DOpenCL_INCLUDE_DIR=/usr/local/cuda/include/ .. && \
+    make OPENCL_HEADERS=/usr/local/cuda/targets/x86_64-linux/include LIBOPENCL=/usr/local/cuda/targets/x86_64-linux/lib
+
+ENV PATH /usr/local/src/lightgbm/LightGBM:${PATH}
+
+RUN /bin/bash -c "source activate py3 && cd /usr/local/src/lightgbm/LightGBM/python-package && python setup.py install --precompile && source deactivate"
+
+#################################################################################################################
+#           System CleanUp
+#################################################################################################################
+# apt-get autoremove: used to remove packages that were automatically installed to satisfy dependencies for some package and that are no more needed.
+# apt-get clean: removes the aptitude cache in /var/cache/apt/archives. You'd be amazed how much is in there! the only drawback is that the packages
+# have to be downloaded again if you reinstall them.
+
+RUN apt-get autoremove -y && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    conda clean -a -y
+
+#################################################################################################################
+#           JUPYTER
+#################################################################################################################
+
+# password: keras
+# password key: --NotebookApp.password='sha1:98b767162d34:8da1bc3c75a0f29145769edc977375a373407824'
+
+# Add a notebook profile.
+RUN mkdir -p -m 700 ~/.jupyter/ && \
+    echo "c.NotebookApp.ip = '*'" >> ~/.jupyter/jupyter_notebook_config.py
+
+VOLUME /home
+WORKDIR /home
+
+# IPython
+EXPOSE 8888
+
+ENTRYPOINT [ "/tini", "--" ]
+CMD /bin/bash -c "source activate py3 && jupyter notebook --allow-root --no-browser --NotebookApp.password='sha1:98b767162d34:8da1bc3c75a0f29145769edc977375a373407824' && source deactivate"

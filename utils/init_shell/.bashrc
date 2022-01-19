@@ -72,3 +72,6 @@ ex() {
  }
 
  alias vv="virtualenv venv"
+
+alias docker_remove_exit="docker ps -a | grep Exit | awk '{print \$1}' | xargs docker rm"
+alias docker_restart="sudo systemctl restart docker && sudo chmod 666 /var/run/docker.sock"

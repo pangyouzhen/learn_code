@@ -18,7 +18,6 @@ tar -zcvf nsg-annoy.tgz nsg_annoy.tar
 #  这里之所以用 tgz进行压缩，是因为tar只是归档，体积太大影响传输
 docker load -i /home/ubuntu/docker/ubuntu.tar
 # 移除退出的docker
-docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
 docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=SeaBiscuit##^ -p 3306:3306 -v /usr/mysql/conf:/etc/mysql/conf.d -v /usr/mysql/data:/var/lib/mysql -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -36,8 +35,6 @@ docker build -t stock:v0.1 .
 #1，就是docker不需要root权限来启动和运行了
 #Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
 #解决办法
-sudo systemctl restart docker
-chmod 666 /var/run/docker.sock
 #2，就是支持GPU的增强功能，我们在docker里面想读取nvidia显卡再也不需要额外的安装nvidia-docker了
 #docker: Error response from daemon: linux runtime spec devices: could not select device driver "" with capabilities: [[gpu]]
 #解决办法
