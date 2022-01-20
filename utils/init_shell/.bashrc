@@ -75,3 +75,4 @@ ex() {
 
 alias docker_remove_exit="docker ps -a | grep Exit | awk '{print \$1}' | xargs docker rm"
 alias docker_restart="sudo systemctl restart docker && sudo chmod 666 /var/run/docker.sock"
+alias docker_remove_none="docker images | grep none | awk '{print \$3}' | xargs docker rmi"
