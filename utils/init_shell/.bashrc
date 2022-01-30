@@ -20,15 +20,6 @@ fi
 #  echo "conda success"
 #fi
 
-alias docker="sudo docker"
-alias ll="ls -alh"
-#wget 断点续传
-alias wget="wget -c"
-#递归的创建目录
-alias mkdir="mkdir -pv"
-alias qv2ray="/home/pang/Downloads/Qv2ray-v2.7.0-linux-x64.AppImage >/dev/null 2>&1"
-alias rsync-stock="rsync -avz root@81.71.140.148:/data/project/stock ./ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea --exclude log"
-alias s148="ssh root@81.71.140.148"
 
 lg() {
   #  lazygit
@@ -71,8 +62,18 @@ ex() {
   lsof -i:$1 | awk '{print $2}' | grep -v PID | xargs pwdx
  }
 
- alias vv="virtualenv venv"
-
+alias vv="virtualenv venv"
 alias docker_remove_exit="docker ps -a | grep Exit | awk '{print \$1}' | xargs docker rm"
 alias docker_restart="sudo systemctl restart docker && sudo chmod 666 /var/run/docker.sock"
 alias docker_remove_none="docker images | grep none | awk '{print \$3}' | xargs docker rmi"
+alias docker_remove="docker ps -a | grep Exit | awk '{print \$1}' | xargs docker rm && docker images | grep none | awk '{print \$3}' | xargs docker rmi"
+alias ll="ls -alh"
+#wget 断点续传
+alias wget="wget -c"
+#递归的创建目录
+alias mkdir="mkdir -pv"
+alias qv2ray="/home/pang/Downloads/Qv2ray-v2.7.0-linux-x64.AppImage >/dev/null 2>&1"
+alias rsync-stock="rsync -avz root@81.71.140.148:/data/project/stock ./ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea --exclude log"
+alias s148="ssh root@81.71.140.148"
+alias python="python3"
+
