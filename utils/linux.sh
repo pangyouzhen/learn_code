@@ -286,3 +286,5 @@ shuf -n 10000 file
 # 1. vim 之所以用的不顺手的地方
     # 1. 和剪切板的交互，复制到剪切板和从剪切板复制过来
     # 1. 进行全局替换的时候，复制的词和的内部命令行的替换，再加上一个中文的输入法切换
+
+awk -F '\t' '$2=="male" {print >> "male.txt"} $3=="female" {print >> "female.txt"}' names.txt
