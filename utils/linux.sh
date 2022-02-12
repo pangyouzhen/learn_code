@@ -288,3 +288,5 @@ shuf -n 10000 file
     # 1. 进行全局替换的时候，复制的词和的内部命令行的替换，再加上一个中文的输入法切换
 
 awk -F '\t' '$2=="male" {print >> "male.txt"} $3=="female" {print >> "female.txt"}' names.txt
+# 不同桌面设置全局系统变量不同 xfce4
+# vim /etc/environment变量设置并注销或者重启
