@@ -5,14 +5,11 @@
 if [[ $(uname) == "MINGW"* ]]; then
   alias python="winpty python"
 #  echo "git bash alias --python-- success"
-  # wsl 使用/mnt/d
+  # wsl,mobaxterm 使用/mnt/d
   # git bash 使用/d/ /c/
-  # mobaxterm 使用 /drivers/c
   ln -s /d/ /mnt/d/
   ln -s /c/ /mnt/c/
   #
-  ln -s /drivers/c /mnt/c/
-  ln -s /drivers/c /mnt/d/
 fi
 
 #if [[ $(uname) == "MINGW"* ]]; then
