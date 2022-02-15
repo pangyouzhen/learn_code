@@ -290,3 +290,13 @@ shuf -n 10000 file
 awk -F '\t' '$2=="male" {print >> "male.txt"} $3=="female" {print >> "female.txt"}' names.txt
 # 不同桌面设置全局系统变量不同 xfce4
 # vim /etc/environment变量设置并注销或者重启
+
+
+# git 设置代理
+git config --global http.proxy socks5://127.0.0.1:1086
+git config --global https.proxy socks5://127.0.0.1:1086
+git config --global http.sslVerify false
+
+#取消代理
+git config --global --unset http.proxy 
+git config --global --unset https.proxy
