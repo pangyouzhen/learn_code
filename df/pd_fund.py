@@ -5,95 +5,19 @@ from typing import List, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from loguru import logger
 from pandas.core.groupby import DataFrameGroupBy
 
+# pd版本检查，文件夹创建等
+today = datetime.today().strftime("%Y-%m-%d")
+path = Path(f"{today}")
+if not path.exists():
+    path.mkdir()
 
-# 数据分析还是建议使用jupyter
-# 普通的数据分析和具体上系统是不一样的
-# 数据的一般流程
-
-# logger 的一些设置
-
-
-def check_pd_version():
-    # 检查pd版本, 防止因为版本不同导致接口不同
-    # 适合整体服务启动初始化时检查
-
-    try:
-        assert float(pd.__version__[:3]) >= 1.2
-    except Exception as e:
-        logger.error(f"pd的版本为{pd.__version__},不符合版本")
-        raise e
-
-
-class PreProcess:
-    # 进行dataframe的预处理，包括列名称的检查，df的类型转换
-    @staticmethod
-    def check_df(df: pd.DataFrame, strict_check_columns: bool = False,
-                 check_columns: bool = False,
-                 column_name: Optional[List[str]] = None,
-                 ) -> None:
-        # 检查列名是否OK
-        if strict_check_columns:
-            if df.columns != column_name:
-                logger.error("assert的名称和输入的不同，请检查")
-        if not strict_check_columns and check_columns:
-            if set(df.columns) != set(column_name):
-                logger.error("assert的名称和输入的不同，请检查")
-        # 检查是是否为空dataframe
-        if df.empty:
-            logger.error("输入df的为空")
-            return
-        if df.shape[0] > 10 ** 7:
-            logger.error(f"df的维度是{df.shape}数据的行数过大，请分块输入")
-        if df.shape[1] == 0:
-            logger.error("输入的空列，请检查")
-        if df.index.duplicated is True:
-            logger.error("输入的index有重复值")
-        logger.info(f"输入的df的维度的时{df.shape}")
-
-    @staticmethod
-    def convert_dtypes_na(df: pd.DataFrame) -> pd.DataFrame:
-        df = df.convert_dtypes()
-        contain_na_colums: List[str] = df.columns[df.isnull().any()].tolist()
-        for i in df.select_dtypes(include=np.number).columns:
-            if i not in contain_na_colums:
-                # Float64Dtype() 在1.2 版本中
-                if isinstance(df[i].dtypes, pd.Float64Dtype()):
-                    df[i] = df[i].astype(np.float32)
-                else:
-                    df[i] = df[i].astype(np.int32)
-        return df
-
-    def __call__(self, df: pd.DataFrame) -> pd.DataFrame:
-        self.check_df(df)
-        self.df = self.convert_dtypes_na(df)
-        return self.df
-
-
-# 大文件分块读取，最好先用linux  wc -l 检查多少行，
-reader = pd.read_csv('data/servicelogs', iterator=True)
-# read_csv
-loop = True
-chunkSize = 1000000
-chunks = []
-while loop:
-    try:
-        chunk = reader.get_chunk(chunkSize)
-        chunks.append(chunk)
-    except StopIteration:
-        loop = False
-    print("Iteration is stopped.")
-df = pd.concat(chunks, ignore_index=True)
-
-path = Path("../learn_torch/.data/train.csv")
 # 读取大数据文件最好使用不要用csv格式，可以使用pickle等格式，csv格式读取和存储比较慢
 df = pd.read_csv(path, sep="\t", names=["sent0", "sent1", "label"])
 df = df.convert_dtypes()
-#  pandas针对大数据进行处理 https://pandas.pydata.org/docs/user_guide/scale.html
-#  一般而讲float32保留8位小数，所以对于普通场景都可以将float64转化为float32降低内存
-# 数据review
 #  注意pandas和numpy的索引选择等不一致
 print(df[:5])
 # 数据index 检查,index的意义为加快查询速度
@@ -134,7 +58,10 @@ df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
 df5: pd.DataFrame = right.loc[right["c"].isin(["a", "b"].squeeze()), :]
 df3: pd.DataFrame = df3[~df3.index.duplicated(keep="first")]
+# pandas 重新赋值
+right.loc[right["dt"] < dt, "y"] = 10
 # pandas 自动推断并转换类型
+
 for i in df.select_dtypes(include=np.number).columns:
     print(i)
 for i in df.select_dtypes(include=np.int64).columns:
@@ -244,5 +171,3 @@ df3 = pd.DataFrame(
 )
 # 针对为NaN的也是ok的，NaN不会进行判定
 df3["num_bin"] = pd.cut(df3["num1"], bins=[float("-inf"), 10, 30, 60, float("inf")])
-# pandas的四种accessor  str, dt, cat, sparse
-# pandas的数据类型

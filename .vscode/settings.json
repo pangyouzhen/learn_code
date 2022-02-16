@@ -1,9 +1,0 @@
-{
-  "terminal.integrated.profiles.windows": {
-    "git bash": {
-      "path": "D:\\software\\git\\Git\\bin\\bash.exe",
-      "args": ["--login", "-i"]
-    }
-  },
-  "python.formatting.provider": "black",
-}

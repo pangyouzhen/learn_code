@@ -8,16 +8,36 @@ from sklearn.datasets import load_iris
 from sklearn.metrics import f1_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 
+print(f"当前使用的pandas版本是{pd.__version__}")
 # 增加日期路径，方便保存多个模型结果
 today = datetime.today().strftime("%Y%m%d")
 path = Path(f"./{today}")
 if not path.exists():
     path.mkdir()
 
+# 读取数据
+time_columns = [""]
+df = pd.read_csv("./not.csv",parse_dates=time_columns)
+print(df[:5])
+# 保存成pkl方便下次读取
+# df.to_pickle("./not.pkl")
+# df = pd.read_pickle("./not.pkl")
 
-iris = load_iris()
-data = iris.data
-target = iris.target
+# 删除缺失值较多的列
+null_num = df.isnull().sum()
+a = df.columns[null_num > len(df) * 0.3]
+print("如下的列缺失值太多，删除")
+df.drop(columns=a,inplace=True)
+
+
+## 删除只有一个值的特征
+
+
+remove_columns = ["target"]
+string_columns = [""]
+remove_columns.extend(string_columns)
+target = df["target"]
+data = df[df[df.columns.difference(remove_columns)]]
 
 X_train, X_test, y_train, y_test = train_test_split(
     data, target, test_size=0.2, random_state=0
