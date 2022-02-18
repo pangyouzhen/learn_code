@@ -60,6 +60,8 @@ git branch -a | grep -v master | xargs git branch -D
 git branch -a | grep -v master >file.log
 #使用文件编辑器编辑 移除所有本地的远程分支
 git branch -r | grep -v master | xargs git branch -r -D
+# xargs 的作用是解决参数过多的问题 其实上述命令可以写成, 但是可能生成的文件太多 -D 报错
+git branch -r -D $(git branch -r | grep -v master)
 # git 撤销命令
 
 # git checkout . 撤销所有修改
@@ -217,6 +219,7 @@ tar -zcvf abc.tgz ./abc
 
 #pigz
 tar -cvf - ./abc | pigz -p 8 >output.tgz && mv output.tgz /run/meida/pang/K...
+# 这里的-cvf 之后的-应该类似于临时文件一类的，正常的 tar -cvf a.tar ./a, 个人猜测，未验证 
 pigz -p 8 -d output.tgz
 
 ssh root@81.71.140.148
