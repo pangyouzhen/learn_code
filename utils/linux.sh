@@ -162,7 +162,8 @@ nl -n ln garch.py >/tmp/garcH_test.py
 #utility 2>&1 | head -n 1
 
 # /dev/null 是空设备，输入的所有东西都将被丢弃
-
+#  leetcode 点击下一页
+# document.getElementsByClassName("reactable-next-page")[0].click()
 # linux
 # !!  上一个命令
 # ！$ 上一个命令的参数
@@ -218,7 +219,7 @@ cat /proc/pid
 tar -zcvf abc.tgz ./abc
 
 #pigz
-tar -cvf - ./abc | pigz -p 8 >output.tgz && mv output.tgz /run/meida/pang/K...
+tar -cvf - ./abc | pigz >output.tgz && mv output.tgz /run/meida/pang/K...
 # 这里的-cvf 之后的-应该类似于临时文件一类的，正常的 tar -cvf a.tar ./a, 个人猜测，未验证 
 pigz -p 8 -d output.tgz
 
