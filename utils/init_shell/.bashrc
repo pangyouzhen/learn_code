@@ -69,7 +69,6 @@ alias ll="ls -alh"
 alias wget="wget -c"
 #递归的创建目录
 alias mkdir="mkdir -pv"
-alias qv2ray="/home/pang/Downloads/Qv2ray-v2.7.0-linux-x64.AppImage >/dev/null 2>&1"
 alias rsync-stock="rsync -avz root@81.71.140.148:/data/project/stock ./ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea --exclude log"
 alias s148="ssh root@81.71.140.148"
 alias python="python3"

@@ -163,7 +163,9 @@ nl -n ln garch.py >/tmp/garcH_test.py
 
 # /dev/null 是空设备，输入的所有东西都将被丢弃
 #  leetcode 点击下一页
+# for (var i=0;i<44;i++){
 # document.getElementsByClassName("reactable-next-page")[0].click()
+# }
 # linux
 # !!  上一个命令
 # ！$ 上一个命令的参数
@@ -304,3 +306,7 @@ git config --global http.sslVerify false
 #取消代理
 git config --global --unset http.proxy 
 git config --global --unset https.proxy
+
+# manjaro 切换镜像分支 stable, testing or unstable. 
+sudo pacman-mirrors --api --set-branch {branch}
+sudo pacman-mirrors --fasttrack 5 && sudo pacman -Syyu
