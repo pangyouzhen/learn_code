@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 from torch.nn import TransformerEncoderLayer
 import torch.nn.functional as F
+from torch.nn.init import xavier_uniform_
 
 
-# todo
 class TrmEncoder(nn.Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1):
         super().__init__()
@@ -32,11 +32,13 @@ class TrmEncoder(nn.Module):
 class MA(nn.Module):
     def __init__(self, embed_dim, nhead):
         super().__init__()
-        self.qkv_para = nn.Parameter(torch.empty(3 * embed_dim, embed_dim))
-        self.bias = nn.Parameter(torch.empty(3 * embed_dim))
+        self.qkv_para = xavier_uniform_(nn.Parameter(torch.empty(3 * embed_dim, embed_dim)))
+        # todo
+        # 这里为什么全部置为0,才不会发生梯度消失的问题
+        self.bias = nn.Parameter(torch.zeros(3 * embed_dim))
         self.nhead = nhead
         self.head_dim = embed_dim // nhead
-        self.out_proj_weight = nn.Parameter(torch.empty(embed_dim, embed_dim))
+        self.out_proj_weight = xavier_uniform_(nn.Parameter(torch.empty(embed_dim, embed_dim)))
 
     def forward(self, src: torch.Tensor):
         # self-attention
@@ -53,6 +55,7 @@ class MA(nn.Module):
         attn_output = attn_output_weights @ v
         attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn_output = F.linear(attn_output, self.out_proj_weight)
+        # todo
         attn_output_weights = attn_output_weights.view(bsz, self.nhead, tgt_len, src_len)
         return attn_output, attn_output_weights
 
