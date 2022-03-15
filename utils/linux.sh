@@ -310,3 +310,12 @@ git config --global --unset https.proxy
 # manjaro 切换镜像分支 stable, testing or unstable. 
 sudo pacman-mirrors --api --set-branch {branch}
 sudo pacman-mirrors --fasttrack 5 && sudo pacman -Syyu
+
+# ubuntu下自动安装雅黑字体脚本
+wget -O get-fonts.sh.zip http://files.cnblogs.com/DengYangjun/get-fonts.sh.zip
+unzip -o get-fonts.sh.zip 1>/dev/null
+chmod a+x get-fonts.sh
+./get-fonts.sh
+
+# 将文件夹的下的所有todo替换成TODO
+grep -irlZ todo ./* | xargs -0 sed -i 's/todo/TODO/gI'

@@ -43,9 +43,9 @@ class MA(nn.Module):
     def forward(self, src: torch.Tensor):
         # self-attention
         q, k, v = F.linear(src, self.qkv_para, self.bias).chunk(3, dim=-1)
-        tgt_len, bsz, embed_dim = src.size()
+        bsz, seq_len, embed_dim = src.size()
         src_len = k.size(1)
-        q = q.contiguous().view(tgt_len, bsz * self.nhead, self.head_dim).transpose(0, 1)
+        q = q.contiguous().view(seq_len, bsz * self.nhead, self.head_dim).transpose(0, 1)
         k = k.contiguous().view(-1, bsz * self.nhead, self.head_dim).transpose(0, 1)
         v = v.contiguous().view(-1, bsz * self.nhead, self.head_dim).transpose(0, 1)
         attn_output_weights = q @ k.transpose(1, 2)
@@ -53,10 +53,15 @@ class MA(nn.Module):
             attn_output_weights, dim=-1)
         attn_output_weights = F.dropout(attn_output_weights, p=0.1)
         attn_output = attn_output_weights @ v
-        attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
+        attn_output = attn_output.transpose(0, 1).contiguous().view(seq_len, bsz, embed_dim)
         attn_output = F.linear(attn_output, self.out_proj_weight)
+        print(f"{attn_output.shape = }",f"{attn_output_weights.shape = }")
         # todo
-        attn_output_weights = attn_output_weights.view(bsz, self.nhead, tgt_len, src_len)
+        # 现在结果
+        # 10,32,512 -- 80,32,32 
+        # 期待维度
+        # 256,10,64---- 256,10,10
+        attn_output_weights = attn_output_weights.view(bsz, self.nhead, seq_len, src_len)
         return attn_output, attn_output_weights
 
 
