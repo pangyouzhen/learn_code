@@ -3,8 +3,10 @@ import torch.nn as nn
 from torch.nn import TransformerEncoderLayer
 import torch.nn.functional as F
 from torch.nn.init import xavier_uniform_
+from torch.nn.modules.activation import MultiheadAttention
 
 
+# TODO
 class TrmEncoder(nn.Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1):
         super().__init__()
@@ -33,7 +35,7 @@ class MA(nn.Module):
     def __init__(self, embed_dim, nhead):
         super().__init__()
         self.qkv_para = xavier_uniform_(nn.Parameter(torch.empty(3 * embed_dim, embed_dim)))
-        # todo
+        # TODO
         # 这里为什么全部置为0,才不会发生梯度消失的问题
         self.bias = nn.Parameter(torch.zeros(3 * embed_dim))
         self.nhead = nhead
@@ -55,17 +57,18 @@ class MA(nn.Module):
         attn_output = attn_output_weights @ v
         attn_output = attn_output.transpose(0, 1).contiguous().view(seq_len, bsz, embed_dim)
         attn_output = F.linear(attn_output, self.out_proj_weight)
-        print(f"{attn_output.shape = }",f"{attn_output_weights.shape = }")
-        # todo
-        # 现在结果
-        # 10,32,512 -- 80,32,32 
-        # 期待维度
-        # 256,10,64---- 256,10,10
+        # print(f"{attn_output.shape = }",f"{attn_output_weights.shape = }")
         attn_output_weights = attn_output_weights.view(bsz, self.nhead, seq_len, src_len)
         return attn_output, attn_output_weights
 
 
 if __name__ == '__main__':
-    trm_encoder = TrmEncoder(d_model=512, nhead=8)
+    # trm_encoder = TrmEncoder(d_model=512, nhead=8)
+    ma = MA(512,8)
+    bulitin_multiha = MultiheadAttention(512,8)
     src = torch.rand(10, 32, 512)
-    print(trm_encoder(src))
+    print("raw_shape",src.shape)
+    ma_res = ma(src,)
+    print("not built-in----",ma_res[0].shape,ma_res[1].shape)
+    multiha_res = bulitin_multiha(src,src,src)
+    print("builtin shape+++++",multiha_res[0].shape,multiha_res[1].shape)
