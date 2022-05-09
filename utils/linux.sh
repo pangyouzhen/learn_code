@@ -323,3 +323,5 @@ find /mnt/c/Users/pang/Downloads/ -type f -newermt 2022-03-21 -exec mv {} /mnt/d
 
 #  将windows文件格式转为linux
 # vim 然后设置 set fileformat=unix
+
+grep -rni fun ./* 
