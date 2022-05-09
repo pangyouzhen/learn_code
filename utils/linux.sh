@@ -218,12 +218,9 @@ cat /proc/pid
 
 #压缩命令/
 # 文件传输一定注意要用，可以极大的减少时间
-tar -zcvf abc.tgz ./abc
+# 使用caf 自动推断格式
+tar -caf abc.tgz ./abc
 
-#pigz
-tar -cvf - ./abc | pigz >output.tgz && mv output.tgz /run/meida/pang/K...
-# 这里的-cvf 之后的-应该类似于临时文件一类的，正常的 tar -cvf a.tar ./a, 个人猜测，未验证 
-pigz -p 8 -d output.tgz
 
 ssh root@81.71.140.148
 # linux常见
@@ -288,7 +285,8 @@ conda create -n env_name python=3.7
 tail -f  /var/log/cron 
 
 # linux 进行采样
-shuf -n 10000 file
+# 保留列名+随机采样数据
+head -n 1 file > new_file && shuf -n10000 file >> new_file
 # 1. vim 之所以用的不顺手的地方
     # 1. 和剪切板的交互，复制到剪切板和从剪切板复制过来
     # 1. 进行全局替换的时候，复制的词和的内部命令行的替换，再加上一个中文的输入法切换
@@ -322,3 +320,6 @@ grep -irlZ todo ./* | xargs -0 sed -i 's/todo/TODO/gI'
 
 # 找到今天的文件并移动
 find /mnt/c/Users/pang/Downloads/ -type f -newermt 2022-03-21 -exec mv {} /mnt/d/project/tianchi/model/  \;
+
+#  将windows文件格式转为linux
+# vim 然后设置 set fileformat=unix
