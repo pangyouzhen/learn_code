@@ -177,16 +177,16 @@ cd $(locate xfce4-keyboard-shortcuts.xml | head -n 5 | xargs dirname | sed -n '5
 
 jupyter lab --allow-root --ip="0.0.0.0" --no-browser >~/jupyter.log 2>&1 &
 scp root@ip ./ && echo success >/tmp/scp.log 2>&1 &
-# 复制文件 时排除某些文件或者文件夹
-rsync -avz --progress ./SimCSE-main /run/media/pang/KINGSTON/ --exclude venv --exclude __pycache__ --exclude .git --exclude .idea
+# 复制文件 时排除虚拟环境路径和以.开头的临时文件
+#  rsync -avzP 要传输的目录 目标路径
+# 不要使用scp，使用rsync，rsync -P 是可以断点续传的
+rsync -avzP ./SimCSE-main /run/media/pang/KINGSTON/ --exclude ./SimCSE-main/venv --exclude ./SimCSE-main/.*
 
 #|       命令      | 标准输出 | 错误输出 | 应用场景 |
 #|:---------------:|:--------:|:--------:|----------|
 #| >/dev/null 2>&1 | 丢弃     | 丢弃     |程序内有log的|
 #| 2>&1 >/dev/null | 丢弃     | 屏幕     |          |
 scp root@ip ./ 2>&1 >/dev/null &
-# 不要使用scp，使用rsync，rsync -P 是可以断点续传的
-rsync -P --rsh='ssh -p 2200' root@81.71.140.148:/data/image2latex_test/image-to-latex/artifacts/model.pt ./
 #因为scp的输出不是标准输出 直接>是无效的
 sfdp -x -Goverlap=scale -Tpng packages.dot >packages.png
 
@@ -209,7 +209,8 @@ crontab -e
 #查看crontab 执行情况
 tail -100f /var/log/cron
 #00 18 * * * /usr/bin/python3 /data/project/stock/main.py
-
+# 每隔十分钟执行一次
+#*/10 * * * * a.sh 
 lsof -i:8082 | awk '{print $2}' | grep -v PID | xargs pwdx
 cat /proc/pid
 
@@ -272,6 +273,8 @@ dot -Tpng classes.dot -o classes.png && viewnior classes.png
 # 全局搜索替换
 sed -i "s/aaa/AAA/g" $(grep -rl "aaa" ./)
 
+sed -i "s/aaa/AAA/g" ./*
+
 # git 从另一个分支取文件和文件夹
 git checkout branch_name -- dirname
 
@@ -282,7 +285,6 @@ conda create -n env_name python=3.7
 # vim 不退出的的情况下暂时返回shell
 :shell
 # 重新返回编辑器 ctrl+D
-tail -f  /var/log/cron 
 
 # linux 进行采样
 # 保留列名+随机采样数据
@@ -325,3 +327,12 @@ find /mnt/c/Users/pang/Downloads/ -type f -newermt 2022-03-21 -exec mv {} /mnt/d
 # vim 然后设置 set fileformat=unix
 
 grep -rni fun ./* 
+# linux 今天
+date +%Y-%m-%d 
+date -d today +%F
+# linux 拼接字符串 将变量放在单引号之中'$(date +%F)',外面再加上单引号
+
+# tar 排除某些文件: 注意这里exclude和 打包的文件要不都用 绝对路径要不都用相对路径
+tar -caf file.tgz ./file --exclude=./file/save 
+# python虚拟环境没生效
+# 查看虚拟环境的启动路径,大概率是因为目录重命名使得虚拟环境启动路径失效
