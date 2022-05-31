@@ -1,0 +1,44 @@
+# FROM nvidia/cuda:10.1-devel-ubuntu18.04
+FROM ubuntu:18.04
+COPY pip.conf /tmp/pip.conf
+COPY requirements.txt /tmp/
+# RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+RUN sed -i 's/archive.ubuntu.com/mirrors.cloud.tencent.com/g' /etc/apt/sources.list && apt-get update && \
+apt install vim -y && \
+apt install python3.6 -y && \
+apt install python3-pip -y 
+
+RUN mkdir ~/.pip && mv /tmp/pip.conf ~/.pip/ 
+# COPY torch-1.7.0+cu101-cp36-cp36m-linux_x86_64.whl /tmp/
+# RUN pip3 install /tmp/torch-1.7.0+cu101-cp36-cp36m-linux_x86_64.whl
+COPY torch-1.7.0-cp36-cp36m-linux_x86_64.whl /tmp/
+RUN pip3 install /tmp/torch-1.7.0-cp36-cp36m-linux_x86_64.whl
+RUN pip3 install cython
+RUN pip3 install --upgrade pip
+COPY sentencepiece-0.1.96-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl /tmp/
+RUN pip3 install /tmp/sentencepiece-0.1.96-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+RUN pip3 install -r /tmp/requirements.txt
+
+RUN apt-get autoremove -y && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm /tmp/*
+
+RUN mkdir -p -m 700 ~/.jupyter/ && \
+    echo "c.NotebookApp.ip = '*'" >> ~/.jupyter/jupyter_notebook_config.py
+
+VOLUME /home
+WORKDIR /home
+
+# IPython
+EXPOSE 8811
+RUN mkdir /data
+CMD /bin/bash -c "cd /data && jupyter-lab  --allow-root --no-browser --port=8811 --NotebookApp.token='' --NotebookApp.password=''"
+# docker run -it -p 8811:8811 -v /data/project/compete/esci-code:/data -d esci:0.1
+# tar -cf - $DIR | pigz > $HOME/repo_archive_$(date +"%Y%m%d").tar.gz
+# pigz -dc repo_archive_$(date +"%Y%m%d").tar.gz | tar -x 
+
+# docker save <image>:<tag> | pigz > <image>.tar.gz
+# docker save <image>:<tag> | zstd > <image>.tar.zst
+
+# pigz -dc <image>.tar.gz | docker load
+# zstd -dc <image>.tar.zst | docker load
