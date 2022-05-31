@@ -8,14 +8,6 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceRoot}/dl/learn_torch/base/trm.py",
-            "console": "integratedTerminal",
-            "justMyCode": false
-        },
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false
