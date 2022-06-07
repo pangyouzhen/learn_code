@@ -199,6 +199,8 @@ kill -CONT pid
 
 #找出本文件夹下文件大于2000M的文件并删除
 find ./ -type f -size +2000M -exec rm {} \;
+# xargs 也可以用{}
+ls Miniconda3-* | xargs -i scp {} root@81.71.140.148:/tmp/
 #按照文件大小排序
 ls -Slh
 
@@ -336,3 +338,7 @@ date -d today +%F
 tar -caf file.tgz ./file --exclude=./file/save 
 # python虚拟环境没生效
 # 查看虚拟环境的启动路径,大概率是因为目录重命名使得虚拟环境启动路径失效
+# windows 使用bash的几种方法
+# 1. wsl
+# 2. cygwin-mobaxterm: apt-get install coreutils,findutils,cron
+# 3. mingw-git_bash: 
