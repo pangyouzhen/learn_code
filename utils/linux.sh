@@ -283,7 +283,7 @@ git checkout branch_name -- dirname
 conda create -n env_name python=3.7
  
 # vim 不退出编辑的情况下执行命令
-:!cmd
+:! ls /data/
 # vim 不退出的的情况下暂时返回shell
 :shell
 # 重新返回编辑器 ctrl+D
@@ -342,3 +342,8 @@ tar -caf file.tgz ./file --exclude=./file/save
 # 1. wsl
 # 2. cygwin-mobaxterm: apt-get install coreutils,findutils,cron
 # 3. mingw-git_bash: 
+
+
+# 1. dns: domain name server。linux解析域名 nslookup
+# 1. 域名比如www.baidu.com 和 ip 是一一对应的
+# 1. 常见域名http的端口是80，https是443

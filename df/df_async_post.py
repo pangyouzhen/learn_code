@@ -109,16 +109,31 @@ class AsyncDf:
 
 
 if __name__ == '__main__':
-    rand_num = np.random.randint(500, size=(10000, 3))
-    df = pd.DataFrame(rand_num)
-    df.columns = ["user1", "user2", "user3"]
-    df_request_name = ["user1", "user2"]
+    # rand_num = np.random.randint(500, size=(10000, 3))
+    # df = pd.DataFrame(rand_num)
+    # df.columns = ["user1", "user2", "user3"]
+    # df_request_name = ["user1", "user2"]
+    df = pd.read_csv("")
+    df = df.drop_duplicates("query")
+    logger.info(f'{df.len = }')
     curl_cmd = """
-    curl -L -X POST 'http://127.0.0.1:8082/reader' \
-    -H 'Content-Type: application/json' \
-    --data-raw '{"username":"%s","age":"%s"}'
+    curl -L -X POST 'https://fanyi.baidu.com/langdetect' \
+    -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0' \
+    -H 'Accept: */*' \
+    -H 'Accept-Language: en-US,en;q=0.5' \
+    -H 'Accept-Encoding: gzip, deflate, br' \
+    -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
+    -H 'X-Requested-With: XMLHttpRequest' \
+    -H 'Origin: https://fanyi.baidu.com' \
+    -H 'Connection: keep-alive' \
+    -H 'Referer: https://fanyi.baidu.com/' \
+    -H 'Sec-Fetch-Dest: empty' \
+    -H 'Sec-Fetch-Mode: cors' \
+    -H 'Sec-Fetch-Site: same-origin' \
+    -H 'Cookie: BAIDUID=5205CCF1BE28D5ECBFA955B10D527899:FG=1' \
+    --data-raw 'query=%s'
     """
     #
-    async_df = AsyncDf.from_curl(df, curl_cmd, "response", df_request_name=["user1", "user2"], sema=100)
+    async_df = AsyncDf.from_curl(df, curl_cmd, "baidu_langs", df_request_name=["query"], sema=20)
     df = async_df()
-    print(df[:5])
+    df.to_csv("baidu_lang.csv",index=False)
