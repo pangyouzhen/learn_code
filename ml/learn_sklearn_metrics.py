@@ -8,6 +8,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
+from sklearn.metrics import ndcg_score
 
 df = pd.read_excel("./data/test.xlsx", encoding="utf-8")
 # 对列名进行重命名

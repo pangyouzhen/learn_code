@@ -14,11 +14,19 @@ sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 # 一些操作
 docker commit d2eb5b9b61f5 nsg_annoy:v1.0
 docker save ubuntu:latest >/tmp/annoy_nsg.tar
-tar -zcvf nsg-annoy.tgz nsg_annoy.tar
 #  这里之所以用 tgz进行压缩，是因为tar只是归档，体积太大影响传输
 docker load -i /home/ubuntu/docker/ubuntu.tar
 # 移除退出的docker
-docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.3.1
+
+
+# es 使用命令
+docker run -d --name es01 -p 9200:9200 -p 9300:9300 -e ES_JAVA_OPTS="-Xms512m -Xmx512m" -e "discovery.type=single-node" elasticsearch:8.2.3
+# 这样启动是没有密码的
+docker exec -it es01 bash
+/usr/share/elasticsearch/bin/elasticsearch-reset-password -a -u elastic
+# 为elastic自动创建密码，这个会在命令行进行打印
+
+
 docker run -d -p 9200:9200 -p 5601:5601 nshou/elasticsearch-kibana
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=SeaBiscuit##^ -p 3306:3306 -v /usr/mysql/conf:/etc/mysql/conf.d -v /usr/mysql/data:/var/lib/mysql -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 docker run -it -p 9000:9000 -v /data/faiss:/index docker.io/daangn/faiss-server:latest --help
@@ -136,6 +144,8 @@ pyreverse --help
 pyreverse -ASmn -o png allennlp/data/
 pyreverse -o png allennlp/data/ --ignore=a.py,b.py
 
+
+pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.7.0+cu101.html
 #时间同步服务
 sudo systemctl restart systemd-timesyncd.service
 # 将当前时间写入硬件时间
@@ -151,7 +161,6 @@ unzip -n geekzw-funNLP-master.zip -d ./funNlp
 #删除软链接
 rm 软链接
 # 注意这里不能加 /加上就成了删除源文件了
-ln -s 源文件 软链接
 # 使用命令时 最好先用man 等linux 常用的来看，后面再去百度，一定改掉这个习惯
 # 将上一个的输出变成下一个的输入 $ 符号  wc -l $(ls)
 # 递增序列

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.nn.modules import TransformerDecoderLayer
 
 encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)
 src = torch.rand(10, 32, 512)

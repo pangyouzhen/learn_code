@@ -58,6 +58,7 @@ df4: pd.DataFrame = left.loc[(left["dt"] < dt) & (left["b"] < 4), ["a", "b"]]
 df5: pd.Series = right.loc[right["dt"] < dt, "y"]
 df5: pd.DataFrame = right.loc[right["c"].isin(["a", "b"].squeeze()), :]
 df3: pd.DataFrame = df3[~df3.index.duplicated(keep="first")]
+df[col].cat.ordered()
 # pandas 重新赋值
 right.loc[right["dt"] < dt, "y"] = 10
 # pandas 自动推断并转换类型
@@ -66,6 +67,12 @@ for i in df.select_dtypes(include=np.number).columns:
     print(i)
 for i in df.select_dtypes(include=np.int64).columns:
     df[i] = df[i].astype(np.int32)
+
+int64_cols = df.select_dtypes(include=np.int64).columns
+for i in set(df.dtypes):
+    print(i)
+    print(sorted(list(df.dtypes[df.dtypes == i].index)))
+df[int64_cols] = df[int64_cols].astype(np.int32)
 print("-----------------------------------------")
 # 这些默认生成的都是series
 print(left.dtypes)
@@ -171,3 +178,9 @@ df3 = pd.DataFrame(
 )
 # 针对为NaN的也是ok的，NaN不会进行判定
 df3["num_bin"] = pd.cut(df3["num1"], bins=[float("-inf"), 10, 30, 60, float("inf")])
+
+
+from pandas_profiling import ProfileReport
+
+profile = ProfileReport(df3, title="Pandas Profiling Report",minimal=True)
+profile.to_file("profile_report.html")
