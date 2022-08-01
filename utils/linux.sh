@@ -356,3 +356,7 @@ tar -caf file.tgz ./file --exclude=./file/save
 # 1. dns: domain name server。linux解析域名 nslookup
 # 1. 域名比如www.baidu.com 和 ip 是一一对应的
 # 1. 常见域名http的端口是80，https是443
+
+# DVC 设置
+echo $HADOOP_HOME
+export CLASSPATH=`$HADOOP_HOME/bin/hdfs classpath --glob`
