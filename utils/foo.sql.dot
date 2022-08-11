@@ -1,0 +1,13 @@
+digraph g {
+size="10,7.5"
+;ratio="auto"
+;page="8.5,11";
+graph [
+rankdir = "LR"
+];
+node [fontsize = "16"
+shape = "ellipse"
+];
+edge [
+];
+}

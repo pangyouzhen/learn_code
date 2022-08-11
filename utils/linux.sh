@@ -360,3 +360,7 @@ tar -caf file.tgz ./file --exclude=./file/save
 # DVC 设置
 echo $HADOOP_HOME
 export CLASSPATH=`$HADOOP_HOME/bin/hdfs classpath --glob`
+
+# 自己启动的服务优先使用，sqlite, 其他的数据库安装复杂，而且自己功能只需要存储
+sqlite3 mlruns.db
+mlflow server --backend-store-uri sqlite:///mlruns.db --default-artifact-root=mlruns --host 0.0.0.0 --port 5000
