@@ -1,0 +1,6 @@
+graph G {
+    艾利斯威特[label="艾利斯.威特\n石油大亨"]
+    /* Relationships */
+    F1 -- shortName[label=""]
+
+}
