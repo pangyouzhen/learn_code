@@ -330,7 +330,8 @@ chmod a+x get-fonts.sh
 
 # 将文件夹的下的所有todo替换成TODO
 grep -irlZ todo ./* | xargs -0 sed -i 's/todo/TODO/gI'
-
+apt-get install default-jre
+apt-get install default-jdk
 # 找到今天的文件并移动
 find /mnt/c/Users/pang/Downloads/ -type f -newermt 2022-03-21 -exec mv {} /mnt/d/project/tianchi/model/  \;
 
