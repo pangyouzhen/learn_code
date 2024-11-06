@@ -68,7 +68,7 @@ class AsyncDf:
         ind, rows = ind_query
         content = tuple(rows[self.df_request_name].tolist())
         data = self.data % content
-        with (await self.sema):
+        async with self.sema:
             async with aiohttp.ClientSession() as session:
                 resp = await session.request(self.method, self.url, data=data, **self.kwargs)
                 await asyncio.sleep(0.5)

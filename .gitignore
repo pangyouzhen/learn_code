@@ -27,3 +27,4 @@ pd_ml/ld/*
 venv
 *exe
 z.sh
+.history
