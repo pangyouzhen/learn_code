@@ -3,12 +3,9 @@ import datetime
 from typing import Tuple, List
 
 import aiohttp
-import numpy as np
 import pandas as pd
 from loguru import logger
-
-
-# logger.add("./a.log")
+import uncurl
 
 def run_time_wraps(func):
     def wrapper(*args, **kwargs):
@@ -20,120 +17,74 @@ def run_time_wraps(func):
         last_time = end_time - start_time
         print(f"last_time is {last_time}")
         return res
-
     return wrapper
 
-
 class AsyncDf:
-    """
-    针对dataframe的异步请求封装
-    """
+    """针对dataframe的异步请求封装，使用单个session"""
 
     def __init__(self, df: pd.DataFrame, df_response: str, df_request_name: List[str],
                  sema: int = 30, **kwargs):
-        """
-        df: 请求的df, 最后保存结果的 df
-        df_request_name: 请求列的列名称 对应 curl -D 中需要格式化的字符串, 需要uuid的用户需要在df中自行构建
-        df_response: 保存在df的响应列的列名称
-        sema: 协程数目
-        **kwargs : aiohttp.ClientSession().request中的参数
-        """
-        self.data = kwargs["data"]
+        self.data = kwargs.pop("data")
         self.df_response = df_response
-        self.sema = asyncio.BoundedSemaphore(sema)
-        self.df = df
         self.df_request_name = df_request_name
         self.kwargs = kwargs
-        self.url = self.kwargs["url"]
-        self.method = self.kwargs["method"]
-        # 下面参数在kwargs中移除
-        self.remove_kwargs()
+        self.url = self.kwargs.pop("url")
+        self.method = self.kwargs.pop("method")
+        self.sema = asyncio.BoundedSemaphore(sema)
+        self.df = df.copy() # 创建副本，避免修改原始DataFrame
+        self.session = None # 初始化session为None
 
-    def remove_kwargs(self):
-        # data在 aiohttp.ClientSession().request 中是变化的
-        self.kwargs.pop("data")
-        # url,method在 aiohttp.ClientSession().request 中是固定参数
-        self.kwargs.pop("url")
-        self.kwargs.pop("method")
-        # 下面参数 aiohttp.ClientSession().request 中没法识别
-        self.kwargs.pop("verify")
-        self.kwargs.pop("auth")
-        self.kwargs.pop("cookies")
-
-    @logger.catch()
+    @logger.catch
     async def _process_url(self, ind_query: Tuple) -> None:
-        """
-        :type ind_query: 元组，第一个为index，第二个为需要格式化的内容，
-        """
-        ind, rows = ind_query
-        content = tuple(rows[self.df_request_name].tolist())
+        ind, row = ind_query
+        content = tuple(row[self.df_request_name].tolist())
         data = self.data % content
         async with self.sema:
-            async with aiohttp.ClientSession() as session:
-                resp = await session.request(self.method, self.url, data=data, **self.kwargs)
-                await asyncio.sleep(0.5)
+            try:
+                resp = await self.session.request(self.method, self.url, data=data, **self.kwargs) # 使用self.session
                 self.df.loc[ind, self.df_response] = await resp.text()
+            except (aiohttp.ClientError, asyncio.TimeoutError) as e: # 添加TimeoutError处理
+                logger.error(f"Error processing row {ind}: {e}")
+                self.df.loc[ind, self.df_response] = f"Error: {e}" # 记录错误信息到DataFrame
+            except Exception as e:
+                logger.exception(f"Unexpected error processing row {ind}: {e}") # 记录完整异常信息
+                self.df.loc[ind, self.df_response] = f"Unexpected Error: {e}"
 
     async def _gather_data(self):
-        await asyncio.gather(
-            *[self._process_url((ind, row)) for ind, row in self.df.iterrows()])
+        tasks = [self._process_url((ind, row)) for ind, row in self.df.iterrows()]
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     @run_time_wraps
     def run(self) -> pd.DataFrame:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._gather_data())
-        loop.close()
+        async def run_async(): # 定义一个内部async函数
+            async with aiohttp.ClientSession() as session: # 在这里创建session
+                self.session = session # 将session赋值给self.session
+                await self._gather_data()
+                self.session = None # 请求完成后将session置为None
+        try:
+            loop.run_until_complete(run_async())
+        except asyncio.CancelledError:
+            logger.warning("Operation cancelled.")
+        finally:
+            loop.close()
         return self.df
-
-    def __call__(self):
-        # 是否pre_process, post_process
-        return self.run()
 
     @classmethod
     def from_curl(cls, df, curl_cmd, df_response, df_request_name, sema=30):
-        """
-        inputs: POSTMAN - curl
-        """
-        import uncurl
-        curl_cmd = curl_cmd.replace(" -L", "")
-        curl_cmd = curl_cmd.replace("--data-raw", "-d")
+        curl_cmd = curl_cmd.replace(" -L", "").replace("--data-raw", "-d")
         context = uncurl.parse_context(curl_cmd)
         context_kwargs = context._asdict()
-        return AsyncDf(df=df, df_response=df_response, df_request_name=df_request_name, sema=sema, **context_kwargs)
-
-    def pre_process(self):
-        return self.df
-
-    def post_process(self):
-        return self.df
-
+        return cls(df=df, df_response=df_response, df_request_name=df_request_name, sema=sema, **context_kwargs)
 
 if __name__ == '__main__':
-    # rand_num = np.random.randint(500, size=(10000, 3))
-    # df = pd.DataFrame(rand_num)
-    # df.columns = ["user1", "user2", "user3"]
-    # df_request_name = ["user1", "user2"]
-    df = pd.read_csv("")
-    df = df.drop_duplicates("query")
-    logger.info(f'{df.len = }')
+    df = pd.DataFrame({'query': ['你好', '世界', 'Python', '编程']})
     curl_cmd = """
-    curl -L -X POST 'https://fanyi.baidu.com/langdetect' \
-    -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0' \
-    -H 'Accept: */*' \
-    -H 'Accept-Language: en-US,en;q=0.5' \
-    -H 'Accept-Encoding: gzip, deflate, br' \
+    curl -X POST 'https://fanyi.baidu.com/langdetect' \
     -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
-    -H 'X-Requested-With: XMLHttpRequest' \
-    -H 'Origin: https://fanyi.baidu.com' \
-    -H 'Connection: keep-alive' \
-    -H 'Referer: https://fanyi.baidu.com/' \
-    -H 'Sec-Fetch-Dest: empty' \
-    -H 'Sec-Fetch-Mode: cors' \
-    -H 'Sec-Fetch-Site: same-origin' \
-    -H 'Cookie: BAIDUID=5205CCF1BE28D5ECBFA955B10D527899:FG=1' \
     --data-raw 'query=%s'
     """
-    #
     async_df = AsyncDf.from_curl(df, curl_cmd, "baidu_langs", df_request_name=["query"], sema=20)
     df = async_df()
-    df.to_csv("baidu_lang.csv",index=False)
+    print(df)
+    # df.to_csv("baidu_lang.csv", index=False)
