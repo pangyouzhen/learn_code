@@ -1,11 +1,12 @@
 import asyncio
 import datetime
-from typing import Tuple, List
+from typing import List, Tuple
 
 import aiohttp
 import pandas as pd
-from loguru import logger
 import uncurl
+from loguru import logger
+
 
 def run_time_wraps(func):
     def wrapper(*args, **kwargs):
@@ -55,10 +56,10 @@ class AsyncDf:
         await asyncio.gather(*tasks, return_exceptions=True)
 
     @run_time_wraps
-    def run(self) -> pd.DataFrame:
+    def run(self, timeout=None) -> pd.DataFrame:
         loop = asyncio.get_event_loop()
         async def run_async(): # 定义一个内部async函数
-            async with aiohttp.ClientSession() as session: # 在这里创建session
+            async with aiohttp.ClientSession(timeout=timeout) as session: # 在这里创建session
                 self.session = session # 将session赋值给self.session
                 await self._gather_data()
                 self.session = None # 请求完成后将session置为None
@@ -84,7 +85,8 @@ if __name__ == '__main__':
     -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
     --data-raw 'query=%s'
     """
+    timeout = aiohttp.ClientTimeout(total=None)
     async_df = AsyncDf.from_curl(df, curl_cmd, "baidu_langs", df_request_name=["query"], sema=20)
-    df = async_df()
+    df = async_df.run(timeout=timeout)
     print(df)
     # df.to_csv("baidu_lang.csv", index=False)
